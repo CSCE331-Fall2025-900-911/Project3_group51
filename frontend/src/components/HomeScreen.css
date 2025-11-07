@@ -1,0 +1,145 @@
+/* Styles for HomeScreen.jsx */
+
+.home-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 90%;
+  margin: auto;
+  font-family: Arial, sans-serif;
+  text-align: center;
+  border: 1px solid #ccc;
+  position: relative; 
+}
+
+/* 1. Top Header */
+.home-header {
+  padding: 10px; /* Reduced padding to match OrderScreen */
+  display: flex;
+  justify-content: space-between; /* This pushes title to center */
+  align-items: center;
+  border-bottom: 1px solid #ccc;
+}
+
+/* New title style, inspired by OrderScreen's menu-title */
+.home-title {
+  font-size: 1.5rem; /* 24px */
+  background: #ddd;
+  padding: 8px 20px;
+  border-radius: 10px;
+  margin: 0; /* Remove default h1 margin */
+}
+
+.nav-btn {
+  font-size: 18px;
+  padding: 12px 24px;
+  border-radius: 30px;
+  border: 1px solid #aaa;
+  background-color: #f0f0f0;
+  cursor: pointer;
+}
+.nav-btn:hover {
+  background-color: #e0e0e0;
+}
+
+/* New placeholder style to balance the flexbox */
+.nav-placeholder {
+  /* This invisible element takes up the same space 
+     as the language button to keep the title centered. */
+  width: 130px; /* Approximate width of the language button */
+  visibility: hidden;
+}
+
+
+/* 2. Language Dropdown */
+.language-dropdown {
+  position: absolute;
+  top: 70px; /* Position below the nav bar */
+  right: 15px; /* Align to the right */
+  width: 150px;
+  border: 1px solid #ccc;
+  background-color: white;
+  z-index: 100;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+.language-dropdown button {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  border: none;
+  background: white;
+  cursor: pointer;
+  text-align: left;
+}
+.language-dropdown button:hover {
+  background-color: #f0f0f0;
+}
+
+/* 3. Main Content (Weather) */
+.home-main {
+  flex-grow: 1; 
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  gap: 20px;
+}
+
+.weather-box {
+  width: 250px;
+  border: 1px solid #aaa;
+  padding: 15px;
+  font-size: 18px;
+}
+.weather-temp {
+  font-size: 28px;
+  font-weight: bold;
+  margin: 5px 0;
+}
+.weather-image {
+  flex-grow: 1;
+  width: 80%;
+  border: 1px solid #aaa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  color: #888;
+  background-color: #f9f9f9;
+}
+
+/* 4. Footer (Action Buttons) */
+.home-footer {
+  padding: 20px;
+  border-top: 1px solid #ccc;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+}
+
+.start-button {
+  font-size: 32px;
+  font-weight: bold;
+  padding: 40px 60px;
+  border-radius: 50px;
+  border: 2px solid #000;
+  background-color: #f9f9f9;
+  cursor: pointer;
+}
+.start-button:hover {
+  background-color: #e0e0e0;
+}
+
+.login-button {
+  font-size: 20px;
+  padding: 15px 30px;
+  border-radius: 30px;
+  border: 1px solid #aaa;
+  background-color: #f0f0f0;
+  cursor: pointer;
+}
+.login-button:hover {
+  background-color: #e0e0e0;
+}
