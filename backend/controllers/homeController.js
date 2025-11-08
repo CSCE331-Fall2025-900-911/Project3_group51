@@ -14,10 +14,16 @@ export const goToHome = async (req, res) => {
             return res.status(response.status).send("Weather API error");
         }
         const data = await response.json();
-        console.log(data);
         const temp = data.main.temp;
         const desc = data.weather[0].description;
-        res.send(`Welcome! Today the weather in ${city} is ${desc} and it’s ${temp}°F`);
+        const name = data.name;
+
+        // send json request to frontend
+        res.json({
+            city: name,
+            temperature: temp,
+            description: desc,
+        });
     }catch(err){
         console.error("Error: ", err);
         res.status(500).send("Server error retrieving weather");

@@ -1,20 +1,22 @@
 import express from "express";
 import dotenv from "dotenv";
 import pkg from "pg";
+import cors from "cors";
+
 import homeRoutes from './routers/homeRoutes.js';
 import menuRoutes from './routers/menuRoutes.js';
 import orderRoutes from './routers/orderRoutes.js';
 import checkoutRoutes from './routers/checkoutRoutes.js';
 import managementRoutes from './routers/managementRoutes.js';
+
 const { Pool } = pkg;
 
 dotenv.config();
 
-
-
 // Create express app
 const app = express();
 const port = 3000;
+app.use(cors());
 
 // Create pool
 const pool = new Pool({
@@ -26,7 +28,7 @@ const pool = new Pool({
     ssl: {rejectUnauthorized: false}
 });
 
-// Add process hook to shutdown pool
+// Add process hook to shutdown pool                  
 process.on('SIGINT', function() {
     pool.end();
     console.log('Application successfully shutdown');
@@ -39,7 +41,7 @@ app.set("view engine", "ejs");
 // Routers
 
 // Home 
-app.use('/', homeRoutes);
+app.use('/api/home', homeRoutes);
 
 // Menu
 app.use('/api/menu', menuRoutes);
