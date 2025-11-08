@@ -1,11 +1,16 @@
 import express from "express";
 import dotenv from "dotenv";
 import pkg from "pg";
+import homeRoutes from './routers/homeRoutes.js';
+import menuRoutes from './routers/menuRoutes.js';
+import orderRoutes from './routers/orderRoutes.js';
+import checkoutRoutes from './routers/checkoutRoutes.js';
+import managementRoutes from './routers/managementRoutes.js';
 const { Pool } = pkg;
 
 dotenv.config();
 
-import menuRoutes from './routers/menuRoutes.js'
+
 
 // Create express app
 const app = express();
@@ -30,25 +35,23 @@ process.on('SIGINT', function() {
 	 	 	 	
 app.set("view engine", "ejs");
 
-// Home page: adjust here show the image of weather, and a button direct to order page
-app.get('/', (req, res) => {
-    const data = {name: 'Thien'};
-    res.render('index', data);
-});
 
 // Routers
 
-// Menu API
+// Home 
+app.use('/', homeRoutes);
+
+// Menu
 app.use('/api/menu', menuRoutes);
 
-// // Order API
-// app.use('/api/orders', orderRoutes);
+// Order
+app.use('/api/orders', orderRoutes);
 
-// // Payment API
-// app.use('/api/payemnt', paymentRoutes);
+// Payment
+app.use('/api/checkout', checkoutRoutes);
 
-// // Management API
-// app.use("/api/management", managementRoutes);
+// Management
+app.use("/api/management", managementRoutes);
 
 // Testing page
 app.get('/user', (req, res) => {
@@ -66,5 +69,5 @@ app.get('/user', (req, res) => {
 });
 
 app.listen(port, () => {
-    console.log(`Example app listening at http://localhost:${port}`);
+    console.log(`App is listening at http://localhost:${port}`);
 });
