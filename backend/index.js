@@ -1,6 +1,11 @@
-const express = require('express');
-const { Pool } = require('pg');
-const dotenv = require('dotenv').config();
+import express from "express";
+import dotenv from "dotenv";
+import pkg from "pg";
+const { Pool } = pkg;
+
+dotenv.config();
+
+import menuRoutes from './routers/menuRoutes.js'
 
 // Create express app
 const app = express();
@@ -25,11 +30,27 @@ process.on('SIGINT', function() {
 	 	 	 	
 app.set("view engine", "ejs");
 
+// Home page: adjust here show the image of weather, and a button direct to order page
 app.get('/', (req, res) => {
-    const data = {name: 'Clayton'};
+    const data = {name: 'Thien'};
     res.render('index', data);
 });
 
+// Routers
+
+// Menu API
+app.use('/api/menu', menuRoutes);
+
+// // Order API
+// app.use('/api/orders', orderRoutes);
+
+// // Payment API
+// app.use('/api/payemnt', paymentRoutes);
+
+// // Management API
+// app.use("/api/management", managementRoutes);
+
+// Testing page
 app.get('/user', (req, res) => {
     teammembers = []
     pool
