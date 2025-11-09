@@ -1,41 +1,46 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
 import "./OrderScreen.css";
+import { getMenu } from "../api/menu.js"; // 1. Import your new API function
 
-// Receives 'cart' as a prop from App.jsx
 function OrderScreen({ cart }) { 
   
   const [menuItems, setMenuItems] = useState([]);
   const [categories, setCategories] = useState([]);
   const [showLanguage, setShowLanguage] = useState(false);
+  const [error, setError] = useState(null); // State for error handling
   const navigate = useNavigate(); 
 
+  // 2. This useEffect now fetches real data
   useEffect(() => {
-    // Using dummy data as requested
-    const dummyItems = Array.from({ length: 8 }).map((_, i) => ({
-      drinkid: i + 1, 
-      drinkname: `Item Name ${i + 1}`,
-      category: `Category ${ (i % 3) + 1 }`,
-      price: (7.79 + i).toFixed(2)
-    }));
-    
-    setMenuItems(dummyItems);
-    const uniqueCategories = [...new Set(dummyItems.map(item => item.category))];
-    setCategories(uniqueCategories);
+    // Call the API function
+    getMenu()
+      .then(data => {
+        setMenuItems(data); // Store the fetched menu items in state
+        
+        // Automatically get unique categories from the data
+        const uniqueCategories = [...new Set(data.map(item => item.category))];
+        setCategories(uniqueCategories);
+      })
+      .catch(err => {
+        console.error("Failed to fetch menu:", err);
+        setError("Could not load menu. Please try again later.");
+      });
   }, []); // [] means this runs only once
 
   const handleItemClick = (item) => {
-    // Navigate to customization screen, passing the item data
     navigate(`/order/${item.drinkid}`, { state: { item: item } });
   };
 
-  // --- Calculate Subtotal ---
-  // Use .reduce() to sum up all prices in the cart
-  // Start the sum (accumulator) at 0
+  // Calculate Subtotal
   const subtotal = cart.reduce((acc, item) => {
-    // Convert the price string (e.g., "8.79") to a number and add it
     return acc + parseFloat(item.price); 
   }, 0);
+
+  // Show error message if API fails
+  if (error) {
+    return <div className="menu-page"><p>{error}</p></div>
+  }
 
   return (
     <div className="menu-page">
@@ -63,7 +68,7 @@ function OrderScreen({ cart }) {
 
       {/* Main Content */}
       <div className="content">
-        {/* Sidebar Categories */}
+        {/* Sidebar Categories (now dynamic) */}
         <aside className="categories">
           <h2>Categories</h2>
           {categories.map((category, i) => (
@@ -73,7 +78,7 @@ function OrderScreen({ cart }) {
           ))}
         </aside>
 
-        {/* Menu Grid */}
+        {/* Menu Grid (now shows real data) */}
         <main className="menu-grid">
           {menuItems.map((item) => (
             <button 
@@ -81,7 +86,7 @@ function OrderScreen({ cart }) {
               className="menu-item" 
               onClick={() => handleItemClick(item)} 
             >
-              <div className="item-image">Item Image</div>
+              <div className="item-image">Item Image</div> {/* Placeholder */}
               <div className="item-name">{item.drinkname}</div>
               <div className="item-price">${item.price}</div>
             </button>
@@ -95,7 +100,6 @@ function OrderScreen({ cart }) {
           <h3>Current Order:</h3>
         </div>
         <div className="order-items">
-          {/* Map over the cart and display each item */}
           {cart.length === 0 ? (
             <p>Your cart is empty.</p>
           ) : (
@@ -107,7 +111,6 @@ function OrderScreen({ cart }) {
           )}
         </div>
         
-        {/* Display the calculated subtotal, formatted to 2 decimal places */}
         <div className="subtotal">
           Subtotal: ${subtotal.toFixed(2)}
         </div>

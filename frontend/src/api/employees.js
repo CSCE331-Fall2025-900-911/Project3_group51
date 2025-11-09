@@ -1,6 +1,10 @@
-const API = import.meta.env.REACT_APP_API_URL || "http://localhost:3000/api";
+// The environment variable MUST start with VITE_
+const API = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
 
 export async function validateUser(first, last) {
+    // Log the API path for debugging
+    console.log(`Validating user at: ${API}/employees/validate?first=${first}&last=${last}`);
+    
     const res = await fetch(`${API}/employees/validate?first=${first}&last=${last}`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return res.json();
