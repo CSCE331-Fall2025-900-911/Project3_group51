@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import express from "express";
 import dotenv from "dotenv";
 import pkg from "pg";
@@ -12,22 +13,21 @@ import managementRoutes from './routers/managementRoutes.js';
 const { Pool } = pkg;
 
 dotenv.config();
+=======
+const express = require('express');
+const cors = require('cors');
+require('dotenv').config({ path: '../.env' });
 
-// Create express app
+>>>>>>> main
+
 const app = express();
 const port = 3000;
 app.use(cors());
 
-// Create pool
-const pool = new Pool({
-    user: process.env.PSQL_USER,
-    host: process.env.PSQL_HOST,
-    database: process.env.PSQL_DATABASE,
-    password: process.env.PSQL_PASSWORD,
-    port: process.env.PSQL_PORT,
-    ssl: {rejectUnauthorized: false}
-});
+app.use(cors());
+app.use(express.json());
 
+<<<<<<< HEAD
 // Add process hook to shutdown pool                  
 process.on('SIGINT', function() {
     pool.end();
@@ -73,3 +73,17 @@ app.get('/user', (req, res) => {
 app.listen(port, () => {
     console.log(`App is listening at http://localhost:${port}`);
 });
+=======
+// Import routes
+app.use('/api/employees', require('./db/routes/employees'));
+app.use('/api/menu', require('./db/routes/menu'));
+app.use('/api/orders', require('./db/routes/orders'));
+app.use('/api/orderitems', require('./db/routes/orderitems'));
+app.use('/api/stock', require('./db/routes/stock'));
+app.use('/api/reports', require('./db/routes/reports'));
+app.use('/api/zreport', require('./db/routes/zreport'));
+
+app.get('/', (_, res) => res.send('POS API running'));
+
+app.listen(port, () => console.log(`Server running on port ${port}`));
+>>>>>>> main
