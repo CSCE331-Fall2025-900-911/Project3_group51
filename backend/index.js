@@ -20,4 +20,4 @@ app.use('/api/zreport', require('./db/routes/zreport'));
 
 app.get('/', (_, res) => res.send('POS API running'));
 
-app.listen(port, () => console.log(`Server running on port ${port}`));
+app.listen(port, () => console.log(`Server running on http://localhost:${port}`));

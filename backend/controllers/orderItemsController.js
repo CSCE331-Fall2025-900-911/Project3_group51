@@ -26,7 +26,7 @@ exports.getOrderItem = async (req, res) => {
 exports.deleteOrderItem = async (req, res) => {
   try {
     await orderItemsDB.deleteOrderItem(req.params.id);
-    res.json({ message: 'Deleted' });
+    res.json({ message: 'Order Deleted' });
   } catch (e) {
     res.status(500).json({ error: e.message });
   }

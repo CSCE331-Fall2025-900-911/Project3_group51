@@ -6,7 +6,7 @@ exports.createOrder = async (req, res) => {
   try {
     const { employeeid } = req.body;
     const id = await ordersDB.createOrder(employeeid);
-    res.status(201).json({ message: `Created new order with #id${id}` });
+    res.status(201).json({ message: `Created new order #${id}` });
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
