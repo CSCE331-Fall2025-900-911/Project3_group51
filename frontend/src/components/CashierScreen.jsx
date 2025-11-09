@@ -1,8 +1,25 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./CashierScreen.css";
+import { getMenu } from "../api/menu";
 
 export default function CashierScreen() {
-  const [selectedCat, setSelectedCat] = useState(null);
+  const [menuItems, setMenuItems] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [activeCategory, setActiveCategory] = useState("");
+
+  // Load menu data
+  useEffect(() => {
+    getMenu()
+      .then((data) => {
+        setMenuItems(data);
+        const unique = [...new Set(data.map((i) => i.category))];
+        setCategories(unique);
+        setActiveCategory(unique[0]); // ✅ Always have one active
+      })
+      .catch((err) => console.error("Error fetching menu:", err));
+  }, []);
+
+  const filteredItems = menuItems.filter((i) => i.category === activeCategory);
 
   return (
     <div className="cashier-root">
@@ -13,30 +30,36 @@ export default function CashierScreen() {
         <div className="hdr-name">Cashier</div>
       </div>
 
-      {/* Main area */}
       <div className="main">
-        {/* Left grid with categories + menu items */}
-        <div className="grid">
+        {/* LEFT SIDE — CATEGORIES + ITEMS */}
+        <div className="left-side">
           {/* Categories */}
-          {Array.from({ length: 5 }).map((_, i) => (
-            <button
-              key={`cat-${i}`}
-              className={`cat ${selectedCat === i ? "active" : ""}`}
-              onClick={() => setSelectedCat(i)}
-            >
-              Category {i + 1}
-            </button>
-          ))}
+          <div className="categories-bar">
+            {categories.map((cat) => (
+              <button
+                key={cat}
+                className={`cat ${activeCategory === cat ? "active" : ""}`}
+                onClick={() => setActiveCategory(cat)}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
 
-          {/* Menu item placeholders */}
-          {Array.from({ length: 20 }).map((_, i) => (
-            <button key={`cell-${i}`} className="cell">
-              -
-            </button>
-          ))}
+          {/* Scrollable Item Grid */}
+          <div className="grid">
+            {filteredItems.map((item) => (
+              <button key={item.drinkid} className="cell">
+                <div className="item-name">{item.drinkname}</div>
+                <div className="item-price">
+                  ${Number(item.price).toFixed(2)}
+                </div>
+              </button>
+            ))}
+          </div>
         </div>
 
-        {/* Right order panel */}
+        {/* RIGHT SIDE — ORDER PANEL */}
         <div className="side">
           <div className="order-box" />
           <div className="total-bar">$0.00</div>
