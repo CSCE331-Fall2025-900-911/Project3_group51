@@ -17,7 +17,6 @@ function OrderScreen({ cart }) {
     getMenu()
       .then(data => {
         setMenuItems(data); // Store the fetched menu items in state
-        
         // Automatically get unique categories from the data
         const uniqueCategories = [...new Set(data.map(item => item.category))];
         setCategories(uniqueCategories);
@@ -30,6 +29,10 @@ function OrderScreen({ cart }) {
 
   const handleItemClick = (item) => {
     navigate(`/order/${item.drinkid}`, { state: { item: item } });
+  };
+
+  const handleCheckout = () => {
+    navigate('/checkout'); // Navigate to the new route
   };
 
   // Calculate Subtotal
@@ -115,7 +118,9 @@ function OrderScreen({ cart }) {
           Subtotal: ${subtotal.toFixed(2)}
         </div>
         
-        <button className="checkout-btn">Checkout</button>
+        <button className="checkout-btn" onClick={handleCheckout}>
+          Checkout
+        </button>
       </footer>
     </div>
   );

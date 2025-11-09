@@ -1,0 +1,170 @@
+/* frontend/src/components/CheckoutScreen.css */
+.checkout-page {
+  width: 90%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #aaa;
+  margin: auto;
+  font-family: sans-serif;
+  background-color: #fff;
+}
+
+.checkout-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid #aaa;
+}
+
+.back-btn {
+  font-size: 16px;
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: 1px solid #aaa;
+  background-color: #f0f0f0;
+  cursor: pointer;
+}
+.back-btn:hover {
+  background-color: #e0e0e0;
+}
+
+.checkout-title {
+  font-size: 1.5rem;
+  background: #ddd;
+  padding: 8px 20px;
+  border-radius: 10px;
+  margin: 0;
+  /* Add an invisible placeholder to keep title centered */
+  margin-right: calc(50% - 100px); /* Adjust 100px as needed */
+  transform: translateX(50%);
+}
+
+.checkout-content {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* Left Side */
+.payment-options {
+  flex: 2; /* Takes 2/3 of the space */
+  padding: 20px;
+  border-right: 1px solid #aaa;
+}
+
+.payment-options h2 {
+  font-size: 1rem;
+  font-weight: bold;
+  margin-bottom: 15px;
+  text-align: left;
+}
+
+.payment-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.payment-btn {
+  border: 1px solid #aaa;
+  background: #f9f9f9;
+  border-radius: 8px;
+  padding: 20px;
+  font-size: 20px;
+  cursor: pointer;
+  min-height: 120px;
+}
+.payment-btn:hover {
+  background-color: #f0f0f0;
+}
+.payment-btn.selected {
+  background-color: #c0e0c0;
+  border-color: #006400;
+  font-weight: bold;
+}
+
+/* Right Sidebar */
+.summary-sidebar {
+  flex: 1; /* Takes 1/3 of the space */
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  background-color: #f9f9f9;
+}
+
+.summary-box {
+  border: 1px solid #aaa;
+  border-radius: 8px;
+  background: #fff;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+.summary-box h3 {
+  padding: 10px;
+  border-bottom: 1px solid #aaa;
+  text-align: center;
+}
+
+.summary-items {
+  padding: 10px;
+  overflow-y: auto;
+  flex-grow: 1;
+}
+
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+.summary-total {
+  display: flex;
+  justify-content: space-between;
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-top: 15px;
+  padding: 10px;
+  border: 1px solid #aaa;
+  background: #fff;
+  border-radius: 8px;
+}
+
+/* This is the default style for all total rows */
+.summary-total {
+  display: flex;
+  justify-content: space-between;
+  font-size: 1.1rem;
+  margin-top: 10px;
+  padding: 10px;
+  border: 1px solid #aaa;
+  background: #fff;
+  border-radius: 8px;
+}
+
+/* Style for subtotal and tax (less important) */
+.subtotal-row, .tax-row {
+  font-size: 1.0rem;
+  font-weight: normal;
+  color: #555;
+  background: #f9f9f9;
+}
+
+/* Style for the main Total row (bold) */
+.total-row {
+  font-size: 1.3rem;
+  font-weight: bold;
+  margin-top: 15px;
+}
+
+/* Style for the Balance row (red, bold) */
+.balance-row {
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #d32f2f; /* Red color to show amount due */
+  border-color: #d32f2f;
+  margin-top: 15px;
+}

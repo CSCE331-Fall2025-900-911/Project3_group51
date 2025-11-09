@@ -31,18 +31,34 @@ function CustomizationScreen({addToCart}) {
     });
   };
 
-  const handleConfirm = () => {
-    // We will calculate the final price with toppings later
-    const finalPrice = parseFloat(item.price); // Placeholder
+const handleConfirm = () => {
+    
+    // 1. Get the base price of the drink
+    let basePrice = parseFloat(item.price);
+    
+    // 2. Calculate the total price of selected toppings
+    let toppingsPrice = 0;
+    toppings.forEach(toppingName => {
+      // Find the topping object in the options array
+      const topping = toppingOptions.find(opt => opt.name === toppingName);
+      if (topping) {
+        // Convert price string (e.g., "+0.75") to a number
+        toppingsPrice += parseFloat(topping.price);
+      }
+    });
+
+    // 3. Calculate the final price
+    const finalPrice = basePrice + toppingsPrice;
     
     // Create the item object to add to the cart
     const customizedItem = {
       id: item.drinkid,
-      name: item.drinkname,
-      price: finalPrice.toFixed(2),
+      name: `${item.drinkname} (Custom)`, // Add "(Custom)" to the name
+      price: finalPrice.toFixed(2), // Use the new final price
       ice: iceLevel,
       sugar: sugarLevel,
-      toppings: toppings
+      toppings: toppings,
+      quantity: 1
     };
     
     // Call the function passed down from App.jsx
