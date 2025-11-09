@@ -1,5 +1,5 @@
 const express = require('express');
-const pool = require('../db/pool');
+const pool = require('../pool');
 const router = express.Router();
 
 // Sales report
