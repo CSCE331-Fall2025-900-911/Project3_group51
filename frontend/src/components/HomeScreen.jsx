@@ -32,7 +32,7 @@ function HomeScreen() {
   };
   
   const handleEmployeeLogin = () => {
-    console.log("Employee Login button clicked");
+    navigate('/login')
   };
 
   return (

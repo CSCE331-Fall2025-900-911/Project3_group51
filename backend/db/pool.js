@@ -1,6 +1,7 @@
-// db/pool.js
 const { Pool } = require('pg');
 require('dotenv').config();
+
+const isProduction = process.env.NODE_ENV === 'production';
 
 const pool = new Pool({
   user: process.env.PSQL_USER,
@@ -8,13 +9,7 @@ const pool = new Pool({
   database: process.env.PSQL_DATABASE,
   password: process.env.PSQL_PASSWORD,
   port: process.env.PSQL_PORT,
-  ssl: { rejectUnauthorized: false },
-});
-
-process.on('SIGINT', async () => {
-  await pool.end();
-  console.log('DB pool closed.');
-  process.exit(0);
+  ssl: isProduction ? { rejectUnauthorized: false } : false,
 });
 
 module.exports = pool;

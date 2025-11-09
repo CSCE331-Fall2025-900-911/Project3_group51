@@ -5,6 +5,7 @@ import { Routes, Route} from 'react-router-dom';
 import HomeScreen from './components/HomeScreen.jsx';
 import OrderScreen from './components/OrderScreen.jsx';
 import CustomizationScreen from './components/CustomizationScreen.jsx'; 
+import LoginScreen from './components/LoginScreen.jsx'; 
 
 function App() {
   
@@ -32,6 +33,11 @@ function App() {
         <Route 
           path="/order/:drinkid" 
           element= {<CustomizationScreen addToCart={addToCart} />}
+        />
+        {}
+        <Route 
+          path="/login" 
+          element= {<LoginScreen/>}
         />
       </Routes>
     </>
