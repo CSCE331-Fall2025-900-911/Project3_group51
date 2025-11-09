@@ -7,14 +7,32 @@ function HomeScreen() {
   const [showLanguage, setShowLanguage] = useState(false);
   const [weather, setWeather] = useState(null);
 
-  useEffect(() => {
-  fetch("http://localhost:3000/api/home/weather")
-    .then(res => res.json())
-    .then(data => {
+useEffect(() => {
+  const fetchWeather = async () => {
+    const API_KEY = import.meta.env.VITE_OPENWEATHER_API_KEY;
+
+    if (!API_KEY) {
+      console.error("Missing OpenWeather API key (frontend/.env.local). Must start with VITE_");
+      return;
+    }
+
+    const lat = '30.6280';
+    const lon = '-96.3344';
+
+    try {
+      const res = await fetch(
+        `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=imperial`
+      );
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
       setWeather(data);
-    })
-    .catch(err => console.error("Failed to fetch weather from backend:", err));
-}, []); 
+    } catch (err) {
+      console.error("Failed to fetch weather data:", err);
+    }
+  };
+
+  fetchWeather();
+}, []);
 
   const handleStartOrder = () => {
     navigate('/order'); 
@@ -54,18 +72,18 @@ function HomeScreen() {
 
       {/* Main content and footer remain the same */}
       <main className="home-main">
-        {/* ... (weather box code) ... */}
-      <div className="weather-box">
-        {weather ? (
+        {/* Weather box */}
+        <div className="weather-box">
+          {weather ? (
             <>
-              <p>{weather.city}</p>
-              <p className="weather-temp">{Math.round(weather.temperature)}°F</p>
-              <p>{weather.description}</p>
+              <p>{weather.name}</p>
+              <p className="weather-temp">{Math.round(weather.main.temp)}°F</p>
+              <p>{weather.weather[0].description}</p>
             </>
           ) : (
             <p>Loading Weather...</p>
           )}
-     </div>
+        </div>
             
         <div className="weather-image">
           {weather && weather.main && weather.main.temp > 60 ? (
