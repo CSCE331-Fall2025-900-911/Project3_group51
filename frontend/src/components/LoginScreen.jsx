@@ -34,7 +34,7 @@ const LoginPage = () => {
         }
 
         // Redirect based on role
-        if (role.toLowerCase() === "cashier") navigate("/cashier");
+        if (role.toLowerCase() === "employee") navigate("/cashier");
         else if (role.toLowerCase() === "manager") navigate("/management");
         else navigate("/");
 
