@@ -6,6 +6,7 @@ import CustomizationScreen from './components/CustomizationScreen.jsx';
 import LoginScreen from './components/LoginScreen.jsx'; 
 import CheckoutScreen from './components/CheckoutScreen.jsx';
 import ConfirmationScreen from './components/ConfirmationScreen.jsx'; 
+import CashierScreen from './components/CashierScreen.jsx';
 
 function App() {
   
@@ -46,6 +47,11 @@ function App() {
           element= {<ConfirmationScreen />}
         />
 
+        {}
+        <Route 
+          path="/cashier" 
+          element= {<CashierScreen/>}
+        />
       </Routes>
     </>
   );
