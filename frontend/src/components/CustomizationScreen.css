@@ -1,0 +1,130 @@
+/* Styles for CustomizationScreen.jsx */
+.custom-page {
+  width: 90%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #aaa;
+  margin: auto;
+  padding: 20px;
+  font-family: sans-serif;
+  background-color: #fff;
+}
+
+.custom-title {
+  text-align: center;
+  background: #ddd;
+  padding: 8px 20px;
+  border-radius: 10px;
+  width: fit-content;
+  margin: 0 auto 20px auto;
+  font-size: 1.5rem;
+}
+
+.custom-content {
+  display: flex;
+  flex-direction: row;
+  flex-grow: 1;
+  gap: 30px; /* Space between columns */
+}
+
+.custom-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.custom-section {
+  margin-bottom: 25px;
+}
+
+.custom-section h2 {
+  font-size: 1rem; /* 16px */
+  font-weight: bold;
+  margin-bottom: 10px;
+  text-align: left;
+  color: #333;
+}
+
+.custom-grid {
+  display: grid;
+  gap: 15px;
+}
+
+.grid-2-col {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.option-btn {
+  border: 1px solid #aaa;
+  background: #f9f9f9;
+  border-radius: 8px;
+  padding: 20px;
+  font-size: 16px;
+  cursor: pointer;
+  text-align: center;
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.option-btn:hover {
+  background-color: #f0f0f0;
+}
+
+/* Style for selected buttons */
+.option-btn.selected {
+  background-color: #c0e0c0; /* Light green */
+  border-color: #006400; /* Dark green border */
+  font-weight: bold;
+  box-shadow: 0 0 5px rgba(0,100,0,0.3);
+}
+
+.option-btn.topping {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.topping-price {
+  font-size: 0.9em;
+  color: #555;
+}
+
+/* Style for disabled topping buttons */
+.option-btn:disabled {
+  background-color: #f0f0f0;
+  color: #aaa;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+.option-btn:disabled.selected {
+  background-color: #c0e0c0; /* Still show selected */
+  color: #333;
+  opacity: 1;
+}
+
+.custom-textarea {
+  width: 100%;
+  font-size: 16px;
+  padding: 10px;
+  border: 1px solid #aaa;
+  border-radius: 8px;
+}
+
+.confirm-btn {
+  background-color: #4CAF50; /* Green from wireframe */
+  border: none;
+  color: white;
+  padding: 20px 40px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 24px;
+  font-weight: bold;
+  margin-top: auto; /* Pushes button to the bottom */
+  cursor: pointer;
+  border-radius: 10px;
+}
+.confirm-btn:hover {
+  background-color: #45a049;
+}

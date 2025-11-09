@@ -1,21 +1,38 @@
-import React from 'react';
+// frontend/src/App.jsx
+
+import React, { useState } from 'react'; 
 import { Routes, Route} from 'react-router-dom';
-import HomeScreen from './components/HomeScreen'; //HomeScreen
-import OrderScreen from './components/OrderScreen'; //OrderScreen
+import HomeScreen from './components/HomeScreen.jsx';
+import OrderScreen from './components/OrderScreen.jsx';
+import CustomizationScreen from './components/CustomizationScreen.jsx'; 
 
 function App() {
+  
+  // Create the "cart" state here, in the parent component
+  const [cart, setCart] = useState([]);
+
+  // Create a function to add an item to the cart
+  const addToCart = (item) => {
+    setCart(prevCart => [...prevCart, item]);
+    console.log("Cart updated:", [...cart, item]);
+  };
+
   return (
     <>
-      {/* Routes controller swap Screens */}
       <Routes>
-        {/* Route 1: The default path "/" shows the HomeScreen */}
         <Route path="/" element= {<HomeScreen/>}/>
-        {/* Route 2: The default path "/" shows the HomeScreen */}
-        <Route path="/order" element= {<OrderScreen/>}/>
-        {/* We can add the "/management" route here later for the employee login */}
-        {/* <Route path="/management" element={<ManagementScreen />} /> */}
-  
-        {/* Add more routes*/}
+        
+        {/* 4. Pass the 'cart' state down to OrderScreen */}
+        <Route 
+          path="/order" 
+          element= {<OrderScreen cart={cart} />}
+        />
+        
+        {/* 5. Pass the 'addToCart' function down to CustomizationScreen */}
+        <Route 
+          path="/order/:drinkid" 
+          element= {<CustomizationScreen addToCart={addToCart} />}
+        />
       </Routes>
     </>
   );

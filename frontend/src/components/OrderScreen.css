@@ -17,6 +17,7 @@ button:hover{
   flex-direction: column;
   border: 1px solid #aaa;
   margin: auto;
+  position: relative; /* This is needed for the dropdown */
 }
 
 /* Header */
@@ -144,4 +145,28 @@ button:hover{
   border-radius: 20px;
   padding: 8px 20px;
   cursor: pointer;
+}
+
+/* Add the language-dropdown styles (copied from HomeScreen.css) */
+.language-dropdown {
+  position: absolute;
+  top: 70px; /* Position below the nav bar */
+  right: 15px; /* Align to the right */
+  width: 150px;
+  border: 1px solid #ccc;
+  background-color: white;
+  z-index: 100;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+.language-dropdown button {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  border: none;
+  background: white;
+  cursor: pointer;
+  text-align: left;
+}
+.language-dropdown button:hover {
+  background-color: #f0f0f0;
 }
