@@ -10,6 +10,13 @@ npm install express dotenv node-fetch
 ```
 
 # Run
+
+## Frontend
+### In Developement
+```bash
+npm run dev
+```
+
 ## Backend
 
 ### In Production
