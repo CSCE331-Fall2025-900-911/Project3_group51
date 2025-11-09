@@ -6,6 +6,7 @@ import HomeScreen from './components/HomeScreen.jsx';
 import OrderScreen from './components/OrderScreen.jsx';
 import CustomizationScreen from './components/CustomizationScreen.jsx'; 
 import LoginScreen from './components/LoginScreen.jsx'; 
+import CashierScreen from './components/CashierScreen.jsx';
 
 function App() {
   
@@ -38,6 +39,11 @@ function App() {
         <Route 
           path="/login" 
           element= {<LoginScreen/>}
+        />
+        {}
+        <Route 
+          path="/cashier" 
+          element= {<CashierScreen/>}
         />
       </Routes>
     </>
