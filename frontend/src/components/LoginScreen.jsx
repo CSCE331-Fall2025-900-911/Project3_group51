@@ -15,33 +15,38 @@ const LoginPage = () => {
     setLoading(true);
 
     try {
-    
-        let firstLower = first.toLowerCase();
-        let lastLower = last.toLowerCase();
-        
-        const { exists } = await validateUser(firstLower, lastLower);
-        if (!exists) {
+      const firstLower = first.trim().toLowerCase();
+      const lastLower  = last.trim().toLowerCase();
+
+      const { exists } = await validateUser(firstLower, lastLower);
+      if (!exists) {
         setError("Employee not found.");
         setLoading(false);
         return;
-        }
+      }
 
-        const { role } = await getUserRole(firstLower, lastLower);
-        if (!role) {
+      const { role } = await getUserRole(firstLower, lastLower);
+      if (!role) {
         setError("User role not found.");
         setLoading(false);
         return;
-        }
+      }
 
-        // Redirect based on role
-        if (role.toLowerCase() === "employee") navigate("/cashier");
-        else if (role.toLowerCase() === "manager") navigate("/management");
-        else navigate("/");
+      // save user and redirect
+      localStorage.setItem(
+        "user",
+        JSON.stringify({ first: firstLower, last: lastLower, role })
+      );
+
+      const r = role.toLowerCase();
+      if (r === "cashier") navigate("/order", { replace: true });
+      else if (r === "manager") navigate("/management", { replace: true });
+      else navigate("/", { replace: true });
 
     } catch (err) {
-        setError("Error: " + err.message);
+      setError("Error: " + err.message);
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
   };
 
