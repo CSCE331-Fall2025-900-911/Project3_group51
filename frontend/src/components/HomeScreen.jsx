@@ -31,7 +31,7 @@ useEffect(() => {
     }
   };
 
-  fetchWeather();
+  // fetchWeather();
 }, []);
 
   const handleStartOrder = () => {
