@@ -1,6 +1,6 @@
 
 // Get the API base URL from the environment variable
-const API = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
+const API = import.meta.env.VITE_API_URL;
 
 /**
  * Creates a new blank order in the database.
