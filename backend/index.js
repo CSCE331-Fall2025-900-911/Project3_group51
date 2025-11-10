@@ -1,34 +1,18 @@
 // backend/index.js
 
-// 2. dotenv.config() is already done, so this line is no longer needed
-require('dotenv').config({ path: './.env' });
+// 1. Load environment variables AT THE TOP from the correct path
+require('dotenv').config({ path: '../.env' });
 
 const express = require('express');
 const cors = require('cors');
-
-const allowedOrigins = [
-  'http://localhost:5173',                  // local dev
-  process.env.FRONTEND_PRODUCTION_URL // production frontend from .env
-];
-
+// 2. dotenv.config() is already done, so this line is no longer needed
+// require('dotenv').config(); 
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = 3000;
 
-// Set up cors policy
-app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin) return callback(null, true); // allow requests with no origin
-    if (allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      console.log('Blocked by CORS:', origin);
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true
-}));
-
+// ... (rest of the file is the same) ...
+app.use(cors());
 app.use(express.json());
 
 // Import routes
