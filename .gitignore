@@ -11,3 +11,7 @@ backend/db/.DS_Store
 node_modules/
 dist/
 build/
+.psql
+# Ignore .env files
+.env
+.env.*

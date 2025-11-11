@@ -10,14 +10,14 @@ function OrderScreen({ cart }) {
   const [showLanguage, setShowLanguage] = useState(false);
   const [error, setError] = useState(null); // State for error handling
   const navigate = useNavigate(); 
+  const [selectedCategory, setSelectedCategory] = useState(null);
 
-  // 2. This useEffect now fetches real data
+  // This useEffect now fetches real data
   useEffect(() => {
     // Call the API function
     getMenu()
       .then(data => {
         setMenuItems(data); // Store the fetched menu items in state
-        
         // Automatically get unique categories from the data
         const uniqueCategories = [...new Set(data.map(item => item.category))];
         setCategories(uniqueCategories);
@@ -30,6 +30,14 @@ function OrderScreen({ cart }) {
 
   const handleItemClick = (item) => {
     navigate(`/order/${item.drinkid}`, { state: { item: item } });
+  };
+
+  const handleCategoryClick = (category) => {
+    setSelectedCategory(category);
+  };
+
+  const handleCheckout = () => {
+    navigate('/checkout'); // Navigate to the new route
   };
 
   // Calculate Subtotal
@@ -71,8 +79,21 @@ function OrderScreen({ cart }) {
         {/* Sidebar Categories (now dynamic) */}
         <aside className="categories">
           <h2>Categories</h2>
+          {/* "All" button to clear the filter */}
+          <button 
+            className={`category-btn ${!selectedCategory ? 'selected' : ''}`}
+            onClick={() => handleCategoryClick(null)}
+          >
+            All
+          </button>
+          
+          {/* Dynamic category buttons */}
           {categories.map((category, i) => (
-            <button key={i} className="category-btn">
+            <button 
+              key={i} 
+              className={`category-btn ${selectedCategory === category ? 'selected' : ''}`}
+              onClick={() => handleCategoryClick(category)}
+            >
               {category}
             </button>
           ))}
@@ -80,17 +101,29 @@ function OrderScreen({ cart }) {
 
         {/* Menu Grid (now shows real data) */}
         <main className="menu-grid">
-          {menuItems.map((item) => (
-            <button 
-              key={item.drinkid} 
-              className="menu-item" 
-              onClick={() => handleItemClick(item)} 
-            >
-              <div className="item-image">Item Image</div> {/* Placeholder */}
-              <div className="item-name">{item.drinkname}</div>
-              <div className="item-price">${item.price}</div>
-            </button>
-          ))}
+          {menuItems
+            // Filter the list before mapping
+            .filter(item => {
+              // If no category is selected (null), show all items
+              if (!selectedCategory) {
+                return true; 
+              }
+              // Otherwise, only show items that match the selected category
+              return item.category === selectedCategory;
+            })
+            // Map over the *filtered* list
+            .map((item) => (
+              <button 
+                key={item.drinkid} 
+                className="menu-item" 
+                onClick={() => handleItemClick(item)} 
+              >
+                <div className="item-image">Item Image</div>
+                <div className="item-name">{item.drinkname}</div>
+                <div className="item-price">${item.price}</div>
+              </button>
+            ))
+          }
         </main>
       </div>
 
@@ -115,7 +148,9 @@ function OrderScreen({ cart }) {
           Subtotal: ${subtotal.toFixed(2)}
         </div>
         
-        <button className="checkout-btn">Checkout</button>
+        <button className="checkout-btn" onClick={handleCheckout}>
+          Checkout
+        </button>
       </footer>
     </div>
   );
