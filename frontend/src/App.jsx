@@ -7,6 +7,10 @@ import LoginScreen from './components/LoginScreen.jsx';
 import CheckoutScreen from './components/CheckoutScreen.jsx';
 import ConfirmationScreen from './components/ConfirmationScreen.jsx'; 
 import CashierScreen from './components/CashierScreen.jsx';
+import ManagementMenu from "./components/ManagementScreen.jsx";
+import TrendsScreen from "./components/TrendsScreen.jsx";
+import InventoryScreen from "./components/InventoryScreen.jsx";
+import ProtectedRoute from "./components/ProtectedRoute.jsx";
 
 function App() {
   
@@ -52,6 +56,26 @@ function App() {
           path="/cashier" 
           element= {<CashierScreen/>}
         />
+              {/* Management entry page */}
+      <Route
+        path="/management"
+        element={
+            <ManagementMenu />
+        }
+      />
+         {/* Management sub-pages */}
+      <Route
+        path="/management/trends"
+        element={
+            <TrendsScreen />
+        }
+      />
+      <Route
+        path="/management/inventory"
+        element={
+            <InventoryScreen />
+        }
+      />
       </Routes>
     </>
   );

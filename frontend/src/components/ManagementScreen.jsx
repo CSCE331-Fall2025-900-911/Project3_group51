@@ -2,7 +2,7 @@ import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./ManagementScreen.css";
 
-export default function ManagementMenu() {
+export default function ManagementScreen() {
   const navigate = useNavigate();
 
   return (
