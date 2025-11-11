@@ -1,16 +1,4 @@
-# macOS junk
-.DS_Store
-backend/.DS_Store
-backend/db/.DS_Store
-
-# Environment files
-.env*
-.env.production
-
-# Dependencies & build
 node_modules/
-dist/
-build/
 .psql
 # Ignore .env files
 .env
