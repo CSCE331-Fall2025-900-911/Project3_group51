@@ -1,0 +1,141 @@
+/* ================================
+   Shared management styles
+   Used by TrendsScreen & InventoryScreen
+   ================================ */
+
+   .mgmt-wrap {
+    max-width: 1100px;
+    margin: 2rem auto;
+    padding: 1rem 1.25rem;
+  }
+  
+  .mgmt-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+  }
+  
+  /* Buttons & tabs */
+  .btn,
+  .tabs button {
+    cursor: pointer;
+    padding: 0.5rem 0.9rem;
+    border: 1px solid #cfd6e4;
+    border-radius: 8px;
+    background: #f7f9fc;
+  }
+  
+  .tabs {
+    display: flex;
+    gap: 0.5rem;
+  }
+  
+  /* Cards & tables */
+  .card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 1rem;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  }
+  
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .table th,
+  .table td {
+    text-align: left;
+    padding: 0.6rem 0.5rem;
+    border-bottom: 1px solid #eef2f7;
+  }
+  
+  /* Status text */
+  .error   { color: #b91c1c; margin: 0.5rem 0; }
+  .loading { color: #6b7280; }
+  .low     { color: #b91c1c; font-weight: 600; }
+  .muted   { color: #9aa3b2; }
+  
+  /* ================================
+     Management Menu layout
+     Used by ManagementMenu.jsx
+     ================================ */
+  
+  .mgmt-menu-wrap {
+    height: 100vh;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    background: #fafafa;
+  }
+  
+  /* Scope the header so it doesn't override the shared .mgmt-header */
+  .mgmt-menu-wrap .mgmt-header {
+    width: 100%;
+    max-width: 900px;
+    margin-bottom: 3rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .mgmt-main {
+    flex: 1;
+    width: 100%;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+  }
+  
+  .menu-buttons {
+    display: flex;
+    gap: 4rem;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 2rem;
+  }
+  
+  .menu-btn {
+    border: none;
+    border-radius: 12px;
+    padding: 2rem 3rem;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #fff;
+    text-decoration: none;
+    background: #3b82f6;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s, background 0.2s;
+  }
+  
+  .menu-btn:hover {
+    background: #2563eb;
+    transform: translateY(-3px);
+  }
+  
+  .back-btn {
+    padding: 0.5rem 1rem;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-weight: 500;
+    color: #111827;
+    background: #f3f4f6;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  
+  .back-btn:hover {
+    background: #e5e7eb;
+  }
+  
+  .hint {
+    margin-top: 1rem;
+    color: #9ca3af;
+  }
+  
