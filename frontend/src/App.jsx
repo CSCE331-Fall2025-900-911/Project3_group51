@@ -11,6 +11,7 @@ import ManagementMenu from "./components/ManagementScreen.jsx";
 import TrendsScreen from "./components/TrendsScreen.jsx";
 import InventoryScreen from "./components/InventoryScreen.jsx";
 import MenuManagementScreen from "./components/MenuManagementScreen.jsx";
+import EmployeeManagementScreen from "./components/EmployeeManagementScreen.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import MagnifyControls from './components/MagnifyControls.jsx';
 
@@ -81,6 +82,10 @@ function App() {
       <Route
         path="/management/menu"
         element={<MenuManagementScreen />}
+      />
+      <Route
+        path="/management/employees"
+        element={<EmployeeManagementScreen />}
       />
       </Routes>
     </>
