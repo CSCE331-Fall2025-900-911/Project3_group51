@@ -17,39 +17,22 @@ const credentials = new Credentials(keyId, keySecret);
 
 const lara = new Translator(credentials);
 
-// Convert language to lara language code
-const LANG_MAP = {
-  english: "en-US",
-  español: "es-ES",
-  francis: "fr-FR",
-  italino: "it-IT",
-  "tiếng việt": "vi-VN",
-};
-
 // POST /api/translate
 router.post("/", async (req, res) => {
   try {
-    const { text, targetLang } = req.body;
+    const { text, targetLangCode} = req.body;
     // Validate input
-    if (!text || !targetLang) {
+    if (!text || !targetLangCode) {
+        if (!targetLangCode) console.log("code missing");
+
         return res.status(400).json({
             error: "Both 'text' and 'targetLang' are required.",
         });
     }
 
-    const formatLang = targetLang.trim().toLowerCase();
-    if (!LANG_MAP[formatLang]) {
-        return res.status(400).json({
-            error: `Unsupported target language: '${targetLang}'`,
-            supported: Object.keys(LANG_MAP),
-        });
-    }
-    
-    const mappedLang = LANG_MAP[formatLang];
-    // Calling Lara Translation api
-    console.log("Translate", text, "en-uS to", mappedLang);
-    const result = await lara.translate(text, "en-US", mappedLang);
-
+   
+  // Calling Lara Translation api
+    const result = await lara.translate(text, "en-US", targetLangCode);
 
     // Return translated text
     return res.json({
