@@ -2,12 +2,11 @@ import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../context/UserContext"; 
 
-const API = import.meta.env.VITE_API_URL;
+const API = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
 
 const LoginPage = () => {
   const navigate = useNavigate();
   const { user, loading } = useUser(); 
-
   useEffect(() => {
     if (!loading && user) {
       const role = user.role.trim().toLowerCase();
@@ -19,6 +18,7 @@ const LoginPage = () => {
   const googleLogin = () => {
     window.location.href = `${API}/auth/google`;
   };
+
   if (loading || user) {
     return <div style={styles.container}><h1>Loading...</h1></div>
   }
@@ -29,6 +29,14 @@ const LoginPage = () => {
       <div style={styles.form}>
         <button onClick={googleLogin} style={styles.googleButton}>
           Sign in with Google
+        </button>
+      
+        <button
+          type="button"
+          onClick={() => navigate("/")}
+          style={styles.secondaryButton}
+        >
+          Back to Welcome
         </button>
       </div>
     </div>
@@ -44,6 +52,15 @@ const styles = {
     flexDirection: "column",
     background: "#f5f5f5",
   },
+  secondaryButton: {
+    background: "transparent",
+    color: "#1976d2",
+    padding: "0.5rem",
+    fontSize: "0.9rem",
+    border: "none",
+    cursor: "pointer",
+    textDecoration: "underline",
+  },
   title: {
     marginBottom: "1rem",
   },
@@ -56,6 +73,7 @@ const styles = {
     boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
     gap: "1rem",
   },
+
   googleButton: { 
     background: "#4285F4", // Google Blue
     color: "white",

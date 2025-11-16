@@ -30,7 +30,7 @@ function App() {
         
         <Route 
           path="/order" 
-          element= {<OrderScreen cart={cart} />}
+          element= {<OrderScreen cart={cart} setCart={setCart} />}
         />
         
         <Route 
@@ -55,37 +55,28 @@ function App() {
 
         <Route 
           path="/cashier" 
-          element={
-            <ProtectedRoute requireRole="employee">
-              <CashierScreen/>
-            </ProtectedRoute>
-          }
+          element= {<CashierScreen cart={cart} setCart={setCart} />}
         />
-        
-        <Route
-          path="/management"
-          element={
-            <ProtectedRoute requireRole="manager">
-              <ManagementMenu />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/management/trends"
-          element={
-            <ProtectedRoute requireRole="manager">
-              <TrendsScreen />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/management/inventory"
-          element={
-            <ProtectedRoute requireRole="manager">
-              <InventoryScreen />
-            </ProtectedRoute>
-          }
-        />
+        {/* Management entry page */}
+      <Route
+        path="/management"
+        element={
+            <ManagementMenu />
+        }
+      />
+         {/* Management sub-pages */}
+      <Route
+        path="/management/trends"
+        element={
+            <TrendsScreen />
+        }
+      />
+      <Route
+        path="/management/inventory"
+        element={
+            <InventoryScreen />
+        }
+      />
       </Routes>
     </>
   );
