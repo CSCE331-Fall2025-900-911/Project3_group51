@@ -51,31 +51,39 @@ function App() {
           element= {<ConfirmationScreen />}
         />
 
-        {}
         <Route 
           path="/cashier" 
-          element= {<CashierScreen/>}
+          element={
+            <ProtectedRoute requireRole="employee">
+              <CashierScreen/>
+            </ProtectedRoute>
+          }
         />
-              {/* Management entry page */}
-      <Route
-        path="/management"
-        element={
-            <ManagementMenu />
-        }
-      />
-         {/* Management sub-pages */}
-      <Route
-        path="/management/trends"
-        element={
-            <TrendsScreen />
-        }
-      />
-      <Route
-        path="/management/inventory"
-        element={
-            <InventoryScreen />
-        }
-      />
+        
+        <Route
+          path="/management"
+          element={
+            <ProtectedRoute requireRole="manager">
+              <ManagementMenu />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/management/trends"
+          element={
+            <ProtectedRoute requireRole="manager">
+              <TrendsScreen />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/management/inventory"
+          element={
+            <ProtectedRoute requireRole="manager">
+              <InventoryScreen />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </>
   );

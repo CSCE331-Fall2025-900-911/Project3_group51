@@ -5,11 +5,16 @@ import "./ManagementScreen.css";
 export default function ManagementScreen() {
   const navigate = useNavigate();
 
+  const handleLogout = () =>{
+    localStorage.removeItem("user");
+    navigate("/login");
+  }
+
   return (
     <div className="mgmt-menu-wrap">
       <header className="mgmt-header">
         <h1>Management</h1>
-        <button className="btn back-btn" onClick={() => navigate("/login")}>
+        <button className="btn back-btn" onClick={handleLogout}>
           ⬅ Back to Login
         </button>
       </header>
