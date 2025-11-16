@@ -7,6 +7,10 @@ import LoginScreen from './components/LoginScreen.jsx';
 import CheckoutScreen from './components/CheckoutScreen.jsx';
 import ConfirmationScreen from './components/ConfirmationScreen.jsx'; 
 import CashierScreen from './components/CashierScreen.jsx';
+import ManagementMenu from "./components/ManagementScreen.jsx";
+import TrendsScreen from "./components/TrendsScreen.jsx";
+import InventoryScreen from "./components/InventoryScreen.jsx";
+import ProtectedRoute from "./components/ProtectedRoute.jsx";
 
 function App() {
   
@@ -47,10 +51,38 @@ function App() {
           element= {<ConfirmationScreen />}
         />
 
-        {}
         <Route 
           path="/cashier" 
-          element= {<CashierScreen/>}
+          element={
+            <ProtectedRoute requireRole="employee">
+              <CashierScreen/>
+            </ProtectedRoute>
+          }
+        />
+        
+        <Route
+          path="/management"
+          element={
+            <ProtectedRoute requireRole="manager">
+              <ManagementMenu />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/management/trends"
+          element={
+            <ProtectedRoute requireRole="manager">
+              <TrendsScreen />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/management/inventory"
+          element={
+            <ProtectedRoute requireRole="manager">
+              <InventoryScreen />
+            </ProtectedRoute>
+          }
         />
       </Routes>
     </>
