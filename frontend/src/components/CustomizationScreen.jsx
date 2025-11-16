@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import './CustomizationScreen.css'; // CSS file we will create next
 
@@ -7,7 +7,17 @@ function CustomizationScreen({addToCart}) {
   const navigate = useNavigate();
   
   const location = useLocation();
-  const { item } = location.state; // item = { drinkid: 1, drinkname: "...", price: "..." }
+  const locationState = location.state || {};
+  const { item } = locationState; // item = { drinkid: 1, drinkname: "...", price: "..." }
+  const orderOrigin = locationState.origin || 'customer';
+  const returnTo =
+    locationState.returnTo || (orderOrigin === 'cashier' ? '/cashier' : '/order');
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem("orderOrigin", orderOrigin);
+    }
+  }, [orderOrigin]);
 
   const [iceLevel, setIceLevel] = useState('Regular Ice');
   const [sugarLevel, setSugarLevel] = useState('100% Sugar');
@@ -51,6 +61,7 @@ const handleConfirm = () => {
     const finalPrice = basePrice + toppingsPrice;
     
     // Create the item object to add to the cart
+    const uniqueSuffix = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
     const customizedItem = {
       id: item.drinkid,
       name: `${item.drinkname} (Custom)`, // Add "(Custom)" to the name
@@ -58,14 +69,17 @@ const handleConfirm = () => {
       ice: iceLevel,
       sugar: sugarLevel,
       toppings: toppings,
-      quantity: 1
+      quantity: 1,
+      isCustom: true,
+      cartItemId: `${item.drinkid}-${uniqueSuffix}`,
+      origin: orderOrigin,
     };
     
     // Call the function passed down from App.jsx
     addToCart(customizedItem);
 
-    // Navigate back to the order screen
-    navigate('/order');
+    // Navigate back to the originating screen
+    navigate(returnTo);
   };
   
   // --- Data for the buttons (from wireframe) ---

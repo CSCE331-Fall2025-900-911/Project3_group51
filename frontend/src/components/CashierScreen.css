@@ -71,18 +71,18 @@
 
 .cell {
   display: flex;
-  flex-direction: column; /* ✅ Stack name + price */
+  flex-direction: column; /* Stack name + price */
   align-items: center;
   justify-content: center;
   border: 1px solid #c7ced6;
   border-radius: 6px;
   background: linear-gradient(#fefefe, #f3f3f3);
-  cursor: pointer;
   font-size: 16px;
   transition: background 0.15s;
   padding: 8px;
   text-align: center;
   box-sizing: border-box;
+  cursor: pointer;
 }
 
 .item-name {
@@ -99,7 +99,6 @@
   padding: 2px 6px;
 }
 
-
 .cell:hover {
   background: #e8ebf0;
 }
@@ -115,19 +114,110 @@
   border-left: 1px solid #c7ced6;
 }
 
+.btn {
+  border: 1px solid #8da2b5;
+  background: #fff;
+  border-radius: 6px;
+  padding: 8px 18px;
+  cursor: pointer;
+}
+
 .order-box {
   flex: 1;
   background: white;
   border: 1px solid #d0d4d9;
   border-radius: 6px;
   margin-bottom: 10px;
+  padding: 12px;
+  overflow-y: auto;
+}
+
+.order-items-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.order-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #e6eaef;
+  padding-bottom: 8px;
+}
+
+.order-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.order-name {
+  font-weight: 600;
+}
+
+.order-price {
+  font-size: 16px;
+}
+
+.order-unit {
+  font-size: 12px;
+  color: #6b7a8c;
+}
+
+.order-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.quantity-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.control-btn {
+  width: 28px;
+  height: 28px;
+  border: 1px solid #a2b4c5;
+  border-radius: 4px;
+  background: #fff;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+.qty {
+  min-width: 24px;
+  text-align: center;
+}
+
+.delete-btn {
+  border: 1px solid #e89a9a;
+  background: #ffe5e5;
+  border-radius: 4px;
+  padding: 4px 8px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.empty-state {
+  color: #6b7a8c;
+  text-align: center;
+  padding: 20px 0;
 }
 
 .total-bar {
   background: lightgreen;
-  text-align: center;
-  padding: 8px;
-  font-size: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 16px;
+  font-size: 18px;
   font-weight: bold;
   border-radius: 6px;
 }
@@ -143,4 +233,15 @@
 
 .checkout:hover {
   background: #5eb4e6;
+}
+
+.checkout:disabled {
+  background: #c7d8e6;
+  cursor: not-allowed;
+}
+
+.side-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }

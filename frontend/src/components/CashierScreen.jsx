@@ -3,45 +3,92 @@ import "./CashierScreen.css";
 import { getMenu } from "../api/menu";
 import { useNavigate } from "react-router-dom";
 
-export default function CashierScreen() {
+export default function CashierScreen({ cart = [], setCart }) {
   const [menuItems, setMenuItems] = useState([]);
   const [categories, setCategories] = useState([]);
   const [activeCategory, setActiveCategory] = useState("");
   const navigate = useNavigate();
+  const parseCurrency = (value) => {
+    const num = parseFloat(value);
+    return Number.isNaN(num) ? 0 : num;
+  };
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem("orderOrigin", "cashier");
+    }
+  }, []);
 
   const handleLoginClick = () => {
     navigate("/login");
   };
 
-  // Load menu data
   useEffect(() => {
     getMenu()
       .then((data) => {
         setMenuItems(data);
         const unique = [...new Set(data.map((i) => i.category))];
         setCategories(unique);
-        setActiveCategory(unique[0]); // ✅ Always have one active
+        if (unique.length > 0) setActiveCategory(unique[0]);
       })
       .catch((err) => console.error("Error fetching menu:", err));
   }, []);
 
-  const filteredItems = menuItems.filter((i) => i.category === activeCategory);
+  const filteredItems =
+    activeCategory === ""
+      ? menuItems
+      : menuItems.filter((i) => i.category === activeCategory);
+
+  const handleCustomize = (item) => {
+    navigate(`/order/${item.drinkid}`, {
+      state: { item, returnTo: "/cashier", origin: "cashier" },
+    });
+  };
+
+  const handleRemoveItem = (index) => {
+    if (!setCart) return;
+    setCart((prev = []) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleQuantityChange = (index, delta) => {
+    if (!setCart) return;
+    setCart((prev = []) => {
+      if (!prev[index]) return prev;
+      const next = [...prev];
+      const current = next[index];
+      const currentQty = current.quantity ?? 1;
+      const updatedQty = Math.max(0, currentQty + delta);
+      if (updatedQty === 0) {
+        next.splice(index, 1);
+      } else {
+        next[index] = { ...current, quantity: updatedQty };
+      }
+      return next;
+    });
+  };
+
+  const subtotal = cart.reduce(
+    (sum, item) => sum + parseCurrency(item.price) * (item.quantity ?? 1),
+    0
+  );
+
+  const handleCheckout = () => {
+    if (!cart.length) return;
+    navigate("/checkout", { state: { returnTo: "/cashier" } });
+  };
 
   return (
     <div className="cashier-root">
-      {/* Header */}
       <div className="hdr">
         <button className="btn" onClick={handleLoginClick}>
           Login
         </button>
-        <div className="hdr-title">Order</div>
+        <div className="hdr-title">Cashier Order</div>
         <div className="hdr-name">Cashier</div>
       </div>
 
       <div className="main">
-        {/* LEFT SIDE — CATEGORIES + ITEMS */}
         <div className="left-side">
-          {/* Categories */}
           <div className="categories-bar">
             {categories.map((cat) => (
               <button
@@ -54,10 +101,13 @@ export default function CashierScreen() {
             ))}
           </div>
 
-          {/* Scrollable Item Grid */}
           <div className="grid">
             {filteredItems.map((item) => (
-              <button key={item.drinkid} className="cell">
+              <button
+                key={item.drinkid}
+                className="cell"
+                onClick={() => handleCustomize(item)}
+              >
                 <div className="item-name">{item.drinkname}</div>
                 <div className="item-price">
                   ${Number(item.price).toFixed(2)}
@@ -67,11 +117,74 @@ export default function CashierScreen() {
           </div>
         </div>
 
-        {/* RIGHT SIDE — ORDER PANEL */}
         <div className="side">
-          <div className="order-box" />
-          <div className="total-bar">$0.00</div>
-          <button className="checkout">Checkout</button>
+          <div className="order-box">
+            {cart.length === 0 ? (
+              <div className="empty-state">Select items to begin an order.</div>
+            ) : (
+              <ul className="order-items-list">
+                {cart.map((item, index) => {
+                  const qty = item.quantity ?? 1;
+                  const unit = parseCurrency(item.price);
+                  const lineTotal = unit * qty;
+                  return (
+                    <li
+                      key={item.cartItemId || `${item.id}-${index}`}
+                      className="order-row"
+                    >
+                      <div className="order-info">
+                        <span className="order-name">{item.name}</span>
+                        <span className="order-price">
+                          ${lineTotal.toFixed(2)}
+                        </span>
+                        <span className="order-unit">
+                          ${unit.toFixed(2)} ea
+                        </span>
+                      </div>
+                      <div className="order-actions">
+                        <div className="quantity-controls">
+                          <button
+                            className="control-btn"
+                            onClick={() => handleQuantityChange(index, -1)}
+                          >
+                            -
+                          </button>
+                          <span className="qty">{qty}</span>
+                          <button
+                            className="control-btn"
+                            onClick={() => handleQuantityChange(index, 1)}
+                          >
+                            +
+                          </button>
+                        </div>
+                        <button
+                          className="delete-btn"
+                          onClick={() => handleRemoveItem(index)}
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </div>
+
+          <div className="total-bar">
+            <div>Subtotal</div>
+            <div>${subtotal.toFixed(2)}</div>
+          </div>
+
+          <div className="side-actions">
+            <button
+              className="checkout"
+              onClick={handleCheckout}
+              disabled={!cart.length}
+            >
+              Checkout
+            </button>
+          </div>
         </div>
       </div>
     </div>

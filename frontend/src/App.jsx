@@ -28,7 +28,7 @@ function App() {
         
         <Route 
           path="/order" 
-          element= {<OrderScreen cart={cart} />}
+          element= {<OrderScreen cart={cart} setCart={setCart} />}
         />
         
         <Route 
@@ -54,7 +54,7 @@ function App() {
         {}
         <Route 
           path="/cashier" 
-          element= {<CashierScreen/>}
+          element= {<CashierScreen cart={cart} setCart={setCart} />}
         />
               {/* Management entry page */}
       <Route
