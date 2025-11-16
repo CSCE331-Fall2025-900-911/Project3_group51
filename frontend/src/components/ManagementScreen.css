@@ -1,4 +1,3 @@
-
 /* ================================
    Shared management styles
    Used by TrendsScreen & InventoryScreen
@@ -25,11 +24,45 @@
     border: 1px solid #cfd6e4;
     border-radius: 8px;
     background: #f7f9fc;
+    font-size: 0.9rem;
   }
   
   .tabs {
     display: flex;
     gap: 0.5rem;
+  }
+  
+  /* Small controls row used in Inventory & Trends */
+  .mgmt-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    gap: 1rem;
+    font-size: 0.9rem;
+  }
+  
+  .mgmt-controls-right {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  
+  .mgmt-controls .btn {
+    padding: 0.35rem 0.7rem;
+  }
+  
+  .btn-active {
+    background: #3b82f6;
+    color: #fff;
+    border-color: #2563eb;
+  }
+  
+  /* low-stock toggler */
+  .low-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
   }
   
   /* Cards & tables */
@@ -59,9 +92,55 @@
   .low     { color: #b91c1c; font-weight: 600; }
   .muted   { color: #9aa3b2; }
   
+  /* Inventory highlights */
+  .low-row {
+    background: #fef2f2;
+  }
+  
+  .low-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.15rem 0.55rem;
+    border-radius: 9999px;
+    background: #fee2e2;
+    color: #b91c1c;
+    font-size: 0.8rem;
+    font-weight: 500;
+  }
+  
+  .ok-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.15rem 0.55rem;
+    border-radius: 9999px;
+    background: #ecfdf3;
+    color: #166534;
+    font-size: 0.8rem;
+  }
+  
+  /* Trends mini chart */
+  .trends-caption {
+    margin-bottom: 0.5rem;
+  }
+  
+  .trend-bar-wrap {
+    position: relative;
+    width: 100%;
+    height: 0.75rem;
+    border-radius: 9999px;
+    background: #eef2f7;
+    overflow: hidden;
+  }
+  
+  .trend-bar {
+    height: 100%;
+    border-radius: 9999px;
+    background: #3b82f6;
+  }
+  
   /* ================================
      Management Menu layout
-     Used by ManagementMenu.jsx
+     Used by ManagementScreen.jsx
      ================================ */
   
   .mgmt-menu-wrap {
