@@ -11,6 +11,7 @@ import ManagementMenu from "./components/ManagementScreen.jsx";
 import TrendsScreen from "./components/TrendsScreen.jsx";
 import InventoryScreen from "./components/InventoryScreen.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
+import MagnifyControls from './components/MagnifyControls.jsx';
 
 function App() {
   
@@ -23,6 +24,7 @@ function App() {
 
   return (
     <>
+      <MagnifyControls />
       <Routes>
         <Route path="/" element= {<HomeScreen/>}/>
         
@@ -51,12 +53,11 @@ function App() {
           element= {<ConfirmationScreen />}
         />
 
-        {}
         <Route 
           path="/cashier" 
           element= {<CashierScreen cart={cart} setCart={setCart} />}
         />
-              {/* Management entry page */}
+        {/* Management entry page */}
       <Route
         path="/management"
         element={

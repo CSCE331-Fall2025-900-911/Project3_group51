@@ -21,23 +21,32 @@ const LoginPage = () => {
         
         const { exists } = await validateUser(firstLower, lastLower);
         if (!exists) {
-        setError("Employee not found.");
-        setLoading(false);
-        return;
+          setError("Employee not found.");
+          setLoading(false);
+          return;
         }
 
         const { role } = await getUserRole(firstLower, lastLower);
         if (!role) {
-        setError("User role not found.");
-        setLoading(false);
-        return;
+          setError("User role not found.");
+          setLoading(false);
+          return;
         }
+
+        // save the current user info
+        const user = {
+          first : firstLower,
+          last : lastLower,
+          role : role.trim().toLowerCase()
+        };
+
+        localStorage.setItem("user", JSON.stringify(user));
 
         // Redirect based on role
         if (role.toLowerCase() === "employee") navigate("/cashier");
         else if (role.toLowerCase() === "manager") navigate("/management");
         else navigate("/");
-
+        
     } catch (err) {
         setError("Error: " + err.message);
     } finally {

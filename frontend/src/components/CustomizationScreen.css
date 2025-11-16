@@ -128,3 +128,33 @@
 .confirm-btn:hover {
   background-color: #45a049;
 }
+body[data-magnify-level="1"] .custom-title {
+  font-size: 1.8rem;
+}
+body[data-magnify-level="1"] .custom-section h2 {
+  font-size: 1.15rem;
+}
+body[data-magnify-level="1"] .option-btn {
+  font-size: 18px;
+  min-height: 90px;
+}
+body[data-magnify-level="1"] .confirm-btn {
+  font-size: 27px;
+}
+
+/* Level 2 Zoom (2 clicks on +) */
+body[data-magnify-level="2"] .custom-title {
+  font-size: 2.1rem;
+}
+body[data-magnify-level="2"] .custom-section h2 {
+  font-size: 1.3rem;
+}
+body[data-magnify-level="2"] .option-btn {
+  font-size: 21px;
+  min-height: 100px;
+  padding: 25px;
+}
+body[data-magnify-level="2"] .confirm-btn {
+  font-size: 30px;
+  padding: 25px 45px;
+}

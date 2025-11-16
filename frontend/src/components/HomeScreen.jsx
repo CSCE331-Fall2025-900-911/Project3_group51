@@ -1,38 +1,38 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './HomeScreen.css'; // Import the CSS file
+import './HomeScreen.css';
 
 function HomeScreen() {
   const navigate = useNavigate();
   const [showLanguage, setShowLanguage] = useState(false);
   const [weather, setWeather] = useState(null);
 
-useEffect(() => {
-  const fetchWeather = async () => {
-    const API_KEY = import.meta.env.VITE_OPENWEATHER_API_KEY;
+  useEffect(() => {
+    const fetchWeather = async () => {
+      const API_KEY = import.meta.env.VITE_OPENWEATHER_API_KEY;
 
-    if (!API_KEY) {
-      console.error("Missing OpenWeather API key (frontend/.env.local). Must start with VITE_");
-      return;
-    }
+      if (!API_KEY) {
+        console.error("Missing OpenWeather API key (frontend/.env.local). Must start with VITE_");
+        return;
+      }
 
-    const lat = '30.6280';
-    const lon = '-96.3344';
+      const lat = '30.6280';
+      const lon = '-96.3344';
 
-    try {
-      const res = await fetch(
-        `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=imperial`
-      );
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json();
-      setWeather(data);
-    } catch (err) {
-      console.error("Failed to fetch weather data:", err);
-    }
-  };
+      try {
+        const res = await fetch(
+          `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=imperial`
+        );
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        setWeather(data);
+      } catch (err) {
+        console.error("Failed to fetch weather data:", err);
+      }
+    };
 
-  //fetchWeather();
-}, []);
+    //fetchWeather();
+  }, []);
 
   const handleStartOrder = () => {
     navigate('/order'); 
@@ -99,6 +99,7 @@ useEffect(() => {
         <button className="start-button" onClick={handleStartOrder}>
           Tap to Start Order
         </button>
+        
         <button className="login-button" onClick={handleEmployeeLogin}>
           Employee Login
         </button>
