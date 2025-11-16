@@ -12,6 +12,10 @@ function OrderScreen({ cart }) {
   const navigate = useNavigate(); 
   const [selectedCategory, setSelectedCategory] = useState(null);
 
+  const handleGoHome = () => {
+    navigate("/");
+  };
+
   // This useEffect now fetches real data
   useEffect(() => {
     // Call the API function
@@ -54,7 +58,9 @@ function OrderScreen({ cart }) {
     <div className="menu-page">
       {/* Header */}
       <header className="header">
-        <button className="nav-btn">View Menu</button>
+        <button className="nav-btn" onClick={handleGoHome}>
+          Welcome
+        </button>
         <h1 className="menu-title">Menu</h1>
         <button 
           className="nav-btn" 
