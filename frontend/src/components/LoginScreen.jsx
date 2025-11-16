@@ -1,82 +1,36 @@
-import React, { useState } from "react";
-import { validateUser, getUserRole } from "../api/employees";
+import React, { useEffect } from "react"; 
 import { useNavigate } from "react-router-dom";
+import { useUser } from "../context/UserContext"; 
+
+const API = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
 
 const LoginPage = () => {
-  const [first, setFirst] = useState("");
-  const [last, setLast] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
   const navigate = useNavigate();
-
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    setError("");
-    setLoading(true);
-
-    try {
-    
-        let firstLower = first.toLowerCase();
-        let lastLower = last.toLowerCase();
-        
-        const { exists } = await validateUser(firstLower, lastLower);
-        if (!exists) {
-          setError("Employee not found.");
-          setLoading(false);
-          return;
-        }
-
-        const { role } = await getUserRole(firstLower, lastLower);
-        if (!role) {
-          setError("User role not found.");
-          setLoading(false);
-          return;
-        }
-
-        // save the current user info
-        const user = {
-          first : firstLower,
-          last : lastLower,
-          role : role.trim().toLowerCase()
-        };
-
-        localStorage.setItem("user", JSON.stringify(user));
-
-        // Redirect based on role
-        if (role.toLowerCase() === "employee") navigate("/cashier");
-        else if (role.toLowerCase() === "manager") navigate("/management");
-        else navigate("/");
-        
-    } catch (err) {
-        setError("Error: " + err.message);
-    } finally {
-        setLoading(false);
+  const { user, loading } = useUser(); 
+  useEffect(() => {
+    if (!loading && user) {
+      const role = user.role.trim().toLowerCase();
+      if (role === 'manager') navigate('/management');
+      if (role === 'employee') navigate('/cashier');
     }
+  }, [user, loading, navigate]); 
+
+  const googleLogin = () => {
+    window.location.href = `${API}/auth/google`;
   };
+
+  if (loading || user) {
+    return <div style={styles.container}><h1>Loading...</h1></div>
+  }
 
   return (
     <div style={styles.container}>
-      <h1 style={styles.title}>POS Login</h1>
-      <form onSubmit={handleLogin} style={styles.form}>
-        <input
-          type="text"
-          placeholder="First name"
-          value={first}
-          onChange={(e) => setFirst(e.target.value)}
-          style={styles.input}
-          required
-        />
-        <input
-          type="text"
-          placeholder="Last name"
-          value={last}
-          onChange={(e) => setLast(e.target.value)}
-          style={styles.input}
-          required
-        />
-        <button type="submit" disabled={loading} style={styles.button}>
-          {loading ? "Logging in..." : "Login"}
+      <h1 style={styles.title}>Employee Login</h1>
+      <div style={styles.form}>
+        <button onClick={googleLogin} style={styles.googleButton}>
+          Sign in with Google
         </button>
+      
         <button
           type="button"
           onClick={() => navigate("/")}
@@ -84,8 +38,7 @@ const LoginPage = () => {
         >
           Back to Welcome
         </button>
-      </form>
-      {error && <p style={styles.error}>{error}</p>}
+      </div>
     </div>
   );
 };
@@ -120,25 +73,17 @@ const styles = {
     boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
     gap: "1rem",
   },
-  input: {
-    padding: "0.75rem",
-    fontSize: "1rem",
-    border: "1px solid #ccc",
-    borderRadius: "6px",
-  },
-  button: {
-    background: "#1976d2",
+
+  googleButton: { 
+    background: "#4285F4", // Google Blue
     color: "white",
-    padding: "0.75rem",
+    padding: "0.75rem 1.5rem",
     fontSize: "1rem",
     border: "none",
     borderRadius: "6px",
     cursor: "pointer",
-  },
-  error: {
-    color: "red",
-    marginTop: "1rem",
-  },
+    fontWeight: "bold",
+  }
 };
 
 export default LoginPage;
