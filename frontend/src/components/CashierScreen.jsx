@@ -1,11 +1,17 @@
 import React, { useState, useEffect } from "react";
 import "./CashierScreen.css";
 import { getMenu } from "../api/menu";
+import { useNavigate } from "react-router-dom";
 
 export default function CashierScreen() {
   const [menuItems, setMenuItems] = useState([]);
   const [categories, setCategories] = useState([]);
   const [activeCategory, setActiveCategory] = useState("");
+  const navigate = useNavigate();
+
+  const handleLoginClick = () => {
+    navigate("/login");
+  };
 
   // Load menu data
   useEffect(() => {
@@ -25,7 +31,9 @@ export default function CashierScreen() {
     <div className="cashier-root">
       {/* Header */}
       <div className="hdr">
-        <button className="btn">Login</button>
+        <button className="btn" onClick={handleLoginClick}>
+          Login
+        </button>
         <div className="hdr-title">Order</div>
         <div className="hdr-name">Cashier</div>
       </div>
