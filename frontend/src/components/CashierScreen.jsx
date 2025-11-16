@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import "./CashierScreen.css";
 
+const API = import.meta.env.VITE_API_URL;
+
 export default function CashierScreen() {
   const [selectedCat, setSelectedCat] = useState(null);
 
@@ -8,7 +10,9 @@ export default function CashierScreen() {
     <div className="cashier-root">
       {/* Header */}
       <div className="hdr">
-        <button className="btn">Login</button>
+        <a className="btn" href={`${API}/auth/logout`}>
+          Logout ➔
+        </a>
         <div className="hdr-title">Order</div>
         <div className="hdr-name">Cashier</div>
       </div>
