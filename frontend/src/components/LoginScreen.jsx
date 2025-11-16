@@ -33,6 +33,7 @@ const LoginPage = () => {
           return;
         }
 
+        // save the current user info
         const user = {
           first : firstLower,
           last : lastLower,

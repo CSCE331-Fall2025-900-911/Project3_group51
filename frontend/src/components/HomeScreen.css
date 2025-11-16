@@ -143,3 +143,52 @@
 .login-button:hover {
   background-color: #e0e0e0;
 }
+/* ================================
+   MAGNIFY STYLES (Level-based)
+   ================================ */
+
+/* --- Level 1 Zoom --- */
+body[data-magnify-level="1"] .home-title {
+  font-size: 1.8rem;
+}
+body[data-magnify-level="1"] .nav-btn {
+  font-size: 20px;
+  padding: 14px 26px;
+}
+body[data-magnify-level="1"] .weather-box {
+  font-size: 20px;
+}
+body[data-magnify-level="1"] .weather-temp {
+  font-size: 32px;
+}
+body[data-magnify-level="1"] .start-button {
+  font-size: 36px;
+  padding: 45px 65px;
+}
+body[data-magnify-level="1"] .login-button {
+  font-size: 22px;
+  padding: 18px 32px;
+}
+
+/* --- Level 2 Zoom --- */
+body[data-magnify-level="2"] .home-title {
+  font-size: 2.1rem;
+}
+body[data-magnify-level="2"] .nav-btn {
+  font-size: 22px;
+  padding: 16px 28px;
+}
+body[data-magnify-level="2"] .weather-box {
+  font-size: 22px;
+}
+body[data-magnify-level="2"] .weather-temp {
+  font-size: 36px;
+}
+body[data-magnify-level="2"] .start-button {
+  font-size: 40px;
+  padding: 50px 70px;
+}
+body[data-magnify-level="2"] .login-button {
+  font-size: 24px;
+  padding: 20px 35px;
+}
