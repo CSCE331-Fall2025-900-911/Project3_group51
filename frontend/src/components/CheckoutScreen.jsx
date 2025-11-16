@@ -1,6 +1,6 @@
 // frontend/src/components/CheckoutScreen.jsx
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import './CheckoutScreen.css'; 
 import { createOrder, addOrderItem, updateOrderTotal } from '../api/orders.js';
 
@@ -10,6 +10,16 @@ const TAX_RATE = 0.0825;
 // Receive the 'cart' state as a prop from App.jsx
 function CheckoutScreen({ cart, setCart }) {
   const navigate = useNavigate();
+  const location = useLocation();
+  const storedOrigin =
+    typeof window !== "undefined"
+      ? sessionStorage.getItem("orderOrigin") || "customer"
+      : "customer";
+  const fallbackReturn = storedOrigin === "cashier" ? "/cashier" : "/order";
+  const returnTo = location.state?.returnTo || fallbackReturn;
+  const completeReturnTo =
+    location.state?.completeReturnTo ||
+    (storedOrigin === "cashier" ? "/cashier" : "/");
   const [paymentType, setPaymentType] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -40,7 +50,7 @@ function CheckoutScreen({ cart, setCart }) {
 
       // If all successful, clear the cart and go to confirmation
       setCart([]);
-      navigate('/confirmation'); // Navigate to the next screen
+      navigate('/confirmation', { state: { returnTo: completeReturnTo } }); // Navigate to the next screen with origin
 
     } catch (err) {
       console.error("Failed to create order:", err);
@@ -50,7 +60,7 @@ function CheckoutScreen({ cart, setCart }) {
   };
 
   const handleGoBack = () => {
-    navigate('/order'); // Go back to the order screen
+    navigate(returnTo); // Go back to the originating screen
   };
 
   return (
@@ -107,12 +117,18 @@ function CheckoutScreen({ cart, setCart }) {
               {cart.length === 0 ? (
                 <p>No items in cart.</p>
               ) : (
-                cart.map((item, index) => (
-                  <div key={index} className="summary-item">
-                    <span>{item.name}</span>
-                    <span>${item.price}</span>
-                  </div>
-                ))
+                cart.map((item, index) => {
+                  const qty = item.quantity ?? 1;
+                  const lineTotal = (parseFloat(item.price) * qty).toFixed(2);
+                  return (
+                    <div key={index} className="summary-item">
+                      <span>
+                        {item.name} x {qty}
+                      </span>
+                      <span>${lineTotal}</span>
+                    </div>
+                  );
+                })
               )}
             </div>
           </div>

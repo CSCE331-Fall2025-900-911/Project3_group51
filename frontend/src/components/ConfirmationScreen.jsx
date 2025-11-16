@@ -1,10 +1,17 @@
 // frontend/src/components/ConfirmationScreen.jsx
 import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import './ConfirmationScreen.css'; // We will create this file next
 
 function ConfirmationScreen() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const storedOrigin =
+    typeof window !== "undefined"
+      ? sessionStorage.getItem("orderOrigin") || "customer"
+      : "customer";
+  const redirectTo =
+    location.state?.returnTo || (storedOrigin === "cashier" ? "/cashier" : "/");
 
   // Generate a random order number for display
   const orderNumber = Math.floor(Math.random() * 1000) + 1;
@@ -13,7 +20,7 @@ function ConfirmationScreen() {
   useEffect(() => {
     // Set a timer to redirect back to the home screen after 5 seconds
     const timer = setTimeout(() => {
-      navigate('/'); // Navigate to the HomeScreen
+      navigate(redirectTo); // Navigate back to appropriate screen
     }, 5000); // 5000 milliseconds = 5 seconds
 
     // Clean up the timer if the component is unmounted early

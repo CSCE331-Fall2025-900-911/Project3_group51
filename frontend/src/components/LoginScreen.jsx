@@ -77,6 +77,13 @@ const LoginPage = () => {
         <button type="submit" disabled={loading} style={styles.button}>
           {loading ? "Logging in..." : "Login"}
         </button>
+        <button
+          type="button"
+          onClick={() => navigate("/")}
+          style={styles.secondaryButton}
+        >
+          Back to Welcome
+        </button>
       </form>
       {error && <p style={styles.error}>{error}</p>}
     </div>
@@ -91,6 +98,15 @@ const styles = {
     justifyContent: "center",
     flexDirection: "column",
     background: "#f5f5f5",
+  },
+  secondaryButton: {
+    background: "transparent",
+    color: "#1976d2",
+    padding: "0.5rem",
+    fontSize: "0.9rem",
+    border: "none",
+    cursor: "pointer",
+    textDecoration: "underline",
   },
   title: {
     marginBottom: "1rem",
