@@ -197,3 +197,84 @@ button:hover{
   gap: 10px;
   margin-top: 15px;
 }
+
+/* ================================
+   MAGNIFY STYLES (Level-based)
+   ================================ */
+
+/* --- Level 1 Zoom --- */
+body[data-magnify-level="1"] .menu-title {
+  font-size: 2rem; 
+}
+
+body[data-magnify-level="1"] .categories h2 {
+  font-size: 1.5rem;
+}
+body[data-magnify-level="1"] .category-btn {
+  font-size: 1.3rem; 
+  padding: 15px;     
+  margin: 8px 0;
+}
+
+body[data-magnify-level="1"] .menu-item {
+  min-height: 45vh; 
+}
+body[data-magnify-level="1"] .item-image {
+  width: 220px;
+  height: 220px;
+}
+body[data-magnify-level="1"] .item-name {
+  font-size: 36px; 
+}
+body[data-magnify-level="1"] .item-price {
+  font-size: 24px;
+  padding: 6px 14px;
+}
+
+body[data-magnify-level="1"] .order-summary {
+  font-size: 1.2rem;
+  padding: 15px;
+}
+body[data-magnify-level="1"] .checkout-btn {
+  font-size: 1.2rem;
+  padding: 12px 25px;
+}
+
+
+/* --- Level 2 Zoom --- */
+body[data-magnify-level="2"] .menu-title {
+  font-size: 2.5rem;
+}
+
+body[data-magnify-level="2"] .categories h2 {
+  font-size: 1.8rem;
+}
+body[data-magnify-level="2"] .category-btn {
+  font-size: 1.6rem; 
+  padding: 20px;
+  margin: 10px 0;
+}
+
+body[data-magnify-level="2"] .menu-item {
+  min-height: 50vh;
+}
+body[data-magnify-level="2"] .item-image {
+  width: 250px;
+  height: 250px;
+}
+body[data-magnify-level="2"] .item-name {
+  font-size: 42px; 
+}
+body[data-magnify-level="2"] .item-price {
+  font-size: 28px; 
+  padding: 8px 18px;
+}
+
+body[data-magnify-level="2"] .order-summary {
+  font-size: 1.4rem;
+  padding: 20px;
+}
+body[data-magnify-level="2"] .checkout-btn {
+  font-size: 1.5rem;
+  padding: 15px 30px;
+}
