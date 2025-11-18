@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import "./CashierScreen.css";
-import { getMenu } from "../api/menu";
+import { getMenu } from "../api/menu"; // From main
 import { useNavigate } from "react-router-dom";
+
+const API = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
 
 export default function CashierScreen({ cart = [], setCart }) {
   const [menuItems, setMenuItems] = useState([]);
@@ -18,10 +20,6 @@ export default function CashierScreen({ cart = [], setCart }) {
       sessionStorage.setItem("orderOrigin", "cashier");
     }
   }, []);
-
-  const handleLoginClick = () => {
-    navigate("/login");
-  };
 
   useEffect(() => {
     getMenu()
@@ -80,10 +78,10 @@ export default function CashierScreen({ cart = [], setCart }) {
   return (
     <div className="cashier-root">
       <div className="hdr">
-        <button className="btn" onClick={handleLoginClick}>
-          Login
-        </button>
-        <div className="hdr-title">Cashier Order</div>
+        <a className="btn" href={`${API}/auth/logout`}>
+          Logout ➔
+        </a>
+        <div className="hdr-title">Order</div>
         <div className="hdr-name">Cashier</div>
       </div>
 
