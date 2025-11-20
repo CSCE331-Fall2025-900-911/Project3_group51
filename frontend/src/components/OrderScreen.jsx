@@ -15,6 +15,7 @@ function OrderScreen({ cart, setCart }) {
   const location = useLocation();
   const cashierOrder = location.state?.returnTo === "/cashier";
   const cancelDestination = cashierOrder ? "/cashier" : "/";
+  const imageBase = (import.meta.env.VITE_API_URL || "http://localhost:3000/api").replace(/\/api$/, "");
   useEffect(() => {
     if (typeof window !== "undefined") {
       sessionStorage.setItem(
@@ -145,7 +146,16 @@ function OrderScreen({ cart, setCart }) {
                 className="menu-item" 
                 onClick={() => handleItemClick(item)} 
               >
-                <div className="item-image">Item Image</div>
+                <div className="item-image">
+                  {item.image ? (
+                    <img
+                      src={`${imageBase}/images/${item.image}`}
+                      alt={item.drinkname}
+                    />
+                  ) : (
+                    <span>Item Image</span>
+                  )}
+                </div>
                 <div className="item-name">{item.drinkname}</div>
                 <div className="item-price">${item.price}</div>
               </button>
