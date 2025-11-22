@@ -56,3 +56,16 @@ export async function deleteMenuItem(id) {
     }
     return res.json();
 }
+
+export async function uploadMenuImage(filename, base64Data) {
+    const res = await fetch(`${API}/menu/upload-image`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ filename, data: base64Data }),
+    });
+    if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`HTTP ${res.status}: ${text}`);
+    }
+    return res.json(); // { filename }
+}

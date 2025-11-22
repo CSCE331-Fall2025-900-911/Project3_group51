@@ -1,110 +1,147 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import './HomeScreen.css';
+// src/screens/HomeScreen.jsx
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import useLanguage from "../hooks/useLanguage";
+import { LANG_MAP } from "../hooks/useLanguage";
+import { translateText } from "../utils/translate";
+import "./HomeScreen.css";
 
 function HomeScreen() {
   const navigate = useNavigate();
   const [showLanguage, setShowLanguage] = useState(false);
   const [weather, setWeather] = useState(null);
+  const [translatedDesc, setTranslatedDesc] = useState("");
 
+  const { labels, updateLanguage, selectedLang } = useLanguage();
+
+  const LANG_OPTIONS = [
+    "English",
+    "Español",
+    "Français",
+    "Italiano",
+    "Tiếng Việt",
+    "한국어",
+  ];
+
+  // Fetch weather condition
   useEffect(() => {
     const fetchWeather = async () => {
       const API_KEY = import.meta.env.VITE_OPENWEATHER_API_KEY;
-
-      if (!API_KEY) {
-        console.error("Missing OpenWeather API key (frontend/.env.local). Must start with VITE_");
-        return;
-      }
-
-      const lat = '30.6280';
-      const lon = '-96.3344';
+      if (!API_KEY) return;
 
       try {
+        const lat = "30.6280";
+        const lon = "-96.3344";
+
         const res = await fetch(
           `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=imperial`
         );
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
         const data = await res.json();
         setWeather(data);
       } catch (err) {
-        console.error("Failed to fetch weather data:", err);
+        console.error("Weather API error:", err);
       }
     };
 
-    //fetchWeather();
+    fetchWeather();
   }, []);
 
-  const handleStartOrder = () => {
-    navigate('/order'); 
-  };
-  
-  const handleEmployeeLogin = () => {
-    navigate('/login')
-  };
+  // Translate weather description when language changes
+  useEffect(() => {
+    async function translateWeather() {
+      if (!weather || !weather.weather) return;
+
+      const englishDesc = weather.weather[0].description;
+
+      // English → no translation needed
+      if (selectedLang === "English") {
+        setTranslatedDesc(englishDesc);
+        return;
+      }
+
+      // Get Lara code (fr-FR, vi-VN, etc)
+      const targetLangCode = LANG_MAP[selectedLang];
+      if (!targetLangCode) {
+        setTranslatedDesc(englishDesc);
+        return;
+      }
+
+      const resp = await translateText(englishDesc, targetLangCode);
+      setTranslatedDesc(resp?.translatedText || englishDesc);
+    }
+
+    translateWeather();
+  }, [weather, selectedLang]);
 
   return (
     <div className="home-container">
-      
-      {/* This header is now modeled after OrderScreen.jsx */}
+      {/* Header */}
       <header className="home-header">
-        
-        {/* Empty div for spacing, balances the "Language" button */}
         <div className="nav-placeholder"></div>
-        
-        {/* The title label "Home" in the center */}
-        <h1 className="home-title">Home</h1>
-        
-        {/* Language button on the right */}
-        <button className="nav-btn lang-btn" onClick={() => setShowLanguage(!showLanguage)}>
-          Language
+
+        <h1 className="home-title">{labels.home}</h1>
+
+        <button
+          className="nav-btn lang-btn"
+          onClick={() => setShowLanguage(!showLanguage)}
+        >
+          {labels.language}
         </button>
       </header>
 
-      {/* Conditionally render the language dropdown based on state */}
+      {/* Language Dropdown */}
       {showLanguage && (
         <div className="language-dropdown">
-          <button>English</button>
-          <button>Espanol</button>
-          <button>Francis</button>
-          <button>Italino</button>
+          {LANG_OPTIONS.map((lang) => (
+            <button
+              key={lang}
+              onClick={() => {
+                updateLanguage(lang);
+                setShowLanguage(false);
+              }}
+            >
+              {lang}
+            </button>
+          ))}
         </div>
       )}
 
-      {/* Main content and footer remain the same */}
+      {/* Main Content */}
       <main className="home-main">
-        {/* Weather box */}
         <div className="weather-box">
           {weather ? (
             <>
               <p>{weather.name}</p>
               <p className="weather-temp">{Math.round(weather.main.temp)}°F</p>
-              <p>{weather.weather[0].description}</p>
+
+              {/* Translated weather description */}
+              <p>{translatedDesc}</p>
             </>
           ) : (
-            <p>Loading Weather...</p>
+            <p>{labels.weatherLoading}</p>
           )}
         </div>
-            
+
         <div className="weather-image">
           {weather && weather.main && weather.main.temp > 60 ? (
-            <p>Image based on warm weather (e.g., Iced Tea)</p>
+            <p>{labels.warmWeather}</p>
           ) : (
-            <p>Image based on cold weather (e.g., Hot Coffee)</p>
+            <p>{labels.coldWeather}</p>
           )}
         </div>
       </main>
 
+      {/* Footer buttons */}
       <footer className="home-footer">
-        {/* ... (start button code) ... */}
-        <button className="start-button" onClick={handleStartOrder}>
-          Tap to Start Order
+        <button className="start-button" onClick={() => navigate("/order")}>
+          {labels.start}
         </button>
-        
-        <button className="login-button" onClick={handleEmployeeLogin}>
-          Employee Login
+
+        <button className="login-button" onClick={() => navigate("/login")}>
+          {labels.login}
         </button>
       </footer>
-
     </div>
   );
 }
