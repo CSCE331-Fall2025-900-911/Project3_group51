@@ -5,6 +5,7 @@ import {
   createMenuItem,
   updateMenuItem,
   deleteMenuItem,
+  uploadMenuImage,
 } from "../api/menu";
 import "./MenuManagementScreen.css";
 
@@ -13,6 +14,7 @@ const emptyForm = {
   category: "",
   ingredient: "",
   price: "",
+  image: "",
 };
 
 export default function MenuManagementScreen() {
@@ -21,6 +23,7 @@ export default function MenuManagementScreen() {
   const [selectedId, setSelectedId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState({ type: "", message: "" });
+  const [imageData, setImageData] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -57,6 +60,7 @@ export default function MenuManagementScreen() {
   const resetForm = () => {
     setForm(emptyForm);
     setSelectedId(null);
+    setImageData("");
   };
 
   const setError = (message) => setStatus({ type: "error", message });
@@ -68,6 +72,7 @@ export default function MenuManagementScreen() {
       category: form.category.trim(),
       ingredient: form.ingredient.trim(),
       price: form.price.trim(),
+      image: form.image.trim(),
     };
 
     if (!trimmed.drinkname || !trimmed.category) {
@@ -89,16 +94,25 @@ export default function MenuManagementScreen() {
       category: trimmed.category,
       ingredient,
       price: Number(price.toFixed(2)),
+      image: trimmed.image,
     };
+  };
+
+  const maybeUploadImage = async () => {
+    if (!imageData || !form.image) return null;
+    const { filename } = await uploadMenuImage(form.image, imageData);
+    return filename;
   };
 
   const handleAddItem = async () => {
     try {
       setLoading(true);
       const payload = parsePayload();
-      const { id } = await createMenuItem(payload);
-      setMenuItems((prev) => [...prev, { ...payload, drinkid: id }]);
-      setInfo(`Added ${payload.drinkname}.`);
+      const uploadedName = await maybeUploadImage();
+      const finalPayload = uploadedName ? { ...payload, image: uploadedName } : payload;
+      const { id } = await createMenuItem(finalPayload);
+      setMenuItems((prev) => [...prev, { ...finalPayload, drinkid: id }]);
+      setInfo(`Added ${finalPayload.drinkname}.`);
       resetForm();
     } catch (err) {
       console.error(err);
@@ -116,13 +130,15 @@ export default function MenuManagementScreen() {
     try {
       setLoading(true);
       const payload = parsePayload();
-      await updateMenuItem(selectedId, payload);
+      const uploadedName = await maybeUploadImage();
+      const finalPayload = uploadedName ? { ...payload, image: uploadedName } : payload;
+      await updateMenuItem(selectedId, finalPayload);
       setMenuItems((prev) =>
         prev.map((item) =>
-          item.drinkid === selectedId ? { ...item, ...payload } : item
+          item.drinkid === selectedId ? { ...item, ...finalPayload } : item
         )
       );
-      setInfo(`Updated ${payload.drinkname}.`);
+      setInfo(`Updated ${finalPayload.drinkname}.`);
       resetForm();
     } catch (err) {
       console.error(err);
@@ -166,8 +182,22 @@ export default function MenuManagementScreen() {
       category: item.category ?? "",
       ingredient: (item.ingredient ?? "").toString(),
       price: (item.price ?? "").toString(),
+      image: item.image ?? "",
     });
+    setImageData("");
     setStatus({ type: "", message: "" });
+  };
+
+  const handleFileChange = (evt) => {
+    const file = evt.target.files?.[0];
+    if (!file) return;
+    setForm((prev) => ({ ...prev, image: file.name }));
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const base64 = (e.target?.result || "").toString().split(",").pop();
+      setImageData(base64 || "");
+    };
+    reader.readAsDataURL(file);
   };
 
   return (
@@ -198,6 +228,7 @@ export default function MenuManagementScreen() {
               <th>Category</th>
               <th>Ingredients</th>
               <th>Price</th>
+              <th>Image</th>
             </tr>
           </thead>
           <tbody>
@@ -214,11 +245,12 @@ export default function MenuManagementScreen() {
                 <td>{item.category}</td>
                 <td>{item.ingredient}</td>
                 <td>${Number(item.price).toFixed(2)}</td>
+                <td>{item.image || "—"}</td>
               </tr>
             ))}
             {!sortedItems.length && (
               <tr>
-                <td colSpan="5" className="empty-row">
+                <td colSpan="6" className="empty-row">
                   No menu items found.
                 </td>
               </tr>
@@ -259,6 +291,7 @@ export default function MenuManagementScreen() {
           onChange={handleInputChange}
           min="0"
         />
+        <input type="file" accept="image/*" onChange={handleFileChange} />
         <button onClick={handleAddItem} disabled={loading}>
           Add Item
         </button>

@@ -9,6 +9,7 @@ const cors = require('cors');
 const session = require('express-session');
 const passport = require('passport');     
 require('./auth/passport-setup');
+const path = require('path');
 
 const app = express();
 const port = 3000;
@@ -21,7 +22,9 @@ app.use(cors({
   ],
   credentials: true 
 }));
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+app.use('/images', express.static(path.join(__dirname, 'images')));
 
 app.use(session({
   secret: process.env.SESSION_SECRET, 

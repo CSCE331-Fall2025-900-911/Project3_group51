@@ -22,7 +22,7 @@ router.get('/google/callback',
     const role = req.user.role.trim().toLowerCase();
     
     if (role === 'manager') {
-      res.redirect(`${CLIENT_URL}/management`);
+      res.redirect(`${CLIENT_URL}/manager-portal`);
     } else if (role === 'employee') {
       res.redirect(`${CLIENT_URL}/cashier`);
     } else {

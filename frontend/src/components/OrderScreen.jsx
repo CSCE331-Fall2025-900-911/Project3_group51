@@ -28,8 +28,7 @@ function OrderScreen({ cart, setCart }) {
   // Is this order coming from cashier?
   const cashierOrder = location.state?.returnTo === "/cashier";
   const cancelDestination = cashierOrder ? "/cashier" : "/";
-
-  // Save origin to sessionStorage
+  const imageBase = (import.meta.env.VITE_API_URL || "http://localhost:3000/api").replace(/\/api$/, "");
   useEffect(() => {
     sessionStorage.setItem("orderOrigin", cashierOrder ? "cashier" : "customer");
   }, [cashierOrder]);
@@ -171,8 +170,17 @@ function OrderScreen({ cart, setCart }) {
                 className="menu-item"
                 onClick={() => handleItemClick(item)}
               >
-                <div className="item-image">Item Image</div>
-                <div className="item-name">{translatedDrinkNames[item.drinkid]}</div>
+                <div className="item-image">
+                  {item.image ? (
+                    <img
+                      src={`${imageBase}/images/${item.image}`}
+                      alt={item.drinkname}
+                    />
+                  ) : (
+                    <span>Item Image</span>
+                  )}
+                </div>
+                <div className="item-name">{item.drinkname}</div>
                 <div className="item-price">${item.price}</div>
               </button>
             ))}

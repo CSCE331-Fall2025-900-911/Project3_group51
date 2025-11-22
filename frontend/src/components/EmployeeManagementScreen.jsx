@@ -12,6 +12,7 @@ const emptyForm = {
   firstname: "",
   lastname: "",
   role: "",
+  email: "",
 };
 
 const ROLE_OPTIONS = [
@@ -75,13 +76,18 @@ export default function EmployeeManagementScreen() {
       firstname: form.firstname.trim(),
       lastname: form.lastname.trim(),
       role: normalizedRole,
+      email: form.email.trim(),
     };
-    if (!trimmed.firstname || !trimmed.lastname || !trimmed.role) {
-      throw new Error("First name, last name, and role are required.");
+    if (!trimmed.firstname || !trimmed.lastname || !trimmed.role || !trimmed.email) {
+      throw new Error("First name, last name, role, and email are required.");
     }
     const allowed = new Set(["Employee", "Manager"]);
     if (!allowed.has(trimmed.role)) {
       throw new Error("Role must be Employee or Manager.");
+    }
+    const emailPattern = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+    if (!emailPattern.test(trimmed.email)) {
+      throw new Error("Enter a valid email address.");
     }
     return trimmed;
   };
@@ -165,6 +171,7 @@ export default function EmployeeManagementScreen() {
       firstname: emp.firstname ?? "",
       lastname: emp.lastname ?? "",
       role: emp.role ?? "",
+      email: emp.email ?? "",
     });
     setStatus({ type: "", message: "" });
   };
@@ -199,6 +206,7 @@ export default function EmployeeManagementScreen() {
               <th>First Name</th>
               <th>Last Name</th>
               <th>Role</th>
+              <th>Email</th>
             </tr>
           </thead>
           <tbody>
@@ -216,11 +224,12 @@ export default function EmployeeManagementScreen() {
                 <td className="role-cell">
                   {emp.role ? emp.role.charAt(0).toUpperCase() + emp.role.slice(1) : ""}
                 </td>
+                <td>{emp.email || "—"}</td>
               </tr>
             ))}
             {!sortedEmployees.length && (
               <tr>
-                <td colSpan="4" className="empty-row">
+                <td colSpan="5" className="empty-row">
                   No employees found.
                 </td>
               </tr>
@@ -258,6 +267,13 @@ export default function EmployeeManagementScreen() {
             </option>
           ))}
         </select>
+        <input
+          type="email"
+          name="email"
+          placeholder="Email"
+          value={form.email}
+          onChange={handleInputChange}
+        />
         <button onClick={handleAdd} disabled={loading}>
           Add Employee
         </button>
