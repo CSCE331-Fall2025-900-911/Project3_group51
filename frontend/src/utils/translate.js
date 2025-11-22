@@ -8,8 +8,6 @@ export async function translateText(text, targetLangCode) {
         text, targetLangCode 
       }),
     });
-    console.log("🔥 translateText send to backend:", text, targetLangCode);
-
 
     const data = await res.json();
     console.log(data);

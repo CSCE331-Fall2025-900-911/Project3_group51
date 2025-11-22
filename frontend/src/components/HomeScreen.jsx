@@ -1,18 +1,27 @@
-// src/screens/HomeScreen.jsx
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import useLanguage from "../hooks/useLanguage";
-import { LANG_MAP } from "../hooks/useLanguage";
+
+import useLanguage, { LANG_MAP } from "../hooks/useLanguage.js";
+import useTranslate from "../hooks/useTranslate";
 import { translateText } from "../utils/translate";
+import { HOME_LABELS } from "./HomeScreen.labels.js";
+
+
 import "./HomeScreen.css";
 
 function HomeScreen() {
   const navigate = useNavigate();
+
+  // UI state
   const [showLanguage, setShowLanguage] = useState(false);
   const [weather, setWeather] = useState(null);
   const [translatedDesc, setTranslatedDesc] = useState("");
 
-  const { labels, updateLanguage, selectedLang } = useLanguage();
+  // Global language state
+  const { selectedLang, setSelectedLang } = useLanguage();
+
+  // Page-level translated labels
+  const labels = useTranslate(HOME_LABELS, selectedLang);
 
   const LANG_OPTIONS = [
     "English",
@@ -23,7 +32,7 @@ function HomeScreen() {
     "한국어",
   ];
 
-  // Fetch weather condition
+  // Fetch weather
   useEffect(() => {
     const fetchWeather = async () => {
       const API_KEY = import.meta.env.VITE_OPENWEATHER_API_KEY;
@@ -47,27 +56,21 @@ function HomeScreen() {
     fetchWeather();
   }, []);
 
-  // Translate weather description when language changes
+  // Translate weather description on language change
   useEffect(() => {
     async function translateWeather() {
-      if (!weather || !weather.weather) return;
+      if (!weather?.weather) return;
 
       const englishDesc = weather.weather[0].description;
 
-      // English → no translation needed
       if (selectedLang === "English") {
         setTranslatedDesc(englishDesc);
         return;
       }
 
-      // Get Lara code (fr-FR, vi-VN, etc)
-      const targetLangCode = LANG_MAP[selectedLang];
-      if (!targetLangCode) {
-        setTranslatedDesc(englishDesc);
-        return;
-      }
+      const targetCode = LANG_MAP[selectedLang];
+      const resp = await translateText(englishDesc, targetCode);
 
-      const resp = await translateText(englishDesc, targetLangCode);
       setTranslatedDesc(resp?.translatedText || englishDesc);
     }
 
@@ -97,7 +100,7 @@ function HomeScreen() {
             <button
               key={lang}
               onClick={() => {
-                updateLanguage(lang);
+                setSelectedLang(lang);
                 setShowLanguage(false);
               }}
             >
@@ -114,8 +117,6 @@ function HomeScreen() {
             <>
               <p>{weather.name}</p>
               <p className="weather-temp">{Math.round(weather.main.temp)}°F</p>
-
-              {/* Translated weather description */}
               <p>{translatedDesc}</p>
             </>
           ) : (
@@ -124,7 +125,7 @@ function HomeScreen() {
         </div>
 
         <div className="weather-image">
-          {weather && weather.main && weather.main.temp > 60 ? (
+          {weather && weather.main?.temp > 60 ? (
             <p>{labels.warmWeather}</p>
           ) : (
             <p>{labels.coldWeather}</p>
@@ -132,7 +133,7 @@ function HomeScreen() {
         </div>
       </main>
 
-      {/* Footer buttons */}
+      {/* Footer */}
       <footer className="home-footer">
         <button className="start-button" onClick={() => navigate("/order")}>
           {labels.start}

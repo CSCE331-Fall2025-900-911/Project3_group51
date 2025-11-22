@@ -1,19 +1,6 @@
 // src/hooks/useLanguage.js
-import { useState, useEffect } from "react";
-import { translateText } from "../utils/translate";
+import React, { createContext, useContext, useState } from "react";
 
-// Default English labels
-const DEFAULT_LABELS = {
-  home: "Home",
-  language: "Language",
-  start: "Tap to Start Order",
-  login: "Employee Login",
-  weatherLoading: "Loading Weather...",
-  warmWeather: "Image based on warm weather (e.g., Iced Tea)",
-  coldWeather: "Image based on cold weather (e.g., Hot Coffee)",
-};
-
-// Map UI language → Lara API code
 export const LANG_MAP = {
   English: "en-US",
   Español: "es-ES",
@@ -23,38 +10,18 @@ export const LANG_MAP = {
   한국어: "ko-KR",
 };
 
-export default function useLanguage() {
+const LanguageContext = createContext();
+
+export const LanguageProvider = ({ children }) => {
   const [selectedLang, setSelectedLang] = useState("English");
-  const [labels, setLabels] = useState(DEFAULT_LABELS);
 
-  // Translate all UI labels whenever language changes
-  useEffect(() => {
-    updateLabels(selectedLang);
-  }, [selectedLang]);
+  return React.createElement(
+    LanguageContext.Provider,
+    { value: { selectedLang, setSelectedLang } },
+    children
+  );
+};
 
-  const updateLabels = async (lang) => {
-    const targetCode = LANG_MAP[lang];
-
-    if (!targetCode || targetCode === "en-US") {
-      setLabels({ ...DEFAULT_LABELS, _lang: "English" });
-      return;
-    }
-
-    const translated = {};
-
-    for (const key of Object.keys(DEFAULT_LABELS)) {
-      const text = DEFAULT_LABELS[key];
-      const resp = await translateText(text, targetCode);
-      translated[key] = resp?.translatedText || text;
-    }
-
-    translated._lang = lang; // store language reference
-    setLabels(translated);
-  };
-
-  const updateLanguage = (lang) => {
-    setSelectedLang(lang);
-  };
-
-  return { selectedLang, labels, updateLanguage };
+export default function useLanguage() {
+  return useContext(LanguageContext);
 }
