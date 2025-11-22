@@ -7,13 +7,19 @@ const API = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
 const LoginPage = () => {
   const navigate = useNavigate();
   const { user, loading } = useUser(); 
+
   useEffect(() => {
-    if (!loading && user) {
-      const role = user.role.trim().toLowerCase();
-      if (role === 'manager') navigate('/management');
-      if (role === 'employee') navigate('/cashier');
+    if (loading) return;
+    if (!user) return;
+    const role = user.role?.trim().toLowerCase();
+    if (role === "employee") {
+      navigate("/cashier");
+    } else if (role === "manager") {
+      navigate("/manager-portal");
+    } else {
+      navigate("/");
     }
-  }, [user, loading, navigate]); 
+  }, [user, loading, navigate]);
 
   const googleLogin = () => {
     window.location.href = `${API}/auth/google`;

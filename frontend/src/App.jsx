@@ -12,6 +12,7 @@ import TrendsScreen from "./components/TrendsScreen.jsx";
 import InventoryScreen from "./components/InventoryScreen.jsx";
 import MenuManagementScreen from "./components/MenuManagementScreen.jsx";
 import EmployeeManagementScreen from "./components/EmployeeManagementScreen.jsx";
+import ManagerPortal from "./components/ManagerPortal.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import MagnifyControls from './components/MagnifyControls.jsx';
 
@@ -55,10 +56,11 @@ function App() {
           element= {<ConfirmationScreen />}
         />
 
-        <Route 
-          path="/cashier" 
-          element= {<CashierScreen cart={cart} setCart={setCart} />}
-        />
+      <Route 
+        path="/cashier" 
+        element= {<CashierScreen cart={cart} setCart={setCart} />}
+      />
+      <Route path="/manager-portal" element={<ManagerPortal />} />
         {/* Management entry page */}
       <Route
         path="/management"
