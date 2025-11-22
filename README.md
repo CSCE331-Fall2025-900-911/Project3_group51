@@ -1,12 +1,17 @@
 # Install
-## Backend
-```bash
-# Go to backend folder 
-cd backend
+## Setup
 
-# Install dependencies
-npm install --save-dev nodemon
-npm install express dotenv node-fetch
+This project includes a `setup.sh` script that installs **all backend and frontend dependencies** automatically, including required auth packages such as:
+
+- express-session  
+- passport  
+- passport-google-oauth20  
+
+### 1. Run setup script (recommended)
+
+```bash
+chmod +x setup.sh
+./setup.sh
 ```
 
 # Run
