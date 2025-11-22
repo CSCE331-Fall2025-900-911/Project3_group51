@@ -1,8 +1,8 @@
 // backend/index.js
 
 // 1. Load environment variables AT THE TOP from the correct path
-// require('dotenv').config({ path: '../.env' });
-require('dotenv').config({ path: __dirname + '/.env' });
+require('dotenv').config();
+// require('dotenv').config({ path: __dirname + '/.env' });
 
 const express = require('express');
 const cors = require('cors');
