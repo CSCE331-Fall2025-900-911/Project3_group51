@@ -1,0 +1,25 @@
+{
+  "name": "project3_group51",
+  "version": "1.0.0",
+  "description": "```bash\r # Go to backend folder \r cd backend",
+  "main": "index.js",
+  "scripts": {
+    "frontend": "npm run dev --prefix frontend",
+    "backend": "npm run dev --prefix backend",
+    "dev": "concurrently \"npm:frontend\" \"npm:backend\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CSCE331-Fall2025-900-911/Project3_group51.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/CSCE331-Fall2025-900-911/Project3_group51/issues"
+  },
+  "homepage": "https://github.com/CSCE331-Fall2025-900-911/Project3_group51#readme",
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}

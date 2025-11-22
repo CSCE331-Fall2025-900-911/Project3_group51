@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import "./OrderScreen.css";
 import { getMenu } from "../api/menu.js"; // 1. Import your new API function
 
-function OrderScreen({ cart }) { 
+function OrderScreen({ cart, setCart }) { 
   
   const [menuItems, setMenuItems] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -11,6 +11,18 @@ function OrderScreen({ cart }) {
   const [error, setError] = useState(null); // State for error handling
   const navigate = useNavigate(); 
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false);
+  const location = useLocation();
+  const cashierOrder = location.state?.returnTo === "/cashier";
+  const cancelDestination = cashierOrder ? "/cashier" : "/";
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem(
+        "orderOrigin",
+        cashierOrder ? "cashier" : "customer"
+      );
+    }
+  }, [cashierOrder]);
 
   // This useEffect now fetches real data
   useEffect(() => {
@@ -29,7 +41,9 @@ function OrderScreen({ cart }) {
   }, []); // [] means this runs only once
 
   const handleItemClick = (item) => {
-    navigate(`/order/${item.drinkid}`, { state: { item: item } });
+    navigate(`/order/${item.drinkid}`, {
+      state: { item: item, returnTo: "/order", origin: "customer" },
+    });
   };
 
   const handleCategoryClick = (category) => {
@@ -37,12 +51,25 @@ function OrderScreen({ cart }) {
   };
 
   const handleCheckout = () => {
-    navigate('/checkout'); // Navigate to the new route
+    const checkoutState = {
+      returnTo: cashierOrder ? "/cashier" : "/order",
+      completeReturnTo: cashierOrder ? "/cashier" : "/",
+    };
+    navigate('/checkout', {
+      state: checkoutState,
+    }); // Navigate to the new route
+  };
+
+  const confirmCancelOrder = () => {
+    setShowCancelConfirm(false);
+    if (setCart) setCart([]);
+    navigate(cancelDestination);
   };
 
   // Calculate Subtotal
   const subtotal = cart.reduce((acc, item) => {
-    return acc + parseFloat(item.price); 
+    const qty = item.quantity ?? 1;
+    return acc + parseFloat(item.price) * qty; 
   }, 0);
 
   // Show error message if API fails
@@ -129,18 +156,29 @@ function OrderScreen({ cart }) {
 
       {/* Order Summary Footer */}
       <footer className="order-summary">
+        <button
+          className="nav-btn"
+          onClick={() => setShowCancelConfirm(true)}
+        >
+          Cancel Order
+        </button>
         <div className="current-order">
           <h3>Current Order:</h3>
+          
         </div>
         <div className="order-items">
           {cart.length === 0 ? (
             <p>Your cart is empty.</p>
           ) : (
-            cart.map((item, index) => (
-              <p key={index}>
-                {item.name} - ${item.price}
-              </p>
-            ))
+            cart.map((item, index) => {
+              const qty = item.quantity ?? 1;
+              const total = (parseFloat(item.price) * qty).toFixed(2);
+              return (
+                <p key={index}>
+                  {item.name} x {qty} - ${total}
+                </p>
+              );
+            })
           )}
         </div>
         
@@ -152,6 +190,30 @@ function OrderScreen({ cart }) {
           Checkout
         </button>
       </footer>
+      {showCancelConfirm && (
+        <div className="modal-backdrop">
+          <div className="modal">
+            <p>
+              Cancel the current order and return to the{" "}
+              {cashierOrder ? "cashier page" : "welcome page"}?
+            </p>
+            <div className="modal-actions">
+              <button
+                className="nav-btn"
+                onClick={confirmCancelOrder}
+              >
+                Yes, Cancel
+              </button>
+              <button
+                className="nav-btn"
+                onClick={() => setShowCancelConfirm(false)}
+              >
+                No, Stay
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

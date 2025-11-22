@@ -10,7 +10,10 @@ import CashierScreen from './components/CashierScreen.jsx';
 import ManagementMenu from "./components/ManagementScreen.jsx";
 import TrendsScreen from "./components/TrendsScreen.jsx";
 import InventoryScreen from "./components/InventoryScreen.jsx";
+import MenuManagementScreen from "./components/MenuManagementScreen.jsx";
+import EmployeeManagementScreen from "./components/EmployeeManagementScreen.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
+import MagnifyControls from './components/MagnifyControls.jsx';
 
 function App() {
   
@@ -23,12 +26,13 @@ function App() {
 
   return (
     <>
+      <MagnifyControls />
       <Routes>
         <Route path="/" element= {<HomeScreen/>}/>
         
         <Route 
           path="/order" 
-          element= {<OrderScreen cart={cart} />}
+          element= {<OrderScreen cart={cart} setCart={setCart} />}
         />
         
         <Route 
@@ -51,12 +55,11 @@ function App() {
           element= {<ConfirmationScreen />}
         />
 
-        {}
         <Route 
           path="/cashier" 
-          element= {<CashierScreen/>}
+          element= {<CashierScreen cart={cart} setCart={setCart} />}
         />
-              {/* Management entry page */}
+        {/* Management entry page */}
       <Route
         path="/management"
         element={
@@ -75,6 +78,14 @@ function App() {
         element={
             <InventoryScreen />
         }
+      />
+      <Route
+        path="/management/menu"
+        element={<MenuManagementScreen />}
+      />
+      <Route
+        path="/management/employees"
+        element={<EmployeeManagementScreen />}
       />
       </Routes>
     </>
