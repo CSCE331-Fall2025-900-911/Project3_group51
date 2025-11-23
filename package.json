@@ -21,5 +21,8 @@
   "homepage": "https://github.com/CSCE331-Fall2025-900-911/Project3_group51#readme",
   "devDependencies": {
     "concurrently": "^9.2.1"
+  },
+  "dependencies": {
+    "@translated/lara": "^1.6.7"
   }
 }
