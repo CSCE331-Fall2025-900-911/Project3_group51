@@ -2,6 +2,9 @@ import { useState, useEffect } from "react";
 
 const BACKEND_URL = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
 
+// Cache translation
+const translationCache = {};
+
 export default function useTranslate(textMap, targetLang) {
   const [translated, setTranslated] = useState(textMap);
 
@@ -14,6 +17,16 @@ export default function useTranslate(textMap, targetLang) {
     async function translateAll() {
       let output = {};
       for (const key in textMap) {
+        const originalText = textMap[key];
+        const cacheKey = `${targetLang}:${originalText}`;
+
+        // Check cache
+        if (translationCache[cacheKey]) {
+          output[key] = translationCache[cacheKey];
+          continue;
+        }
+
+        // If cache miss, call backend
         try {
           const res = await fetch(`${BACKEND_URL}/translate`, {
             method: "POST",
@@ -25,9 +38,13 @@ export default function useTranslate(textMap, targetLang) {
           });
 
           const data = await res.json();
-          output[key] = data.translatedText || textMap[key];
+          const translatedText = data.translatedText || originalText;
+
+          translationCache[cacheKey] = translatedText;
+          output[key] = translatedText;
+
         } catch (e) {
-          output[key] = textMap[key];
+          output[key] = originalText;
         }
       }
       setTranslated(output);
