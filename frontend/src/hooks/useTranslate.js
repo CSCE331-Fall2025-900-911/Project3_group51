@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { LANG_MAP } from "./useLanguage";
 
 const BACKEND_URL = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
 
@@ -13,7 +14,7 @@ export default function useTranslate(textMap, targetLang) {
       setTranslated(textMap);
       return;
     }
-
+    const langCode = LANG_MAP[targetLang];
     async function translateAll() {
       let output = {};
       for (const key in textMap) {
@@ -33,7 +34,7 @@ export default function useTranslate(textMap, targetLang) {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               text: textMap[key],
-              targetLangCode: targetLang,
+              targetLangCode: langCode,
             }),
           });
 
