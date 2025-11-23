@@ -53,7 +53,7 @@ function HomeScreen() {
       }
     };
 
-    fetchWeather();
+    // fetchWeather();
   }, []);
 
   // Translate weather description on language change

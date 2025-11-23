@@ -1,35 +1,40 @@
 import { useState, useEffect } from "react";
-import { translateText } from "../utils/translate";
-import { LANG_MAP } from "./useLanguage";
 
-export default function useTranslate(labels, selectedLang) {
-  const [translated, setTranslated] = useState(labels);
+const BACKEND_URL = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
+
+export default function useTranslate(textMap, targetLang) {
+  const [translated, setTranslated] = useState(textMap);
 
   useEffect(() => {
-    async function doTranslate() {
-      if (!labels) return;
-
-      const langCode = LANG_MAP[selectedLang];
-
-      // English → no translation required
-      if (!langCode || langCode === "en-US") {
-        setTranslated(labels);
-        return;
-      }
-
-      const newLabels = {};
-
-      for (const key of Object.keys(labels)) {
-        const original = labels[key];
-        const resp = await translateText(original, langCode);
-        newLabels[key] = resp?.translatedText || original;
-      }
-
-      setTranslated(newLabels);
+    if (!targetLang || targetLang === "English") {
+      setTranslated(textMap);
+      return;
     }
 
-    doTranslate();
-  }, [labels, selectedLang]);
+    async function translateAll() {
+      let output = {};
+      for (const key in textMap) {
+        try {
+          const res = await fetch(`${BACKEND_URL}/translate`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              text: textMap[key],
+              targetLangCode: targetLang,
+            }),
+          });
+
+          const data = await res.json();
+          output[key] = data.translatedText || textMap[key];
+        } catch (e) {
+          output[key] = textMap[key];
+        }
+      }
+      setTranslated(output);
+    }
+
+    translateAll();
+  }, [textMap, targetLang]);
 
   return translated;
 }
