@@ -11,7 +11,7 @@ const passport = require('passport');
 require('./auth/passport-setup');
 const path = require('path');
 
-app.set('trust proxy', 1);
+
 
 const app = express();
 const port = 3000;
