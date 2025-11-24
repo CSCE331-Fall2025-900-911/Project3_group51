@@ -17,6 +17,7 @@ const app = express();
 const port = 3000;
 
 // ... (rest of the file is the same) ...
+app.set('trust proxy', 1); // honor X-Forwarded-* so https redirects work behind Render proxy
 app.use(cors({
   origin: [
     'http://localhost:5173', 
