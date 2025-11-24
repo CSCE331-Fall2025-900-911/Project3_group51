@@ -101,13 +101,15 @@ router.get('/inventory', async (_req, res) => {
   try {
     const r = await pool.query(
       `SELECT
+         mi.drinkid,
          s.stockid,
-         COALESCE(mi.drinkname, 'Item ' || s.drinkid::text) AS itemname,
-         s.quantity  AS qty,
-         s.alert_level AS threshold
-       FROM stock s
-       LEFT JOIN menuitem mi ON s.drinkid = mi.drinkid
-       ORDER BY itemname`
+         COALESCE(mi.drinkname, 'Item ' || mi.drinkid::text) AS itemname,
+         COALESCE(s.quantity, 0) AS qty,
+         COALESCE(s.alert_level, 0) AS threshold,
+         s.restock_date
+       FROM menuitem mi
+       LEFT JOIN stock s ON s.drinkid = mi.drinkid
+       ORDER BY mi.drinkname`
     );
     res.json(r.rows);
   } catch (e) {

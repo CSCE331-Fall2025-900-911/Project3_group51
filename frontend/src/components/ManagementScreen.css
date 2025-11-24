@@ -108,15 +108,39 @@
     font-weight: 500;
   }
   
-  .ok-pill {
-    display: inline-flex;
-    align-items: center;
-    padding: 0.15rem 0.55rem;
-    border-radius: 9999px;
-    background: #ecfdf3;
-    color: #166534;
-    font-size: 0.8rem;
-  }
+.ok-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.15rem 0.55rem;
+  border-radius: 9999px;
+  background: #ecfdf3;
+  color: #166534;
+  font-size: 0.8rem;
+}
+
+.inv-input {
+  width: 80px;
+  padding: 0.35rem 0.4rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+}
+
+.inv-actions {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.inv-input {
+  width: 80px;
+  padding: 0.35rem 0.4rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+}
+
+.inv-actions {
+  display: flex;
+  gap: 0.35rem;
+}
   
   /* Trends mini chart */
   .trends-caption {
