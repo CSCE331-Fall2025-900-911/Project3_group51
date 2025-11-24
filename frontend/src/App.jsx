@@ -10,7 +10,11 @@ import CashierScreen from './components/CashierScreen.jsx';
 import ManagementMenu from "./components/ManagementScreen.jsx";
 import TrendsScreen from "./components/TrendsScreen.jsx";
 import InventoryScreen from "./components/InventoryScreen.jsx";
+import MenuManagementScreen from "./components/MenuManagementScreen.jsx";
+import EmployeeManagementScreen from "./components/EmployeeManagementScreen.jsx";
+import ManagerPortal from "./components/ManagerPortal.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
+import MagnifyControls from './components/MagnifyControls.jsx';
 
 function App() {
   
@@ -23,12 +27,13 @@ function App() {
 
   return (
     <>
+      <MagnifyControls />
       <Routes>
         <Route path="/" element= {<HomeScreen/>}/>
         
         <Route 
           path="/order" 
-          element= {<OrderScreen cart={cart} />}
+          element= {<OrderScreen cart={cart} setCart={setCart} />}
         />
         
         <Route 
@@ -51,39 +56,39 @@ function App() {
           element= {<ConfirmationScreen />}
         />
 
-        <Route 
-          path="/cashier" 
-          element={
-            <ProtectedRoute requireRole="employee">
-              <CashierScreen/>
-            </ProtectedRoute>
-          }
-        />
-        
-        <Route
-          path="/management"
-          element={
-            <ProtectedRoute requireRole="manager">
-              <ManagementMenu />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/management/trends"
-          element={
-            <ProtectedRoute requireRole="manager">
-              <TrendsScreen />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/management/inventory"
-          element={
-            <ProtectedRoute requireRole="manager">
-              <InventoryScreen />
-            </ProtectedRoute>
-          }
-        />
+      <Route 
+        path="/cashier" 
+        element= {<CashierScreen cart={cart} setCart={setCart} />}
+      />
+      <Route path="/manager-portal" element={<ManagerPortal />} />
+        {/* Management entry page */}
+      <Route
+        path="/management"
+        element={
+            <ManagementMenu />
+        }
+      />
+         {/* Management sub-pages */}
+      <Route
+        path="/management/trends"
+        element={
+            <TrendsScreen />
+        }
+      />
+      <Route
+        path="/management/inventory"
+        element={
+            <InventoryScreen />
+        }
+      />
+      <Route
+        path="/management/menu"
+        element={<MenuManagementScreen />}
+      />
+      <Route
+        path="/management/employees"
+        element={<EmployeeManagementScreen />}
+      />
       </Routes>
     </>
   );

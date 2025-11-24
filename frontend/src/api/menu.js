@@ -19,3 +19,53 @@ export async function getMenuItem(id) {
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return res.json();
 }
+
+export async function createMenuItem(payload) {
+    const res = await fetch(`${API}/menu`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+    });
+    if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`HTTP ${res.status}: ${text}`);
+    }
+    return res.json(); // { id }
+}
+
+export async function updateMenuItem(id, payload) {
+    const res = await fetch(`${API}/menu/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+    });
+    if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`HTTP ${res.status}: ${text}`);
+    }
+    return res.json();
+}
+
+export async function deleteMenuItem(id) {
+    const res = await fetch(`${API}/menu/${id}`, {
+        method: "DELETE",
+    });
+    if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`HTTP ${res.status}: ${text}`);
+    }
+    return res.json();
+}
+
+export async function uploadMenuImage(filename, base64Data) {
+    const res = await fetch(`${API}/menu/upload-image`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ filename, data: base64Data }),
+    });
+    if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`HTTP ${res.status}: ${text}`);
+    }
+    return res.json(); // { filename }
+}

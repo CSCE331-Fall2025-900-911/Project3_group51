@@ -1,0 +1,114 @@
+.employee-mgmt {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px;
+}
+
+.employee-mgmt__header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.employee-mgmt__header h1 {
+  margin: 0;
+  font-size: 1.75rem;
+}
+
+.employee-mgmt__back {
+  border: 1px solid #a4b0be;
+  border-radius: 4px;
+  padding: 6px 12px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.employee-mgmt__status {
+  padding: 10px 12px;
+  border-radius: 6px;
+}
+
+.employee-mgmt__status.info {
+  background: #e6f4ea;
+  color: #205522;
+  border: 1px solid #9fd2a6;
+}
+
+.employee-mgmt__status.error {
+  background: #ffe5e5;
+  color: #842029;
+  border: 1px solid #f5c2c7;
+}
+
+.employee-mgmt__table-wrap {
+  border: 1px solid #dcdfe3;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.employee-mgmt__table-wrap table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.employee-mgmt__table-wrap th,
+.employee-mgmt__table-wrap td {
+  padding: 10px;
+  border-bottom: 1px solid #e8ebf0;
+  text-align: left;
+}
+
+.employee-mgmt__table-wrap tbody tr {
+  cursor: pointer;
+}
+
+.employee-mgmt__table-wrap tbody tr.selected {
+  background: #e8f0fe;
+}
+
+.employee-mgmt__table-wrap tbody tr:hover {
+  background: #f5f7fa;
+}
+
+.employee-mgmt__table-wrap .empty-row {
+  text-align: center;
+  color: #7a7a7a;
+  padding: 20px 0;
+}
+
+.employee-mgmt__form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  border-top: 1px solid #dcdfe3;
+  padding-top: 12px;
+}
+
+.employee-mgmt__form input,
+.employee-mgmt__form select {
+  flex: 1;
+  min-width: 150px;
+  padding: 8px;
+  border: 1px solid #cfd4da;
+  border-radius: 4px;
+}
+
+.employee-mgmt__form select {
+  background: white;
+}
+
+.employee-mgmt__form button {
+  border: none;
+  border-radius: 4px;
+  padding: 8px 14px;
+  cursor: pointer;
+  background: #4a90e2;
+  color: white;
+}
+
+.employee-mgmt__form button:disabled {
+  background: #9bbce5;
+  cursor: not-allowed;
+}

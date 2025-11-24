@@ -34,7 +34,7 @@ router.get('/role', async (req, res) => {
 router.get('/', async (_, res) => {
   try {
     const result = await pool.query(
-      'SELECT employeeid, firstname, lastname, role FROM employees ORDER BY employeeid'
+      'SELECT employeeid, firstname, lastname, role, email FROM employees ORDER BY employeeid'
     );
     res.json(result.rows);
   } catch (err) {
@@ -44,13 +44,13 @@ router.get('/', async (_, res) => {
 
 // Add employee
 router.post('/', async (req, res) => {
-  const { firstname, lastname, role } = req.body;
+  const { firstname, lastname, role, email } = req.body;
   try {
     const next = await pool.query('SELECT COALESCE(MAX(employeeid),0)+1 AS next FROM employees');
     const id = next.rows[0].next;
     await pool.query(
-      'INSERT INTO employees (employeeid, firstname, lastname, role) VALUES ($1,$2,$3,$4::role_type)',
-      [id, firstname, lastname, role]
+      'INSERT INTO employees (employeeid, firstname, lastname, role, email) VALUES ($1,$2,$3,$4::role_type,$5)',
+      [id, firstname, lastname, role, email]
     );
     res.status(201).json({ id });
   } catch (err) {
@@ -60,11 +60,11 @@ router.post('/', async (req, res) => {
 
 // Update
 router.put('/:id', async (req, res) => {
-  const { id } = req.params, { firstname, lastname, role } = req.body;
+  const { id } = req.params, { firstname, lastname, role, email } = req.body;
   try {
     await pool.query(
-      'UPDATE employees SET firstname=$1, lastname=$2, role=$3::role_type WHERE employeeid=$4',
-      [firstname, lastname, role, id]
+      'UPDATE employees SET firstname=$1, lastname=$2, role=$3::role_type, email=$4 WHERE employeeid=$5',
+      [firstname, lastname, role, email, id]
     );
     res.json({ message: 'Updated' });
   } catch (err) {
@@ -85,7 +85,7 @@ router.delete('/:id', async (req, res) => {
 // Get by ID
 router.get('/:id', async (req, res) => {
   try {
-    const r = await pool.query('SELECT firstname, lastname FROM employees WHERE employeeid=$1', [req.params.id]);
+    const r = await pool.query('SELECT firstname, lastname, email FROM employees WHERE employeeid=$1', [req.params.id]);
     res.json(r.rows[0] || null);
   } catch (e) {
     res.status(500).json({ error: e.message });

@@ -1,22 +1,18 @@
 import React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import "./ManagementScreen.css";
 
-export default function ManagementScreen() {
-  const navigate = useNavigate();
+const API = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
 
-  const handleLogout = () =>{
-    localStorage.removeItem("user");
-    navigate("/login");
-  }
+export default function ManagementScreen() {
 
   return (
     <div className="mgmt-menu-wrap">
       <header className="mgmt-header">
         <h1>Management</h1>
-        <button className="btn back-btn" onClick={handleLogout}>
+        <a className="btn back-btn" href={`${API}/auth/logout`}>
           ⬅ Back to Login
-        </button>
+        </a>
       </header>
 
       <main className="mgmt-main">
@@ -26,6 +22,12 @@ export default function ManagementScreen() {
           </Link>
           <Link to="/management/inventory" className="menu-btn">
             Inventory
+          </Link>
+          <Link to="/management/menu" className="menu-btn">
+            Menu Management
+          </Link>
+          <Link to="/management/employees" className="menu-btn">
+            Employee Management
           </Link>
         </div>
         <p className="hint">Choose a section above to view details.</p>
