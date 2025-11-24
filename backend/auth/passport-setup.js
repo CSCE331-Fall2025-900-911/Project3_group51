@@ -2,6 +2,11 @@ const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const pool = require('../db/pool'); 
 
+const isProduction = process.env.NODE_ENV === 'production';
+const callbackURL = isProduction
+  ? 'https://project3-group51-y74g.onrender.com/api/auth/google/callback'
+  : 'http://localhost:3000/api/auth/google/callback';
+
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
