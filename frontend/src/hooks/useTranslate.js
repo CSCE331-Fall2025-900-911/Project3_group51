@@ -1,10 +1,6 @@
 import { useState, useEffect } from "react";
-import { LANG_MAP } from "./useLanguage";
-
-const BACKEND_URL = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
-
-// Cache translation
-const translationCache = {};
+import { LANG_MAP } from "./useLanguage"; 
+import { translateText } from "../utils/translate"; 
 
 export default function useTranslate(textMap, targetLang) {
   const [translated, setTranslated] = useState(textMap);
@@ -14,41 +10,25 @@ export default function useTranslate(textMap, targetLang) {
       setTranslated(textMap);
       return;
     }
+
     const langCode = LANG_MAP[targetLang];
+
     async function translateAll() {
-      let output = {};
-      for (const key in textMap) {
+      const newTranslations = {};
+
+      const promises = Object.keys(textMap).map(async (key) => {
         const originalText = textMap[key];
-        const cacheKey = `${targetLang}:${originalText}`;
-
-        // Check cache
-        if (translationCache[cacheKey]) {
-          output[key] = translationCache[cacheKey];
-          continue;
-        }
-
-        // If cache miss, call backend
         try {
-          const res = await fetch(`${BACKEND_URL}/translate`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              text: textMap[key],
-              targetLangCode: langCode,
-            }),
-          });
-
-          const data = await res.json();
-          const translatedText = data.translatedText || originalText;
-
-          translationCache[cacheKey] = translatedText;
-          output[key] = translatedText;
-
-        } catch (e) {
-          output[key] = originalText;
+          const result = await translateText(originalText, langCode);
+          newTranslations[key] = result.translatedText;
+        } catch (err) {
+          console.error(err);
+          newTranslations[key] = originalText;
         }
-      }
-      setTranslated(output);
+      });
+
+      await Promise.all(promises);
+      setTranslated(newTranslations);
     }
 
     translateAll();
