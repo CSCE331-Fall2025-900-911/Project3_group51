@@ -11,10 +11,13 @@ const passport = require('passport');
 require('./auth/passport-setup');
 const path = require('path');
 
+
+
 const app = express();
 const port = 3000;
 
-// ... (rest of the file is the same) ...
+app.set('trust proxy', 1);
+
 app.use(cors({
   origin: [
     'http://localhost:5173', 

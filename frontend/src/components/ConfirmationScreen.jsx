@@ -1,42 +1,51 @@
 // frontend/src/components/ConfirmationScreen.jsx
-import React, { useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import './ConfirmationScreen.css'; // We will create this file next
+import React, { useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import "./ConfirmationScreen.css";
+
+import useLanguage from "../hooks/useLanguage";
+import useTranslate from "../hooks/useTranslate";
+import { CONFIRM_LABELS } from "./ConfirmationScreen.labels";
 
 function ConfirmationScreen() {
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Language + translation
+  const { selectedLang } = useLanguage();
+  const labels = useTranslate(CONFIRM_LABELS, selectedLang);
+
   const storedOrigin =
     typeof window !== "undefined"
       ? sessionStorage.getItem("orderOrigin") || "customer"
       : "customer";
+
   const redirectTo =
     location.state?.returnTo || (storedOrigin === "cashier" ? "/cashier" : "/");
 
-  // Generate a random order number for display
+  // Generate random order number
   const orderNumber = Math.floor(Math.random() * 1000) + 1;
 
-  // This effect runs once when the component mounts
   useEffect(() => {
-    // Set a timer to redirect back to the home screen after 5 seconds
     const timer = setTimeout(() => {
-      navigate(redirectTo); // Navigate back to appropriate screen
-    }, 5000); // 5000 milliseconds = 5 seconds
+      navigate(redirectTo);
+    }, 5000);
 
-    // Clean up the timer if the component is unmounted early
     return () => clearTimeout(timer);
-  }, [navigate]); // Add navigate as a dependency
+  }, [navigate, redirectTo]);
 
   return (
     <div className="confirmation-page">
       <div className="confirmation-box">
-        <h1>Thank You For Your Order!</h1>
-        <p className="order-number">Your order number is:</p>
+        <h1>{labels.thankYou}</h1>
+
+        <p className="order-number">{labels.yourOrderNumber}</p>
+
         <h2 className="order-id">{orderNumber}</h2>
-        <p className="wait-message">Please wait at the counter for your order.</p>
-        <p className="redirect-message">
-          You will be redirected to the home screen shortly...
-        </p>
+
+        <p className="wait-message">{labels.waitCounter}</p>
+
+        <p className="redirect-message">{labels.redirectMsg}</p>
       </div>
     </div>
   );

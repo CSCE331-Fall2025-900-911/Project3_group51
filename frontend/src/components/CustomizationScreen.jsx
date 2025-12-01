@@ -1,167 +1,211 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import './CustomizationScreen.css'; // CSS file we will create next
+import React, { useState, useEffect, useMemo } from "react";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 
-function CustomizationScreen({addToCart}) {
-  const { drinkid } = useParams(); 
+import "./CustomizationScreen.css";
+
+// Language + translation
+import useLanguage from "../hooks/useLanguage";
+import useTranslate from "../hooks/useTranslate";
+import { CUSTOM_LABELS } from "./CustomizationScreen.labels";
+
+const ICE_OPTIONS = ["Regular Ice", "Light Ice", "No Ice", "Extra Ice"];
+
+const SUGAR_OPTIONS = [
+  "100% Sugar",
+  "80% Sugar",
+  "50% Sugar",
+  "30% Sugar",
+  "No Sugar",
+  "120% Sugar",
+];
+
+const TOPPING_OPTIONS = [
+  { name: "Pearl (Boba)", price: "+0.75" },
+  { name: "Coffee Jelly", price: "+0.75" },
+  { name: "Pudding", price: "+0.75" },
+  { name: "Lychee Jelly", price: "+0.75" },
+  { name: "Honey Jelly", price: "+0.75" },
+  { name: "Crystal Boba", price: "+0.75" },
+  { name: "Mango Popping Boba", price: "+1.00" },
+  { name: "Strawberry Popping Boba", price: "+1.00" },
+  { name: "Ice Cream", price: "+1.00" },
+  { name: "Creama", price: "+1.25" },
+];
+
+function CustomizationScreen({ addToCart }) {
+  const { drinkid } = useParams();
   const navigate = useNavigate();
-  
   const location = useLocation();
+
+  // Language system
+  const { selectedLang } = useLanguage();
+  const labels = useTranslate(CUSTOM_LABELS, selectedLang);
+
+  // Drink item from navigation
   const locationState = location.state || {};
-  const { item } = locationState; // item = { drinkid: 1, drinkname: "...", price: "..." }
-  const orderOrigin = locationState.origin || 'customer';
+  const { item } = locationState;
+  const orderOrigin = locationState.origin || "customer";
   const returnTo =
-    locationState.returnTo || (orderOrigin === 'cashier' ? '/cashier' : '/order');
+    locationState.returnTo || (orderOrigin === "cashier" ? "/cashier" : "/order");
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      sessionStorage.setItem("orderOrigin", orderOrigin);
-    }
+    sessionStorage.setItem("orderOrigin", orderOrigin);
   }, [orderOrigin]);
 
-  const [iceLevel, setIceLevel] = useState('Regular Ice');
-  const [sugarLevel, setSugarLevel] = useState('100% Sugar');
+  // ------------------------------
+  // Local UI State
+  // ------------------------------
+  const [iceLevel, setIceLevel] = useState("Regular Ice");
+  const [sugarLevel, setSugarLevel] = useState("100% Sugar");
   const [toppings, setToppings] = useState([]);
-  
-  // Topping selection logic (allows max 2)
-  const handleToppingClick = (toppingName) => {
-    setToppings(prevToppings => {
-      const isSelected = prevToppings.includes(toppingName);
-      if (isSelected) {
-        // Return a new array without the topping
-        return prevToppings.filter(t => t !== toppingName);
-      } else {
-        // Return a new array with the topping added
-        if (prevToppings.length < 2) {
-          return [...prevToppings, toppingName];
-        }
-      }
-      // If max (2) is reached and it's not selected, return the same state
-      return prevToppings; 
+
+  // ------------------------------
+  // Memoized maps (stable, no re-renders)
+  // ------------------------------
+  const iceMap = useMemo(
+    () => Object.fromEntries(ICE_OPTIONS.map((o) => [o, o])),
+    []
+  );
+  const sugarMap = useMemo(
+    () => Object.fromEntries(SUGAR_OPTIONS.map((o) => [o, o])),
+    []
+  );
+  const toppingMap = useMemo(
+    () => Object.fromEntries(TOPPING_OPTIONS.map((t) => [t.name, t.name])),
+    []
+  );
+
+  // ------------------------------
+  // Safe translations (no loops)
+  // ------------------------------
+  const translatedIce = useTranslate(iceMap, selectedLang);
+  const translatedSugar = useTranslate(sugarMap, selectedLang);
+  const translatedToppings = useTranslate(toppingMap, selectedLang);
+
+  // ------------------------------
+  // Topping selector
+  // ------------------------------
+  const handleToppingClick = (name) => {
+    setToppings((prev) => {
+      if (prev.includes(name)) return prev.filter((t) => t !== name);
+      return prev.length < 2 ? [...prev, name] : prev;
     });
   };
 
-const handleConfirm = () => {
-    
-    // 1. Get the base price of the drink
+  // ------------------------------
+  // Confirm button
+  // ------------------------------
+  const handleConfirm = () => {
     let basePrice = parseFloat(item.price);
-    
-    // 2. Calculate the total price of selected toppings
     let toppingsPrice = 0;
-    toppings.forEach(toppingName => {
-      // Find the topping object in the options array
-      const topping = toppingOptions.find(opt => opt.name === toppingName);
-      if (topping) {
-        // Convert price string (e.g., "+0.75") to a number
-        toppingsPrice += parseFloat(topping.price);
-      }
+
+    toppings.forEach((name) => {
+      const found = TOPPING_OPTIONS.find((t) => t.name === name);
+      toppingsPrice += found ? parseFloat(found.price) : 0;
     });
 
-    // 3. Calculate the final price
     const finalPrice = basePrice + toppingsPrice;
-    
-    // Create the item object to add to the cart
-    const uniqueSuffix = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+
+    const uniqueSuffix = `${Date.now()}-${Math.random()
+      .toString(36)
+      .slice(2, 8)}`;
+
     const customizedItem = {
       id: item.drinkid,
-      name: `${item.drinkname} (Custom)`, // Add "(Custom)" to the name
-      price: finalPrice.toFixed(2), // Use the new final price
+      name: `${item.drinkname} (Custom)`,
+      price: finalPrice.toFixed(2),
       ice: iceLevel,
       sugar: sugarLevel,
-      toppings: toppings,
+      toppings,
       quantity: 1,
       isCustom: true,
       cartItemId: `${item.drinkid}-${uniqueSuffix}`,
       origin: orderOrigin,
     };
-    
-    // Call the function passed down from App.jsx
-    addToCart(customizedItem);
 
-    // Navigate back to the originating screen
+    addToCart(customizedItem);
     navigate(returnTo);
   };
-  
-  // --- Data for the buttons (from wireframe) ---
-  const iceOptions = ['Regular Ice', 'Light Ice', 'No Ice', 'Extra Ice'];
-  const sugarOptions = ['100% Sugar', '80% Sugar', '50% Sugar', '30% Sugar', 'No Sugar', '120% Sugar'];
-  const toppingOptions = [
-    { name: 'Pearl (Boba)', price: '+0.75' },
-    { name: 'Coffee Jelly', price: '+0.75' },
-    { name: 'Pudding', price: '+0.75' },
-    { name: 'Lychee Jelly', price: '+0.75' },
-    { name: 'Honey Jelly', price: '+0.75' },
-    { name: 'Crystal Boba', price: '+0.75' },
-    { name: 'Mango Popping Boba', price: '+1.00' },
-    { name: 'Strawberry Popping Boba', price: '+1.00' },
-    { name: 'Ice Cream', price: '+1.00' },
-    { name: 'Creama', price: '+1.25' },
-  ];
 
+  // ------------------------------
+  // UI
+  // ------------------------------
   return (
     <div className="custom-page">
-    <h1 className="custom-title">Customization ({item.drinkname})</h1>
+      <h1 className="custom-title">
+        {labels.customization} ({item.drinkname})
+      </h1>
+
       <div className="custom-content">
-        {/* Left Column: Ice, Sugar, Other */}
+        {/* LEFT COLUMN */}
         <div className="custom-column">
+          {/* ICE */}
           <section className="custom-section">
-            <h2>ICE LEVEL (CHOOSE ONE)</h2>
+            <h2>{labels.iceLevel}</h2>
             <div className="custom-grid grid-2-col">
-              {iceOptions.map(name => (
+              {ICE_OPTIONS.map((name) => (
                 <button
                   key={name}
-                  className={`option-btn ${iceLevel === name ? 'selected' : ''}`}
+                  className={`option-btn ${iceLevel === name ? "selected" : ""}`}
                   onClick={() => setIceLevel(name)}
                 >
-                  {name}
+                  {translatedIce[name]}
                 </button>
               ))}
             </div>
           </section>
 
+          {/* SUGAR */}
           <section className="custom-section">
-            <h2>SUGAR LEVEL</h2>
+            <h2>{labels.sugarLevel}</h2>
             <div className="custom-grid grid-2-col">
-              {sugarOptions.map(name => (
+              {SUGAR_OPTIONS.map((name) => (
                 <button
                   key={name}
-                  className={`option-btn ${sugarLevel === name ? 'selected' : ''}`}
+                  className={`option-btn ${
+                    sugarLevel === name ? "selected" : ""
+                  }`}
                   onClick={() => setSugarLevel(name)}
                 >
-                  {name}
+                  {translatedSugar[name]}
                 </button>
               ))}
             </div>
           </section>
 
+          {/* OTHER */}
           <section className="custom-section">
-            <h2>OTHER CUSTOMIZATIONS OR RESTRICTIONS</h2>
+            <h2>{labels.otherCustom}</h2>
             <textarea className="custom-textarea" rows="5"></textarea>
           </section>
         </div>
 
-        {/* Right Column: Toppings, Confirm */}
+        {/* RIGHT COLUMN */}
         <div className="custom-column">
+          {/* TOPPINGS */}
           <section className="custom-section">
-            <h2>CHOOSE TOPPINGS (2 MAX)</h2>
+            <h2>{labels.chooseToppings}</h2>
             <div className="custom-grid grid-2-col">
-              {toppingOptions.map(item => (
+              {TOPPING_OPTIONS.map((item) => (
                 <button
                   key={item.name}
-                  className={`option-btn topping ${toppings.includes(item.name) ? 'selected' : ''}`}
+                  className={`option-btn topping ${
+                    toppings.includes(item.name) ? "selected" : ""
+                  }`}
                   onClick={() => handleToppingClick(item.name)}
-                  // Disable button if max is reached and this item is not already selected
-                  disabled={toppings.length >= 2 && !toppings.includes(item.name)}
+                  disabled={
+                    toppings.length >= 2 && !toppings.includes(item.name)
+                  }
                 >
-                  <span>{item.name}</span>
+                  <span>{translatedToppings[item.name]}</span>
                   <span className="topping-price">({item.price})</span>
                 </button>
               ))}
             </div>
           </section>
-          
+
           <button className="confirm-btn" onClick={handleConfirm}>
-            Confirm
+            {labels.confirm}
           </button>
         </div>
       </div>
