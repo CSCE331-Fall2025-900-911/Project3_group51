@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 
 import "./OrderScreen.css";
 import { getMenu } from "../api/menu.js";
+import MagnifyControls from "./MagnifyControls.jsx";
 
 // Language + translation hooks
 import useLanguage from "../hooks/useLanguage";
@@ -108,8 +109,7 @@ function OrderScreen({ cart, setCart }) {
     <div className="menu-page">
       {/* Header */}
       <header className="header">
-        <button className="nav-btn">{labels.viewMenu}</button>
-
+        <MagnifyControls />
         <h1 className="menu-title">{labels.menu}</h1>
 
         <button className="nav-btn" onClick={() => setShowLanguage(!showLanguage)}>

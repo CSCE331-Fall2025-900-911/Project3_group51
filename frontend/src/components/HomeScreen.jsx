@@ -5,7 +5,7 @@ import useLanguage, { LANG_MAP } from "../hooks/useLanguage.js";
 import useTranslate from "../hooks/useTranslate";
 import { translateText } from "../utils/translate";
 import { HOME_LABELS } from "./HomeScreen.labels.js";
-
+import MagnifyControls from "./MagnifyControls.jsx";
 
 import "./HomeScreen.css";
 
@@ -81,7 +81,7 @@ function HomeScreen() {
     <div className="home-container">
       {/* Header */}
       <header className="home-header">
-        <div className="nav-placeholder"></div>
+        <MagnifyControls />
 
         <h1 className="home-title">{labels.home}</h1>
 
