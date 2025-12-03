@@ -7,6 +7,7 @@ import useTranslate from "../hooks/useTranslate";
 import { CHECKOUT_LABELS } from "./CheckoutScreen.labels";
 
 import { createOrder, addOrderItem, updateOrderTotal } from '../api/orders.js';
+import MagnifyControls from './MagnifyControls.jsx';
 
 // Tax rate
 const TAX_RATE = 0.0825;
@@ -73,10 +74,14 @@ function CheckoutScreen({ cart, setCart }) {
       
       {/* Header */}
       <header className="checkout-header">
+        <div className="header-left">
+            <MagnifyControls />
+        </div>
+
+        <h1 className="checkout-title">{labels.checkout}</h1>
         <button className="back-btn" onClick={() => navigate(returnTo)}>
           {labels.back}
         </button>
-        <h1 className="checkout-title">{labels.checkout}</h1>
       </header>
 
       <div className="checkout-content">

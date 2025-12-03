@@ -1,5 +1,5 @@
 import React, { useState } from 'react'; 
-import { Routes, Route} from 'react-router-dom';
+import { Routes, Route, useLocation} from 'react-router-dom';
 import HomeScreen from './components/HomeScreen.jsx';
 import OrderScreen from './components/OrderScreen.jsx';
 import CustomizationScreen from './components/CustomizationScreen.jsx'; 
@@ -13,8 +13,6 @@ import InventoryScreen from "./components/InventoryScreen.jsx";
 import MenuManagementScreen from "./components/MenuManagementScreen.jsx";
 import EmployeeManagementScreen from "./components/EmployeeManagementScreen.jsx";
 import ManagerPortal from "./components/ManagerPortal.jsx";
-import ProtectedRoute from "./components/ProtectedRoute.jsx";
-import MagnifyControls from './components/MagnifyControls.jsx';
 
 function App() {
   
@@ -27,7 +25,6 @@ function App() {
 
   return (
     <>
-      <MagnifyControls />
       <Routes>
         <Route path="/" element= {<HomeScreen/>}/>
         

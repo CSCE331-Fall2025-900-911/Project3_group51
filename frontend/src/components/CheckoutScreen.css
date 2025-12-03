@@ -14,32 +14,42 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px;
+  padding: 15px 20px;
   border-bottom: 1px solid #aaa;
+  height: 80px;
+  position: relative;
+}
+
+.checkout-title {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 2rem;
+  font-weight: bold;
+  margin: 0;
+  background: none; 
+  padding: 0;
+}
+
+.header-left {
+  z-index: 10;
 }
 
 .back-btn {
-  font-size: 16px;
-  padding: 10px 20px;
-  border-radius: 8px;
+  font-size: 18px;
+  padding: 10px 24px;
+  border-radius: 30px;
   border: 1px solid #aaa;
   background-color: #f0f0f0;
   cursor: pointer;
+  font-weight: 600;
+  z-index: 10;
 }
 .back-btn:hover {
   background-color: #e0e0e0;
 }
 
-.checkout-title {
-  font-size: 1.5rem;
-  background: #ddd;
-  padding: 8px 20px;
-  border-radius: 10px;
-  margin: 0;
-  /* Add an invisible placeholder to keep title centered */
-  margin-right: calc(50% - 100px); /* Adjust 100px as needed */
-  transform: translateX(50%);
-}
+
 
 .checkout-content {
   display: flex;
@@ -167,4 +177,44 @@
   color: #d32f2f; /* Red color to show amount due */
   border-color: #d32f2f;
   margin-top: 15px;
+}
+
+body[data-magnify-level="1"] .checkout-title {
+  font-size: 2.4rem;
+}
+body[data-magnify-level="1"] .payment-btn {
+  font-size: 24px;
+  min-height: 140px;
+}
+body[data-magnify-level="1"] .summary-item, 
+body[data-magnify-level="1"] .summary-total {
+  font-size: 1.2rem;
+}
+body[data-magnify-level="1"] .back-btn {
+  font-size: 20px;
+  padding: 12px 28px;
+}
+body[data-magnify-level="1"] .payment-options h2,
+body[data-magnify-level="1"] .summary-box h3 {
+  font-size: 1.5rem; 
+}
+
+body[data-magnify-level="2"] .checkout-title {
+  font-size: 2.8rem;
+}
+body[data-magnify-level="2"] .payment-btn {
+  font-size: 28px;
+  min-height: 160px;
+}
+body[data-magnify-level="2"] .summary-item, 
+body[data-magnify-level="2"] .summary-total {
+  font-size: 1.4rem;
+}
+body[data-magnify-level="2"] .back-btn {
+  font-size: 22px;
+  padding: 14px 32px;
+}
+body[data-magnify-level="2"] .payment-options h2,
+body[data-magnify-level="2"] .summary-box h3 {
+  font-size: 2.0rem;
 }
