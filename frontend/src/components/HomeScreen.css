@@ -1,4 +1,3 @@
-/* Styles for HomeScreen.jsx */
 
 .home-container {
   display: flex;
@@ -6,56 +5,146 @@
   height: 100vh;
   width: 90%;
   margin: auto;
-  font-family: Arial, sans-serif;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   text-align: center;
-  border: 1px solid #ccc;
-  position: relative; 
+  border: none;
+  position: relative;
+  background-color: #F4F8FB; 
 }
 
-/* 1. Top Header */
 .home-header {
-  padding: 10px; /* Reduced padding to match OrderScreen */
+  padding: 15px 25px; 
   display: flex;
-  justify-content: space-between; /* This pushes title to center */
+  justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid #ccc;
+  border-bottom: 1px solid #e0e0e0;
+  background-color: white; 
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); 
 }
 
-/* New title style, inspired by OrderScreen's menu-title */
 .home-title {
-  font-size: 1.5rem; /* 24px */
-  background: #ddd;
+  font-size: 1.8rem;
+  background: #E0EAF3;
+  color: #333;
   padding: 8px 20px;
-  border-radius: 10px;
-  margin: 0; /* Remove default h1 margin */
+  border-radius: 25px;
+  margin: 0;
 }
 
 .nav-btn {
   font-size: 18px;
-  padding: 12px 24px;
+  padding: 10px 20px; 
   border-radius: 30px;
-  border: 1px solid #aaa;
-  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  background-color: #E5EAF3;
+  color: #333;
   cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 600;
+  
+
+  display: flex;
+  align-items: center;
+  gap: 8px; 
 }
+
 .nav-btn:hover {
-  background-color: #e0e0e0;
+  background-color: #d8e0eb; 
+}
+.nav-btn .nav-icon {
+  height: 24px;
+  width: 24px;
+  filter: invert(30%); 
 }
 
-/* New placeholder style to balance the flexbox */
-.nav-placeholder {
-  /* This invisible element takes up the same space 
-     as the language button to keep the title centered. */
-  width: 130px; /* Approximate width of the language button */
-  visibility: hidden;
+.home-main {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 30px;
+  gap: 40px;
 }
 
+.weather-box {
+  width: 300px;
+  border: none;
+  background: #E8F8EA;
+  padding: 20px;
+  font-size: 20px;
+  border-radius: 12px; 
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
 
-/* 2. Language Dropdown */
+.weather-temp {
+  font-size: 36px;
+  font-weight: bold;
+  margin: 8px 0;
+  color: #1A993D; 
+}
+
+.weather-image {
+  flex-grow: 1;
+  width: 90%;
+  border: 1px dashed #d0d0d0; 
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  color: #888;
+  background-color: white;
+}
+
+.home-footer {
+  padding: 25px;
+  border-top: none;
+  display: flex;
+  justify-content: center; 
+  align-items: center;
+  gap: 30px;
+  background-color: #333333;
+  color: white;
+  position: relative; 
+}
+
+.start-button {
+  font-size: 38px;
+  font-weight: 800;
+  padding: 45px 75px; 
+  border-radius: 15px; 
+  border: none;
+  background-color: #FF9900; 
+  color: white;
+  cursor: pointer;
+  box-shadow: 0 8px 15px rgba(255, 153, 0, 0.4); 
+  transition: all 0.2s ease-in-out;
+}
+.start-button:hover {
+  background-color: #e58a00;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(255, 153, 0, 0.5);
+}
+
+.login-tap-zone {
+  position: absolute;
+  bottom: 0; 
+  right: 0; 
+  
+  width: 100px;
+  height: 100px; 
+  
+  z-index: 50; 
+  cursor: pointer;
+  
+  background-color: transparent; 
+}
+
 .language-dropdown {
   position: absolute;
-  top: 70px; /* Position below the nav bar */
-  right: 15px; /* Align to the right */
+  top: 70px; 
+  right: 15px;
   width: 150px;
   border: 1px solid #ccc;
   background-color: white;
@@ -75,73 +164,13 @@
   background-color: #f0f0f0;
 }
 
-/* 3. Main Content (Weather) */
-.home-main {
-  flex-grow: 1; 
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  gap: 20px;
-}
-
-.weather-box {
-  width: 250px;
-  border: 1px solid #aaa;
-  padding: 15px;
-  font-size: 18px;
-}
-.weather-temp {
-  font-size: 28px;
+.language-dropdown button.selected {
+  background-color: #4A90E2; 
+  color: white;
   font-weight: bold;
-  margin: 5px 0;
 }
-.weather-image {
-  flex-grow: 1;
-  width: 80%;
-  border: 1px solid #aaa;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 22px;
-  color: #888;
-  background-color: #f9f9f9;
-}
-
-/* 4. Footer (Action Buttons) */
-.home-footer {
-  padding: 20px;
-  border-top: 1px solid #ccc;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 20px;
-}
-
-.start-button {
-  font-size: 32px;
-  font-weight: bold;
-  padding: 40px 60px;
-  border-radius: 50px;
-  border: 2px solid #000;
-  background-color: #f9f9f9;
-  cursor: pointer;
-}
-.start-button:hover {
-  background-color: #e0e0e0;
-}
-
-.login-button {
-  font-size: 20px;
-  padding: 15px 30px;
-  border-radius: 30px;
-  border: 1px solid #aaa;
-  background-color: #f0f0f0;
-  cursor: pointer;
-}
-.login-button:hover {
-  background-color: #e0e0e0;
+.language-dropdown button:hover.selected {
+  background-color: #3578c0; 
 }
 /* ================================
    MAGNIFY STYLES (Level-based)

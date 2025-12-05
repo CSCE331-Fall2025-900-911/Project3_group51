@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
 import useLanguage, { LANG_MAP } from "../hooks/useLanguage.js";
@@ -12,10 +12,16 @@ import "./HomeScreen.css";
 function HomeScreen() {
   const navigate = useNavigate();
 
+  const imageBase = (import.meta.env.VITE_API_URL || "http://localhost:3000/api").replace(/\/api$/, "");
+
   // UI state
   const [showLanguage, setShowLanguage] = useState(false);
   const [weather, setWeather] = useState(null);
   const [translatedDesc, setTranslatedDesc] = useState("");
+
+  // Login Secret Tap State (NEW)
+  const [tapCount, setTapCount] = useState(0); 
+  const timerRef = useRef(null); 
 
   // Global language state
   const { selectedLang, setSelectedLang } = useLanguage();
@@ -77,18 +83,57 @@ function HomeScreen() {
     translateWeather();
   }, [weather, selectedLang]);
 
+  //Secret Login Logic
+  const handleSecretTap = useCallback((evt) => {
+    evt.stopPropagation(); 
+    
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+    }
+    
+    setTapCount(prevCount => {
+      const newCount = prevCount + 1;
+      
+      if (newCount >= 5) {
+        navigate("/login");
+        return 0; 
+      }
+      
+      timerRef.current = setTimeout(() => {
+        setTapCount(0);
+      }, 1500); 
+
+      return newCount;
+    });
+  }, [navigate]);
+
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+      }
+    };
+  }, []);
+
   return (
     <div className="home-container">
+      <div 
+          className="login-tap-zone" 
+          onClick={handleSecretTap} 
+          title="Hidden Employee Login Access (Tap 5 times)"
+      />
       {/* Header */}
       <header className="home-header">
         <MagnifyControls />
 
         <h1 className="home-title">{labels.home}</h1>
 
-        <button
-          className="nav-btn lang-btn"
-          onClick={() => setShowLanguage(!showLanguage)}
-        >
+        <button className="nav-btn" onClick={() => setShowLanguage(!showLanguage)}>
+          <img 
+            src={`${imageBase}/images/Icons/Language.png`} 
+            alt="Language Icon" 
+            className="nav-icon" 
+          />
           {labels.language}
         </button>
       </header>
@@ -96,16 +141,18 @@ function HomeScreen() {
       {/* Language Dropdown */}
       {showLanguage && (
         <div className="language-dropdown">
-          {LANG_OPTIONS.map((lang) => (
-            <button
-              key={lang}
-              onClick={() => {
-                setSelectedLang(lang);
-                setShowLanguage(false);
-              }}
-            >
-              {lang}
-            </button>
+          {["English", "Español", "Français", "Italiano", "Tiếng Việt", "한국어"].map(
+            (lang) => (
+              <button
+                key={lang}
+                className={lang === selectedLang ? "selected" : ""} 
+                onClick={() => {
+                  setSelectedLang(lang);
+                  setShowLanguage(false);
+                }}
+              >
+                {lang}
+              </button>
           ))}
         </div>
       )}
@@ -137,10 +184,6 @@ function HomeScreen() {
       <footer className="home-footer">
         <button className="start-button" onClick={() => navigate("/order")}>
           {labels.start}
-        </button>
-
-        <button className="login-button" onClick={() => navigate("/login")}>
-          {labels.login}
         </button>
       </footer>
     </div>

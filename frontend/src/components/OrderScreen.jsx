@@ -113,6 +113,11 @@ function OrderScreen({ cart, setCart }) {
         <h1 className="menu-title">{labels.menu}</h1>
 
         <button className="nav-btn" onClick={() => setShowLanguage(!showLanguage)}>
+          <img 
+            src={`${imageBase}/images/Icons/Language.png`} 
+            alt="Language Icon" 
+            className="nav-icon" 
+          />
           {labels.language}
         </button>
       </header>
@@ -124,6 +129,7 @@ function OrderScreen({ cart, setCart }) {
             (lang) => (
               <button
                 key={lang}
+                className={lang === selectedLang ? "selected" : ""} 
                 onClick={() => {
                   setSelectedLang(lang);
                   setShowLanguage(false);
@@ -220,6 +226,11 @@ function OrderScreen({ cart, setCart }) {
         </div>
 
         <button className="checkout-btn" onClick={handleCheckout}>
+          <img 
+            src={`${imageBase}/images/Icons/Cart.png`} 
+            alt="Cart Icon" 
+            className="checkout-icon" 
+          />
           {labels.checkout}
         </button>
       </footer>
