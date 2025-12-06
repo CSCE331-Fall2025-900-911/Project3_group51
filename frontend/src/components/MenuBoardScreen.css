@@ -1,79 +1,111 @@
-/* ===========================
-   Menu Board Print Style
-   =========================== */
+/* ======================================================
+   BASE CONTAINER
+   ====================================================== */
 
-   .menu-board-container {
-    max-width: 1400px;
-    margin: 2rem auto;
-    padding: 1rem 2rem;
+   .menu-board-wrapper {
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 2rem;
+    font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
+  }
+  
+  .menu-board-container {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 3rem;
-    font-family: "Helvetica Neue", Arial, sans-serif;
+    gap: 4rem;
   }
   
-  /* Category block */
-  .menu-board-section {
-    border-right: 2px solid #eee;
-    padding-right: 1.5rem;
-  }
+  /* ======================================================
+     CATEGORY HEADER
+     ====================================================== */
   
-  /* Category header row */
   .menu-board-header {
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    margin-bottom: 1rem;
+    margin-bottom: 0.75rem;
   }
   
-  /* Category title */
   .menu-board-category {
     font-size: 1.8rem;
     font-weight: 800;
     letter-spacing: 1px;
     text-transform: uppercase;
-    color: #000;
+    margin: 0;
   }
   
-  /* Category thumbnail (small!) */
   .menu-board-category-image {
     width: 50px;
     height: 50px;
     object-fit: cover;
     border-radius: 6px;
-    margin: 0;
     background: #f4f4f4;
   }
   
-  /* Drink list */
+  /* ======================================================
+     DRINK LIST
+     ====================================================== */
+  
   .menu-board-list {
     list-style: none;
     padding: 0;
     margin: 0;
   }
   
-  /* Each drink */
   .menu-board-item {
     display: grid;
-    grid-template-columns: 1fr auto;
-    padding: 0.3rem 0;
+    grid-template-columns: 1fr 60px;
+    border-bottom: 1px dotted rgba(0, 0, 0, 0.2);
+    padding: 0.35rem 0;
     font-size: 1.1rem;
-    border-bottom: 1px dotted #ddd;
   }
   
-  /* Drink name */
-  .menu-board-item span {
-    color: #222;
-  }
-  
-  /* Right price */
   .menu-board-price {
     font-weight: 700;
     color: #000;
-    padding-left: 1rem;
   }
   
-  /* Loading */
+  /* ======================================================
+     CUSTOMIZATION SECTION
+     ====================================================== */
+  
+  .menu-board-customization {
+    margin-top: 4rem;
+    padding-top: 3rem;
+    border-top: 2px solid #eee;
+  }
+  
+  .menu-board-custom-title {
+    font-size: 1.8rem;
+    font-weight: 800;
+    margin-bottom: 1.5rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  
+  .menu-board-custom-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 3rem;
+  }
+  
+  .menu-board-custom-grid h3 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+  }
+  
+  .menu-board-custom-grid ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    line-height: 1.6;
+  }
+  
+  /* ======================================================
+     LOADING
+     ====================================================== */
+  
   .menu-board-loading {
     font-size: 2rem;
     text-align: center;
