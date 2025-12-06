@@ -1,0 +1,88 @@
+/* Position dropdown in top-right corner */
+.right-align {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 2000;
+}
+
+/* Wrapper */
+.lang-dropdown {
+  position: relative;
+}
+
+/* Main button */
+.lang-dropdown-btn {
+  padding: 12px 18px;
+  background: #ffffff;
+  border: 2px solid #222;
+  border-radius: 10px;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+/* Arrow animation */
+.arrow {
+  transition: transform 0.25s ease;
+}
+
+.arrow.open {
+  transform: rotate(180deg);
+}
+
+/* Dropdown menu */
+.lang-dropdown-menu {
+  position: absolute;
+  top: 48px;
+  right: 0;
+  width: 180px;
+  background: white;
+  border: 2px solid #222;
+  border-radius: 10px;
+  overflow: hidden;
+  animation: fadeIn 0.2s ease-out;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+/* Menu item */
+.lang-dropdown-item {
+  padding: 12px 16px;
+  cursor: pointer;
+  font-size: 15px;
+  transition: background 0.2s ease;
+}
+
+.lang-dropdown-item:hover {
+  background: #f2f2f2;
+}
+
+/* Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Hide Google default UI */
+.goog-te-banner-frame.skiptranslate {
+  display: none !important;
+}
+
+body {
+  top: 0 !important;
+}
+
+.goog-te-combo,
+.goog-logo-link,
+.goog-te-gadget {
+  display: none !important;
+}

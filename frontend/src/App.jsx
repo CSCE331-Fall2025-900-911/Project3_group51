@@ -14,6 +14,9 @@ import MenuManagementScreen from "./components/MenuManagementScreen.jsx";
 import EmployeeManagementScreen from "./components/EmployeeManagementScreen.jsx";
 import ManagerPortal from "./components/ManagerPortal.jsx";
 
+import GoogleTranslateLoader from "./components/translation/GoogleTranslateLoader.jsx";
+import LanguageSelector from "./components/translation/LanguageSelector.jsx";
+import "./index.css";
 function App() {
   
   const [cart, setCart] = useState([]);
@@ -25,6 +28,15 @@ function App() {
 
   return (
     <>
+      {/* Google Translate Engine (hidden widget) */}
+      <GoogleTranslateLoader />
+
+      {/* Custom Language Buttons */}
+      <LanguageSelector />
+
+       {/* Magnifying button */}
+      <MagnifyControls />
+
       <Routes>
         <Route path="/" element= {<HomeScreen/>}/>
         
