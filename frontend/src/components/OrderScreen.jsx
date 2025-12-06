@@ -80,9 +80,9 @@ function OrderScreen({ cart, setCart }) {
       if (!prev[index]) return prev;
       const next = [...prev];
       const current = next[index];
-      const currentQty = current.quantity ?? 1; 
+      const currentQty = current.quantity ?? 1;
       const updatedQty = Math.max(0, currentQty + delta);
-      
+
       if (updatedQty === 0) {
         next.splice(index, 1);
       } else {
@@ -131,10 +131,10 @@ function OrderScreen({ cart, setCart }) {
         <h1 className="menu-title">{labels.menu}</h1>
 
         <button className="nav-btn" onClick={() => setShowLanguage(!showLanguage)}>
-          <img 
-            src={`${imageBase}/images/Icons/Language.png`} 
-            alt="Language Icon" 
-            className="nav-icon" 
+          <img
+            src={`${imageBase}/images/Icons/Language.png`}
+            alt="Language Icon"
+            className="nav-icon"
           />
           {labels.language}
         </button>
@@ -147,7 +147,7 @@ function OrderScreen({ cart, setCart }) {
             (lang) => (
               <button
                 key={lang}
-                className={lang === selectedLang ? "selected" : ""} 
+                className={lang === selectedLang ? "selected" : ""}
                 onClick={() => {
                   setSelectedLang(lang);
                   setShowLanguage(false);
@@ -190,7 +190,7 @@ function OrderScreen({ cart, setCart }) {
             .filter((i) => !selectedCategory || i.category === selectedCategory)
             .map((item) => {
               const categoryClass = item.category.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-*|-*$/g, '');
-              
+
               return (
                 <button
                   key={item.drinkid}
@@ -235,29 +235,29 @@ function OrderScreen({ cart, setCart }) {
               const translatedName = translatedDrinkNames[item.name] || item.name;
 
               return (
-                  <div key={idx} className="order-row-item">
-                    <span className="item-name-qty">
-                        {translatedName} x {qty}
-                    </span>
-                    
-                    <span className="item-price-total">
-                        ${total}
-                    </span>
-                    
-                    <div className="item-controls">
-                        <button 
-                            className="control-btn" 
-                            onClick={() => handleQuantityChange(idx, -1)}
-                        >
-                            -
-                        </button>
-                        <button 
-                            className="control-btn" 
-                            onClick={() => handleQuantityChange(idx, 1)}
-                        >
-                            +
-                        </button>
-                    </div>
+                <div key={idx} className="order-row-item">
+                  <span className="item-name-qty">
+                    {translatedName} x {qty}
+                  </span>
+
+                  <span className="item-price-total">
+                    ${total}
+                  </span>
+
+                  <div className="item-controls">
+                    <button
+                      className="control-btn"
+                      onClick={() => handleQuantityChange(idx, -1)}
+                    >
+                      -
+                    </button>
+                    <button
+                      className="control-btn"
+                      onClick={() => handleQuantityChange(idx, 1)}
+                    >
+                      +
+                    </button>
+                  </div>
                 </div>
               );
             })
@@ -269,10 +269,10 @@ function OrderScreen({ cart, setCart }) {
         </div>
 
         <button className="checkout-btn" onClick={handleCheckout}>
-          <img 
-            src={`${imageBase}/images/Icons/Cart.png`} 
-            alt="Cart Icon" 
-            className="checkout-icon" 
+          <img
+            src={`${imageBase}/images/Icons/Cart.png`}
+            alt="Cart Icon"
+            className="checkout-icon"
           />
           {labels.checkout}
         </button>
