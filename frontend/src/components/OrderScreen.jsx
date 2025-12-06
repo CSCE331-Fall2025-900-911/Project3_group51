@@ -3,13 +3,13 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import "./OrderScreen.css";
 import { getMenu } from "../api/menu.js"; // 1. Import your new API function
 
-function OrderScreen({ cart, setCart }) { 
-  
+function OrderScreen({ cart, setCart }) {
+
   const [menuItems, setMenuItems] = useState([]);
   const [categories, setCategories] = useState([]);
   const [showLanguage, setShowLanguage] = useState(false);
   const [error, setError] = useState(null); // State for error handling
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
   const location = useLocation();
@@ -69,7 +69,7 @@ function OrderScreen({ cart, setCart }) {
   // Calculate Subtotal
   const subtotal = cart.reduce((acc, item) => {
     const qty = item.quantity ?? 1;
-    return acc + parseFloat(item.price) * qty; 
+    return acc + parseFloat(item.price) * qty;
   }, 0);
 
   // Show error message if API fails
@@ -83,8 +83,8 @@ function OrderScreen({ cart, setCart }) {
       <header className="header">
         <button className="nav-btn">View Menu</button>
         <h1 className="menu-title">Menu</h1>
-        <button 
-          className="nav-btn" 
+        <button
+          className="nav-btn"
           onClick={() => setShowLanguage(!showLanguage)}
         >
           Language
@@ -107,17 +107,17 @@ function OrderScreen({ cart, setCart }) {
         <aside className="categories">
           <h2>Categories</h2>
           {/* "All" button to clear the filter */}
-          <button 
+          <button
             className={`category-btn ${!selectedCategory ? 'selected' : ''}`}
             onClick={() => handleCategoryClick(null)}
           >
             All
           </button>
-          
+
           {/* Dynamic category buttons */}
           {categories.map((category, i) => (
-            <button 
-              key={i} 
+            <button
+              key={i}
               className={`category-btn ${selectedCategory === category ? 'selected' : ''}`}
               onClick={() => handleCategoryClick(category)}
             >
@@ -133,17 +133,17 @@ function OrderScreen({ cart, setCart }) {
             .filter(item => {
               // If no category is selected (null), show all items
               if (!selectedCategory) {
-                return true; 
+                return true;
               }
               // Otherwise, only show items that match the selected category
               return item.category === selectedCategory;
             })
             // Map over the *filtered* list
             .map((item) => (
-              <button 
-                key={item.drinkid} 
-                className="menu-item" 
-                onClick={() => handleItemClick(item)} 
+              <button
+                key={item.drinkid}
+                className="menu-item"
+                onClick={() => handleItemClick(item)}
               >
                 <div className="item-image">Item Image</div>
                 <div className="item-name">{item.drinkname}</div>
@@ -164,7 +164,7 @@ function OrderScreen({ cart, setCart }) {
         </button>
         <div className="current-order">
           <h3>Current Order:</h3>
-          
+
         </div>
         <div className="order-items">
           {cart.length === 0 ? (
@@ -181,11 +181,11 @@ function OrderScreen({ cart, setCart }) {
             })
           )}
         </div>
-        
+
         <div className="subtotal">
           Subtotal: ${subtotal.toFixed(2)}
         </div>
-        
+
         <button className="checkout-btn" onClick={handleCheckout}>
           Checkout
         </button>
