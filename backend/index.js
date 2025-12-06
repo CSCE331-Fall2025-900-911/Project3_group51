@@ -51,6 +51,7 @@ app.use('/api/translate', require('./routes/translateRoutes')) // backend transl
 app.use('/api/stock', require('./db/routes/stock'));
 app.use('/api/reports', require('./db/routes/reports'));
 app.use('/api/zreport', require('./db/routes/zreport'));
+app.use('/api/customers', require('./db/routes/customers'));
 
 
 app.get('/', (_, res) => res.send('POS API running'));

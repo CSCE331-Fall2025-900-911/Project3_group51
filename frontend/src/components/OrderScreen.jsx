@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 
 import "./OrderScreen.css";
 import { getMenu } from "../api/menu.js";
+import { identifyCustomer, createCustomer } from "../api/customers.js";
 import MagnifyControls from "./MagnifyControls.jsx";
 
 // Language + translation hooks
@@ -10,7 +11,7 @@ import useLanguage from "../hooks/useLanguage";
 import useTranslate from "../hooks/useTranslate";
 import { ORDER_LABELS } from "./OrderScreen.labels.js";
 
-function OrderScreen({ cart, setCart }) {
+function OrderScreen({ cart, setCart, customer, setCustomer }) {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -24,7 +25,21 @@ function OrderScreen({ cart, setCart }) {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [showLanguage, setShowLanguage] = useState(false);
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
-  const [error, setError] = useState(null);
+  const [showIdentityPrompt, setShowIdentityPrompt] = useState(false);
+  const [contactInfo, setContactInfo] = useState({ name: "", phone: "", email: "" });
+  const [error, setError] = useState(null); // menu load errors
+  const [identityError, setIdentityError] = useState(null);
+  const [stockWarning, setStockWarning] = useState(null);
+  const [allowAnon, setAllowAnon] = useState(false);
+  const [identityPrompted, setIdentityPrompted] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return sessionStorage.getItem("identityPrompted") === "true";
+  });
+  const [offerCreate, setOfferCreate] = useState(false);
+  const [showCreateForm, setShowCreateForm] = useState(false);
+  const [contactMode, setContactMode] = useState("phone"); // 'phone' | 'email'
+  const resetFromHomeRef = React.useRef(false);
+  const fromHome = location.state?.fromHome || false;
 
   // Is this order coming from cashier?
   const cashierOrder = location.state?.returnTo === "/cashier";
@@ -33,6 +48,27 @@ function OrderScreen({ cart, setCart }) {
   useEffect(() => {
     sessionStorage.setItem("orderOrigin", cashierOrder ? "cashier" : "customer");
   }, [cashierOrder]);
+
+  // Trigger identity prompt only once per order, and only when entering from Home
+  useEffect(() => {
+    if (fromHome && !customer && !allowAnon && !identityPrompted) {
+      setShowIdentityPrompt(true);
+    }
+  }, [fromHome, customer, allowAnon, identityPrompted]);
+
+  // If entering from Home, clear any previous customer once
+  useEffect(() => {
+    if (fromHome && !resetFromHomeRef.current) {
+      resetFromHomeRef.current = true;
+      setCustomer?.(null);
+      setAllowAnon(false);
+      setIdentityPrompted(false);
+      if (typeof window !== "undefined") {
+        sessionStorage.removeItem("customerInfo");
+        sessionStorage.removeItem("identityPrompted");
+      }
+    }
+  }, [fromHome, setCustomer]);
 
   // Fetch menu items
   useEffect(() => {
@@ -43,7 +79,7 @@ function OrderScreen({ cart, setCart }) {
       })
       .catch((err) => {
         console.error("Failed to fetch menu:", err);
-        setError("Could not load menu. Please try again later.");
+      setError("Could not load menu. Please try again later.");
       });
   }, []);
 
@@ -62,8 +98,27 @@ function OrderScreen({ cart, setCart }) {
   const translatedCategories = useTranslate(categoryMap, selectedLang);
   const translatedDrinkNames = useTranslate(drinkNameMap, selectedLang);
 
+  // Track how many of each drink are in the cart (for live stock checks)
+  const cartQtyByDrink = useMemo(() => {
+    return cart.reduce((acc, item) => {
+      const id = item.id ?? item.drinkid;
+      const qty = item.quantity ?? 1;
+      acc[id] = (acc[id] || 0) + qty;
+      return acc;
+    }, {});
+  }, [cart]);
+
   // Handle selecting drink
   const handleItemClick = (item) => {
+    const available = (item.stockqty ?? 0) - (cartQtyByDrink[item.drinkid] || 0);
+    if (available <= 0) {
+      setStockWarning(`${item.drinkname} is out of stock.`);
+      return;
+    }
+    if (fromHome && !customer && !allowAnon) {
+      setShowIdentityPrompt(true);
+      return;
+    }
     navigate(`/order/${item.drinkid}`, {
       state: { item, returnTo: "/order", origin: "customer" },
     });
@@ -82,6 +137,25 @@ function OrderScreen({ cart, setCart }) {
       const current = next[index];
       const currentQty = current.quantity ?? 1;
       const updatedQty = Math.max(0, currentQty + delta);
+      
+      // Enforce stock limits per drink when increasing
+      if (delta > 0) {
+        const drinkId = current.id ?? current.drinkid;
+        const stockQty = menuItems.find((m) => m.drinkid === drinkId)?.stockqty ?? 0;
+        const otherQty = next.reduce((acc, itm, idx) => {
+          if (idx === index) return acc;
+          if ((itm.id ?? itm.drinkid) === drinkId) {
+            acc += itm.quantity ?? 1;
+          }
+          return acc;
+        }, 0);
+        const desired = updatedQty + otherQty;
+        if (desired > stockQty) {
+          setStockWarning(`Only ${Math.max(stockQty - otherQty, 0)} left for ${current.name || "this item"}.`);
+          return prev;
+        }
+      }
+      setStockWarning(null);
 
       if (updatedQty === 0) {
         next.splice(index, 1);
@@ -94,6 +168,10 @@ function OrderScreen({ cart, setCart }) {
 
   // Checkout
   const handleCheckout = () => {
+    if (fromHome && !customer && !allowAnon) {
+      setShowIdentityPrompt(true);
+      return;
+    }
     navigate("/checkout", {
       state: {
         returnTo: cashierOrder ? "/cashier" : "/order",
@@ -107,6 +185,78 @@ function OrderScreen({ cart, setCart }) {
     setShowCancelConfirm(false);
     setCart?.([]);
     navigate(cancelDestination);
+  };
+
+  const handleIdentify = async () => {
+    if (contactMode === "phone" && !contactInfo.phone) {
+      setIdentityError("Please enter a phone number.");
+      return;
+    }
+    if (contactMode === "email" && !contactInfo.email) {
+      setIdentityError("Please enter an email address.");
+      return;
+    }
+    try {
+      const result = await identifyCustomer({
+        phone: contactMode === "phone" ? contactInfo.phone || null : null,
+        email: contactMode === "email" ? contactInfo.email || null : null,
+      });
+      setCustomer?.({
+        id: result.id,
+        phone: result.phone,
+        email: result.email,
+        points: result.points ?? 0,
+      });
+      setShowIdentityPrompt(false);
+      setIdentityError(null);
+      setIdentityPrompted(true);
+      setOfferCreate(false);
+      setShowCreateForm(false);
+      if (typeof window !== "undefined") {
+        sessionStorage.setItem("identityPrompted", "true");
+      }
+    } catch (e) {
+      console.error("Failed to identify customer", e);
+      if (e.status === 404) {
+        setOfferCreate(true);
+        setShowCreateForm(false);
+        setIdentityError("No account found. Try again or create a new account.");
+      } else {
+        setIdentityError("Could not verify customer. Please try again.");
+      }
+    }
+  };
+
+  const handleCreateCustomer = async () => {
+    if (!contactInfo.name || !contactInfo.phone || !contactInfo.email) {
+      setIdentityError("Full name, phone, and email are required.");
+      return;
+    }
+    try {
+      const result = await createCustomer({
+        name: contactInfo.name || null,
+        phone: contactInfo.phone || null,
+        email: contactInfo.email || null,
+      });
+      setCustomer?.({
+        id: result.id,
+        name: result.name,
+        phone: result.phone,
+        email: result.email,
+        points: result.points ?? 0,
+      });
+      setShowIdentityPrompt(false);
+      setOfferCreate(false);
+      setShowCreateForm(false);
+      setIdentityError(null);
+      setIdentityPrompted(true);
+      if (typeof window !== "undefined") {
+        sessionStorage.setItem("identityPrompted", "true");
+      }
+    } catch (e) {
+      console.error("Failed to create customer", e);
+      setIdentityError("Could not create customer. Please try again.");
+    }
   };
 
   // Subtotal
@@ -160,6 +310,12 @@ function OrderScreen({ cart, setCart }) {
         </div>
       )}
 
+      {stockWarning && (
+        <div className="stock-warning">
+          {stockWarning}
+        </div>
+      )}
+
       {/* Main Content */}
       <div className="content">
         {/* Categories */}
@@ -190,12 +346,17 @@ function OrderScreen({ cart, setCart }) {
             .filter((i) => !selectedCategory || i.category === selectedCategory)
             .map((item) => {
               const categoryClass = item.category.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-*|-*$/g, '');
+              const used = cartQtyByDrink[item.drinkid] || 0;
+              const available = (item.stockqty ?? 0) - used;
+              const outOfStock = available <= 0;
+              
 
               return (
                 <button
                   key={item.drinkid}
-                  className={`menu-item category-${categoryClass}`}
-                  onClick={() => handleItemClick(item)}
+                  className={`menu-item category-${categoryClass} ${outOfStock ? "sold-out" : ""}`}
+                  onClick={() => !outOfStock && handleItemClick(item)}
+                  disabled={outOfStock}
                 >
                   <div className="item-image">
                     {item.image ? (
@@ -206,6 +367,7 @@ function OrderScreen({ cart, setCart }) {
                     ) : (
                       <span>Item Image</span>
                     )}
+                    {outOfStock && <div className="sold-out-overlay">Sold Out</div>}
                   </div>
                   <div className="item-name">{item.drinkname}</div>
                   <div className="item-price">${item.price}</div>
@@ -223,6 +385,9 @@ function OrderScreen({ cart, setCart }) {
 
         <div className="current-order">
           <h3>{labels.currentOrder}</h3>
+          {customer && (
+            <small>Points: {customer.points ?? 0}</small>
+          )}
         </div>
 
         <div className="order-items">
@@ -290,6 +455,160 @@ function OrderScreen({ cart, setCart }) {
               </button>
               <button className="nav-btn" onClick={() => setShowCancelConfirm(false)}>
                 {labels.confirmCancelNo}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Identity Modal */}
+      {showIdentityPrompt && (
+        <div className="modal-backdrop">
+          <div className="modal">
+            <p>Please enter your details to earn/use points.</p>
+            {showCreateForm && (
+              <input
+                type="text"
+                placeholder="Full Name (required)"
+                value={contactInfo.name}
+                onChange={(e) => {
+                  setContactInfo({ ...contactInfo, name: e.target.value });
+                  setOfferCreate(false);
+                  setIdentityError(null);
+                }}
+                style={{ width: "100%", padding: "10px", marginBottom: "10px" }}
+              />
+            )}
+
+            {!showCreateForm && (
+              <>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "10px" }}>
+                  <input
+                    type="radio"
+                    name="contact-mode"
+                    checked={contactMode === "phone"}
+                    onChange={() => {
+                      setContactMode("phone");
+                      setIdentityError(null);
+                    }}
+                  />
+                  <input
+                    type="text"
+                    placeholder="Phone"
+                    value={contactInfo.phone}
+                    onChange={(e) => {
+                      setContactInfo({ ...contactInfo, phone: e.target.value });
+                      setOfferCreate(false);
+                      setIdentityError(null);
+                    }}
+                    style={{ width: "100%", padding: "10px" }}
+                    disabled={contactMode !== "phone"}
+                  />
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "10px" }}>
+                  <input
+                    type="radio"
+                    name="contact-mode"
+                    checked={contactMode === "email"}
+                    onChange={() => {
+                      setContactMode("email");
+                      setIdentityError(null);
+                    }}
+                  />
+                  <input
+                    type="email"
+                    placeholder="Email"
+                    value={contactInfo.email}
+                    onChange={(e) => {
+                      setContactInfo({ ...contactInfo, email: e.target.value });
+                      setOfferCreate(false);
+                      setIdentityError(null);
+                    }}
+                    style={{ width: "100%", padding: "10px" }}
+                    disabled={contactMode !== "email"}
+                  />
+                </div>
+              </>
+            )}
+
+            {showCreateForm && (
+              <>
+                <input
+                  type="text"
+                  placeholder="Phone"
+                  value={contactInfo.phone}
+                  onChange={(e) => {
+                    setContactInfo({ ...contactInfo, phone: e.target.value });
+                    setOfferCreate(false);
+                    setIdentityError(null);
+                  }}
+                  style={{ width: "100%", padding: "10px", marginBottom: "10px" }}
+                />
+                <input
+                  type="email"
+                  placeholder="Email"
+                  value={contactInfo.email}
+                  onChange={(e) => {
+                    setContactInfo({ ...contactInfo, email: e.target.value });
+                    setOfferCreate(false);
+                    setIdentityError(null);
+                  }}
+                  style={{ width: "100%", padding: "10px" }}
+                />
+              </>
+            )}
+            {identityError && <p style={{ color: "red", marginTop: "8px" }}>{identityError}</p>}
+            <div className="modal-actions">
+              {!showCreateForm && (
+                <>
+                  <button className="nav-btn" onClick={handleIdentify}>
+                    Continue
+                  </button>
+                  <button
+                    className="nav-btn"
+                    onClick={() => {
+                      setShowCreateForm(true);
+                      setOfferCreate(false);
+                      setIdentityError(null);
+                      setContactMode("phone"); // default to phone for signup
+                    }}
+                  >
+                    {offerCreate ? "Create Account" : "New Account"}
+                  </button>
+                </>
+              )}
+              {showCreateForm && (
+                <>
+                  <button className="nav-btn" onClick={handleCreateCustomer}>
+                    Create Account
+                  </button>
+                  <button
+                    className="nav-btn"
+                    onClick={() => {
+                      setShowCreateForm(false);
+                      setIdentityError(null);
+                      setOfferCreate(false);
+                    }}
+                  >
+                    Back to Login
+                  </button>
+                </>
+              )}
+              <button
+                className="nav-btn"
+                onClick={() => {
+                  setAllowAnon(true);
+                  setShowIdentityPrompt(false);
+                  setIdentityError(null);
+                  setOfferCreate(false);
+                  setShowCreateForm(false);
+                  setIdentityPrompted(true);
+                  if (typeof window !== "undefined") {
+                    sessionStorage.setItem("identityPrompted", "true");
+                  }
+                }}
+              >
+                Skip
               </button>
             </div>
           </div>

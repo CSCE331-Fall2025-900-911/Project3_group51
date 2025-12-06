@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import './CheckoutScreen.css';
 
@@ -12,7 +12,7 @@ import MagnifyControls from './MagnifyControls.jsx';
 // Tax rate
 const TAX_RATE = 0.0825;
 
-function CheckoutScreen({ cart, setCart }) {
+function CheckoutScreen({ cart, setCart, customer, setCustomer }) {
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -35,6 +35,7 @@ function CheckoutScreen({ cart, setCart }) {
   const [paymentType, setPaymentType] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [pointsToUse, setPointsToUse] = useState(0);
 
   // Price calculations
   const subtotal = cart.reduce(
@@ -44,6 +45,17 @@ function CheckoutScreen({ cart, setCart }) {
 
   const taxAmount = subtotal * TAX_RATE;
   const priceTotal = subtotal + taxAmount;
+
+  const availablePoints = customer?.points ?? 0;
+  const maxRedeemable = useMemo(
+    () => Math.min(availablePoints, Math.round(priceTotal * 100)),
+    [availablePoints, priceTotal]
+  );
+
+  const appliedPoints = Math.min(pointsToUse, maxRedeemable);
+  const discount = appliedPoints / 100;
+  const finalTotal = Math.max(priceTotal - discount, 0);
+  const pointsEarned = Math.floor(finalTotal * 10); // 10 cents per point
 
 const handleConfirmOrder = async () => { 
   // Check for selection and cart items
@@ -55,13 +67,28 @@ const handleConfirmOrder = async () => {
   setError(null);
 
   try {
-    const { id: newOrderId } = await createOrder();
+    const { id: newOrderId } = await createOrder({
+      customerid: customer?.id ?? null,
+    });
 
     for (const item of cart) {
       await addOrderItem(item, newOrderId);
     }
 
-    await updateOrderTotal(newOrderId, priceTotal);
+    const updateResult = await updateOrderTotal(newOrderId, {
+      totalprice: finalTotal,
+      grossTotal: priceTotal,
+      customerid: customer?.id ?? null,
+      pointsUsed: appliedPoints,
+    });
+
+    if (customer && setCustomer) {
+      const newBalance =
+        typeof updateResult.pointsBalance === "number"
+          ? updateResult.pointsBalance
+          : (customer.points ?? 0) - appliedPoints + pointsEarned;
+      setCustomer({ ...customer, points: newBalance });
+    }
 
     setCart([]);
     // Pass paymentType to confirmation screen for potential use
@@ -69,7 +96,12 @@ const handleConfirmOrder = async () => {
 
   } catch (err) {
     console.error("Failed to create order:", err);
-    setError("Failed to submit order. Please try again.");
+    const msg =
+      err.details?.includes("Insufficient stock") ||
+      err.message?.toLowerCase().includes("insufficient stock")
+        ? "One or more items are out of stock. Please adjust your cart."
+        : "Failed to submit order. Please try again.";
+    setError(msg);
     setLoading(false);
   }
 };
@@ -169,9 +201,42 @@ const handleConfirmOrder = async () => {
             <span>${priceTotal.toFixed(2)}</span>
           </div>
 
+          {customer && (
+            <>
+              <div className="summary-total">
+                <span>Available Points</span>
+                <span>{availablePoints}</span>
+              </div>
+              <div className="summary-total" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "10px" }}>
+                <span>Apply Points</span>
+                <button
+                  className="back-btn"
+                  style={{ margin: 0, borderRadius: "8px" }}
+                  onClick={() => setPointsToUse(maxRedeemable)}
+                  disabled={loading || maxRedeemable === 0}
+                >
+                  Use {maxRedeemable} pts
+                </button>
+              </div>
+              <div className="summary-total">
+                <span>Points Applied</span>
+                <span>{appliedPoints}</span>
+              </div>
+              <div className="summary-total">
+                <span>Points Discount</span>
+                <span>-${discount.toFixed(2)}</span>
+              </div>
+            </>
+          )}
+
+          <div className="summary-total total-row">
+            <span>Final Total</span>
+            <span>${finalTotal.toFixed(2)}</span>
+          </div>
+
           <div className="summary-total balance-row">
             <span>{labels.balance}</span>
-            <span>${priceTotal.toFixed(2)}</span>
+            <span>${finalTotal.toFixed(2)}</span>
           </div>
 
           {/* NEW: Confirm Checkout Button */}

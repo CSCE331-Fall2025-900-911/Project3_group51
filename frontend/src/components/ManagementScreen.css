@@ -33,14 +33,26 @@
   }
   
   /* Small controls row used in Inventory & Trends */
-  .mgmt-controls {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 0.75rem;
-    gap: 1rem;
-    font-size: 0.9rem;
-  }
+.mgmt-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  gap: 1rem;
+  font-size: 0.9rem;
+}
+
+.date-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.date-controls input {
+  border: 1px solid #cfd6e4;
+  border-radius: 6px;
+  padding: 0.35rem 0.5rem;
+}
   
   .mgmt-controls-right {
     display: flex;
@@ -80,11 +92,54 @@
   }
   
   .table th,
-  .table td {
-    text-align: left;
-    padding: 0.6rem 0.5rem;
-    border-bottom: 1px solid #eef2f7;
-  }
+.table td {
+  text-align: left;
+  padding: 0.6rem 0.5rem;
+  border-bottom: 1px solid #eef2f7;
+}
+
+/* Dedicated table styling for management lists */
+.mgmt-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.mgmt-table th {
+  text-align: left;
+  padding: 0.65rem 1rem;
+  background: #f7f9fc;
+  border-bottom: 1px solid #e5e7eb;
+  color: #374151;
+}
+
+.mgmt-table td {
+  padding: 0.6rem 1rem;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.mgmt-table .nowrap {
+  white-space: nowrap;
+}
+
+.mgmt-table td {
+  word-break: break-word;
+}
+
+.mgmt-table tr:nth-child(every) {
+  background: #fff;
+}
+
+.mgmt-table tr:nth-child(odd) {
+  background: #fbfdff;
+}
+
+.mgmt-table-wrap {
+  overflow: auto;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
+}
   
   /* Status text */
   .error   { color: #b91c1c; margin: 0.5rem 0; }
@@ -178,24 +233,24 @@
   }
   
   /* Scope the header so it doesn't override the shared .mgmt-header */
-  .mgmt-menu-wrap .mgmt-header {
-    width: 100%;
-    max-width: 900px;
-    margin-bottom: 3rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  
-  .mgmt-main {
-    flex: 1;
-    width: 100%;
-    text-align: center;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-  }
+.mgmt-menu-wrap .mgmt-header {
+  width: 100%;
+  max-width: 900px;
+  margin-bottom: 3rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.mgmt-main {
+  flex: 1;
+  width: 100%;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
   
   .menu-buttons {
     display: flex;
@@ -213,13 +268,13 @@
     font-weight: 600;
     color: #fff;
     text-decoration: none;
-    background: #3b82f6;
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     transition: transform 0.2s, background 0.2s;
   }
   
   .menu-btn:hover {
-    background: #2563eb;
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
     transform: translateY(-3px);
   }
   
@@ -238,8 +293,18 @@
     background: #e5e7eb;
   }
   
-  .hint {
-    margin-top: 1rem;
-    color: #9ca3af;
-  }
+.hint {
+  margin-top: 1rem;
+  color: #9ca3af;
+}
+
+/* Recent orders page tweaks */
+.recent-wrap .mgmt-header {
+  margin-bottom: 1.25rem;
+}
+
+.recent-wrap .mgmt-main {
+  align-items: stretch;
+  justify-content: flex-start;
+}
   

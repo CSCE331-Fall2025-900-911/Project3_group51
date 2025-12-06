@@ -29,6 +29,9 @@ export default function ManagementScreen() {
           <Link to="/management/employees" className="menu-btn">
             Employee Management
           </Link>
+          <Link to="/management/recent-orders" className="menu-btn">
+            Recent Order Items
+          </Link>
         </div>
         <p className="hint">Choose a section above to view details.</p>
       </main>

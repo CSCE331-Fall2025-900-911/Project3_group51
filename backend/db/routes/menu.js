@@ -5,10 +5,15 @@ const pool = require('../pool');
 const router = express.Router();
 const IMAGES_DIR = path.join(__dirname, '..', '..', 'images');
 
-// All menu items
+// All menu items with stock quantity
 router.get('/', async (_, res) => {
   try {
-    const r = await pool.query('SELECT * FROM menuitem ORDER BY drinkid');
+    const r = await pool.query(
+      `SELECT mi.*, COALESCE(s.quantity, 0) AS stockqty
+       FROM menuitem mi
+       LEFT JOIN stock s ON s.drinkid = mi.drinkid
+       ORDER BY mi.drinkid`
+    );
     res.json(r.rows);
   } catch (e) { res.status(500).json({ error: e.message }); }
 });

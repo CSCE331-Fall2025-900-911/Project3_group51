@@ -58,6 +58,7 @@ function CustomizationScreen({ addToCart }) {
   const [iceLevel, setIceLevel] = useState("Regular Ice");
   const [sugarLevel, setSugarLevel] = useState("100% Sugar");
   const [toppings, setToppings] = useState([]);
+  const [comments, setComments] = useState("");
 
   // ------------------------------
   // Memoized maps (stable, no re-renders)
@@ -117,6 +118,7 @@ function CustomizationScreen({ addToCart }) {
       ice: iceLevel,
       sugar: sugarLevel,
       toppings,
+      comments: comments.slice(0, 255),
       quantity: 1,
       isCustom: true,
       cartItemId: `${item.drinkid}-${uniqueSuffix}`,
@@ -172,7 +174,13 @@ function CustomizationScreen({ addToCart }) {
           {/* OTHER */}
           <section className="custom-section">
             <h2>{labels.otherCustom}</h2>
-            <textarea className="custom-textarea" rows="5"></textarea>
+            <textarea
+              className="custom-textarea"
+              rows="5"
+              maxLength={255}
+              value={comments}
+              onChange={(e) => setComments(e.target.value)}
+            ></textarea>
           </section>
         </div>
 
