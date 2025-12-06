@@ -29,6 +29,7 @@ function OrderScreen({ cart, setCart, customer, setCustomer }) {
   const [contactInfo, setContactInfo] = useState({ name: "", phone: "", email: "" });
   const [error, setError] = useState(null); // menu load errors
   const [identityError, setIdentityError] = useState(null);
+  const [stockWarning, setStockWarning] = useState(null);
   const [allowAnon, setAllowAnon] = useState(false);
   const [identityPrompted, setIdentityPrompted] = useState(() => {
     if (typeof window === "undefined") return false;
@@ -97,8 +98,23 @@ function OrderScreen({ cart, setCart, customer, setCustomer }) {
   const translatedCategories = useTranslate(categoryMap, selectedLang);
   const translatedDrinkNames = useTranslate(drinkNameMap, selectedLang);
 
+  // Track how many of each drink are in the cart (for live stock checks)
+  const cartQtyByDrink = useMemo(() => {
+    return cart.reduce((acc, item) => {
+      const id = item.id ?? item.drinkid;
+      const qty = item.quantity ?? 1;
+      acc[id] = (acc[id] || 0) + qty;
+      return acc;
+    }, {});
+  }, [cart]);
+
   // Handle selecting drink
   const handleItemClick = (item) => {
+    const available = (item.stockqty ?? 0) - (cartQtyByDrink[item.drinkid] || 0);
+    if (available <= 0) {
+      setStockWarning(`${item.drinkname} is out of stock.`);
+      return;
+    }
     if (fromHome && !customer && !allowAnon) {
       setShowIdentityPrompt(true);
       return;
@@ -122,6 +138,25 @@ function OrderScreen({ cart, setCart, customer, setCustomer }) {
       const currentQty = current.quantity ?? 1; 
       const updatedQty = Math.max(0, currentQty + delta);
       
+      // Enforce stock limits per drink when increasing
+      if (delta > 0) {
+        const drinkId = current.id ?? current.drinkid;
+        const stockQty = menuItems.find((m) => m.drinkid === drinkId)?.stockqty ?? 0;
+        const otherQty = next.reduce((acc, itm, idx) => {
+          if (idx === index) return acc;
+          if ((itm.id ?? itm.drinkid) === drinkId) {
+            acc += itm.quantity ?? 1;
+          }
+          return acc;
+        }, 0);
+        const desired = updatedQty + otherQty;
+        if (desired > stockQty) {
+          setStockWarning(`Only ${Math.max(stockQty - otherQty, 0)} left for ${current.name || "this item"}.`);
+          return prev;
+        }
+      }
+      setStockWarning(null);
+
       if (updatedQty === 0) {
         next.splice(index, 1);
       } else {
@@ -275,6 +310,12 @@ function OrderScreen({ cart, setCart, customer, setCustomer }) {
         </div>
       )}
 
+      {stockWarning && (
+        <div className="stock-warning">
+          {stockWarning}
+        </div>
+      )}
+
       {/* Main Content */}
       <div className="content">
         {/* Categories */}
@@ -305,12 +346,16 @@ function OrderScreen({ cart, setCart, customer, setCustomer }) {
             .filter((i) => !selectedCategory || i.category === selectedCategory)
             .map((item) => {
               const categoryClass = item.category.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-*|-*$/g, '');
+              const used = cartQtyByDrink[item.drinkid] || 0;
+              const available = (item.stockqty ?? 0) - used;
+              const outOfStock = available <= 0;
               
               return (
                 <button
                   key={item.drinkid}
-                  className={`menu-item category-${categoryClass}`}
-                  onClick={() => handleItemClick(item)}
+                  className={`menu-item category-${categoryClass} ${outOfStock ? "sold-out" : ""}`}
+                  onClick={() => !outOfStock && handleItemClick(item)}
+                  disabled={outOfStock}
                 >
                   <div className="item-image">
                     {item.image ? (
@@ -321,6 +366,7 @@ function OrderScreen({ cart, setCart, customer, setCustomer }) {
                     ) : (
                       <span>Item Image</span>
                     )}
+                    {outOfStock && <div className="sold-out-overlay">Sold Out</div>}
                   </div>
                   <div className="item-name">{item.drinkname}</div>
                   <div className="item-price">${item.price}</div>

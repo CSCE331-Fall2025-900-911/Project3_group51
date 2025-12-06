@@ -1,17 +1,46 @@
 // backend/db/orderItems.js
 const pool = require('./pool');
 
-// Insert new order item
+// Insert new order item and decrement stock
 exports.insertOrderItem = async (orderid, drinkid, quantity, price, icelevel, sugarlevel, toppings, comments) => {
-  const next = await pool.query('SELECT COALESCE(MAX(orderitemid),0)+1 AS next FROM orderitem');
-  const id = next.rows[0].next;
-  const trimmedComments = comments ? comments.toString().slice(0, 255) : null;
-  await pool.query(
-    `INSERT INTO orderitem (orderitemid, orderid, drinkid, quantity, price, icelevel, sugarlevel, toppings, comments)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
-    [id, orderid, drinkid, quantity, price, icelevel, sugarlevel, toppings, trimmedComments]
-  );
-  return id;
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+
+    const stockRes = await client.query(
+      'SELECT stockid, quantity FROM stock WHERE drinkid = $1 FOR UPDATE',
+      [drinkid]
+    );
+    const available = stockRes.rows[0]?.quantity ?? 0;
+    if (available < quantity) {
+      const err = new Error('INSUFFICIENT_STOCK');
+      err.code = 'INSUFFICIENT_STOCK';
+      throw err;
+    }
+
+    const next = await client.query('SELECT COALESCE(MAX(orderitemid),0)+1 AS next FROM orderitem');
+    const id = next.rows[0].next;
+    const trimmedComments = comments ? comments.toString().slice(0, 255) : null;
+
+    await client.query(
+      `INSERT INTO orderitem (orderitemid, orderid, drinkid, quantity, price, icelevel, sugarlevel, toppings, comments)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+      [id, orderid, drinkid, quantity, price, icelevel, sugarlevel, toppings, trimmedComments]
+    );
+
+    await client.query(
+      'UPDATE stock SET quantity = quantity - $1 WHERE drinkid = $2',
+      [quantity, drinkid]
+    );
+
+    await client.query('COMMIT');
+    return id;
+  } catch (e) {
+    await client.query('ROLLBACK');
+    throw e;
+  } finally {
+    client.release();
+  }
 };
 
 // Get order item by ID

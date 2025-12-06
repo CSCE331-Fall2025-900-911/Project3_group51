@@ -11,7 +11,11 @@ exports.createOrderItem = async (req, res) => {
     res.status(201).json({ id });
   } catch (e) {
     console.error("Error in createOrderItem:", e);
-    res.status(500).json({ error: e.message });
+    if (e.code === 'INSUFFICIENT_STOCK') {
+      res.status(400).json({ error: 'Insufficient stock for this item' });
+    } else {
+      res.status(500).json({ error: e.message });
+    }
   }
 };
 

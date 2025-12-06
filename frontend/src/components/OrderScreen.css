@@ -154,6 +154,24 @@ button:hover{
   opacity: 1;
 }
 
+.menu-item.sold-out {
+  opacity: 0.6;
+  cursor: not-allowed;
+  position: relative;
+}
+
+.sold-out-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #b91c1c;
+}
+
 /* 1. MILKY SERIES (Milk Teas, Coffee, etc.) */
 .menu-item.category-milky-series {
   background: #FCE7EE; 
@@ -378,6 +396,16 @@ button:hover{
 }
 .language-dropdown button:hover.selected {
   background-color: #3578c0; 
+}
+
+.stock-warning {
+  margin: 10px 25px;
+  padding: 10px 14px;
+  background: #fff8e1;
+  border: 1px solid #f59e0b;
+  border-radius: 8px;
+  color: #92400e;
+  font-weight: 600;
 }
 
 .modal-backdrop {

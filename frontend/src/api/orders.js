@@ -40,7 +40,12 @@ export async function addOrderItem(item, orderId) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
   });
-  if (!res.ok) throw new Error(`HTTP ${res.status} on addOrderItem`);
+  if (!res.ok) {
+    const text = await res.text();
+    const err = new Error(`HTTP ${res.status} on addOrderItem`);
+    err.details = text;
+    throw err;
+  }
   return res.json();
 }
 

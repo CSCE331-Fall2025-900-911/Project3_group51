@@ -96,7 +96,12 @@ const handleConfirmOrder = async () => {
 
   } catch (err) {
     console.error("Failed to create order:", err);
-    setError("Failed to submit order. Please try again.");
+    const msg =
+      err.details?.includes("Insufficient stock") ||
+      err.message?.toLowerCase().includes("insufficient stock")
+        ? "One or more items are out of stock. Please adjust your cart."
+        : "Failed to submit order. Please try again.";
+    setError(msg);
     setLoading(false);
   }
 };
