@@ -1,5 +1,5 @@
 import React, { useState } from 'react'; 
-import { Routes, Route} from 'react-router-dom';
+import { Routes, Route, useLocation} from 'react-router-dom';
 import HomeScreen from './components/HomeScreen.jsx';
 import OrderScreen from './components/OrderScreen.jsx';
 import CustomizationScreen from './components/CustomizationScreen.jsx'; 
@@ -12,8 +12,7 @@ import TrendsScreen from "./components/TrendsScreen.jsx";
 import InventoryScreen from "./components/InventoryScreen.jsx";
 import MenuManagementScreen from "./components/MenuManagementScreen.jsx";
 import EmployeeManagementScreen from "./components/EmployeeManagementScreen.jsx";
-import ProtectedRoute from "./components/ProtectedRoute.jsx";
-import MagnifyControls from './components/MagnifyControls.jsx';
+import ManagerPortal from "./components/ManagerPortal.jsx";
 
 function App() {
   
@@ -26,7 +25,6 @@ function App() {
 
   return (
     <>
-      <MagnifyControls />
       <Routes>
         <Route path="/" element= {<HomeScreen/>}/>
         
@@ -55,10 +53,11 @@ function App() {
           element= {<ConfirmationScreen />}
         />
 
-        <Route 
-          path="/cashier" 
-          element= {<CashierScreen cart={cart} setCart={setCart} />}
-        />
+      <Route 
+        path="/cashier" 
+        element= {<CashierScreen cart={cart} setCart={setCart} />}
+      />
+      <Route path="/manager-portal" element={<ManagerPortal />} />
         {/* Management entry page */}
       <Route
         path="/management"

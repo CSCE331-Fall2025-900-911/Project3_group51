@@ -14,32 +14,48 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px;
-  border-bottom: 1px solid #aaa;
-}
-
-.back-btn {
-  font-size: 16px;
-  padding: 10px 20px;
-  border-radius: 8px;
-  border: 1px solid #aaa;
-  background-color: #f0f0f0;
-  cursor: pointer;
-}
-.back-btn:hover {
-  background-color: #e0e0e0;
+  padding: 15px 25px;
+  background: #333333; 
+  border-bottom: 2px solid #555555; 
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+  height: auto;
+  position: relative;
 }
 
 .checkout-title {
-  font-size: 1.5rem;
-  background: #ddd;
-  padding: 8px 20px;
-  border-radius: 10px;
-  margin: 0;
-  /* Add an invisible placeholder to keep title centered */
-  margin-right: calc(50% - 100px); /* Adjust 100px as needed */
-  transform: translateX(50%);
+  font-size: 1.5rem; 
+  background: #4A90E2; /* Solid Sky Blue background */
+  color: white; 
+  padding: 10px 25px;
+  border-radius: 12px; 
+  font-weight: 700;
+  box-shadow: 0 4px 8px rgba(74, 144, 226, 0.4); 
 }
+
+.header-left {
+  z-index: 10;
+}
+
+.back-btn {
+  font-size: 18px;
+  padding: 10px 20px;
+  border-radius: 30px;
+  
+  border: 1px solid #4A90E2 !important; 
+  background-color: white !important; 
+  color: #333; 
+
+  cursor: pointer;
+  font-weight: 600;
+  z-index: 10;
+  transition: background-color 0.2s;
+}
+
+.back-btn:hover {
+  background-color: #F0F8FF;
+}
+
+
 
 .checkout-content {
   display: flex;
@@ -55,10 +71,16 @@
 }
 
 .payment-options h2 {
-  font-size: 1rem;
+  font-size: 1.2rem;
   font-weight: bold;
   margin-bottom: 15px;
+  padding: 8px 12px;
+  border-radius: 6px;
   text-align: left;
+  
+  background: #F0F3FC; 
+  color: #6C5CE7; 
+  border-left: 5px solid #4A90E2; 
 }
 
 .payment-grid {
@@ -68,21 +90,29 @@
 }
 
 .payment-btn {
-  border: 1px solid #aaa;
-  background: #f9f9f9;
-  border-radius: 8px;
-  padding: 20px;
-  font-size: 20px;
+  border: 1px solid #cfd4da;
+  background: white;
+  border-radius: 10px;
+  padding: 25px; 
+  font-size: 22px; 
+  font-weight: 600;
+  min-height: 140px;
   cursor: pointer;
-  min-height: 120px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s;
 }
-.payment-btn:hover {
-  background-color: #f0f0f0;
+
+.payment-btn:hover:not(.selected) {
+  background-color: #f5f7fa;
+  transform: translateY(-1px);
 }
+
 .payment-btn.selected {
-  background-color: #c0e0c0;
-  border-color: #006400;
+  background-color: #E8F0FE; 
+  border: 3px solid #4A90E2; 
+  color: #194680;
   font-weight: bold;
+  box-shadow: 0 0 10px rgba(74, 144, 226, 0.5); 
 }
 
 /* Right Sidebar */
@@ -106,6 +136,8 @@
   padding: 10px;
   border-bottom: 1px solid #aaa;
   text-align: center;
+  background-color: #EFEFEF; 
+  border-radius: 8px 8px 0 0;
 }
 
 .summary-items {
@@ -119,18 +151,6 @@
   justify-content: space-between;
   font-size: 16px;
   margin-bottom: 8px;
-}
-
-.summary-total {
-  display: flex;
-  justify-content: space-between;
-  font-size: 1.2rem;
-  font-weight: bold;
-  margin-top: 15px;
-  padding: 10px;
-  border: 1px solid #aaa;
-  background: #fff;
-  border-radius: 8px;
 }
 
 /* This is the default style for all total rows */
@@ -160,6 +180,14 @@
   margin-top: 15px;
 }
 
+.summary-total.total-row {
+  font-size: 1.4rem;
+  font-weight: 800;
+  margin-top: 20px;
+  border: 2px solid #4A90E2; 
+  background: #E8F0FE; 
+}
+
 /* Style for the Balance row (red, bold) */
 .balance-row {
   font-size: 1.3rem;
@@ -167,4 +195,89 @@
   color: #d32f2f; /* Red color to show amount due */
   border-color: #d32f2f;
   margin-top: 15px;
+}
+
+.summary-total.balance-row {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #d32f2f; 
+  border: 2px solid #d32f2f; 
+  background: #fffafa; 
+  margin-top: 15px;
+}
+
+.confirm-checkout-btn {
+  background-color: #6CC644; /* Green: Confirm/Submit Action */
+  border: none;
+  color: white;
+  padding: 20px; 
+  text-align: center;
+  font-size: 1.5rem; /* Larger font size for final action */
+  font-weight: bold;
+  margin-top: 25px; /* Space below the balance row */
+  cursor: pointer;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 100, 0, 0.3);
+  transition: all 0.2s;
+  width: 100%; /* Full width in the sidebar */
+}
+
+.confirm-checkout-btn:hover:not(:disabled) {
+  background-color: #5BAA3D;
+  box-shadow: 0 6px 15px rgba(0, 100, 0, 0.4);
+}
+
+.confirm-checkout-btn:disabled {
+  background-color: #a9d9a8; /* Lighter green/gray for disabled state */
+  box-shadow: none;
+  cursor: not-allowed;
+  opacity: 0.8;
+}
+
+body[data-magnify-level="1"] .checkout-title {
+  font-size: 1.8rem;
+}
+body[data-magnify-level="1"] .payment-btn {
+  font-size: 24px;
+  min-height: 140px;
+}
+body[data-magnify-level="1"] .summary-item, 
+body[data-magnify-level="1"] .summary-total {
+  font-size: 1.2rem;
+}
+body[data-magnify-level="1"] .back-btn {
+  font-size: 20px;
+  padding: 12px 28px;
+}
+body[data-magnify-level="1"] .payment-options h2,
+body[data-magnify-level="1"] .summary-box h3 {
+  font-size: 1.5rem; 
+}
+body[data-magnify-level="1"] .confirm-checkout-btn {
+  font-size: 1.8rem;
+  padding: 24px;
+}
+
+body[data-magnify-level="2"] .checkout-title {
+  font-size: 2.1rem;
+}
+body[data-magnify-level="2"] .payment-btn {
+  font-size: 28px;
+  min-height: 160px;
+}
+body[data-magnify-level="2"] .summary-item, 
+body[data-magnify-level="2"] .summary-total {
+  font-size: 1.4rem;
+}
+body[data-magnify-level="2"] .back-btn {
+  font-size: 22px;
+  padding: 14px 32px;
+}
+body[data-magnify-level="2"] .payment-options h2,
+body[data-magnify-level="2"] .summary-box h3 {
+  font-size: 2.0rem;
+}
+body[data-magnify-level="2"] .confirm-checkout-btn {
+  font-size: 2.1rem;
+  padding: 28px;
 }

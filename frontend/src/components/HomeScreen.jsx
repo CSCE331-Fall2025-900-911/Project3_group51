@@ -1,110 +1,191 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import './HomeScreen.css';
+import React, { useState, useEffect, useCallback, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+
+import useLanguage, { LANG_MAP } from "../hooks/useLanguage.js";
+import useTranslate from "../hooks/useTranslate";
+import { translateText } from "../utils/translate";
+import { HOME_LABELS } from "./HomeScreen.labels.js";
+import MagnifyControls from "./MagnifyControls.jsx";
+
+import "./HomeScreen.css";
 
 function HomeScreen() {
   const navigate = useNavigate();
+
+  const imageBase = (import.meta.env.VITE_API_URL || "http://localhost:3000/api").replace(/\/api$/, "");
+
+  // UI state
   const [showLanguage, setShowLanguage] = useState(false);
   const [weather, setWeather] = useState(null);
+  const [translatedDesc, setTranslatedDesc] = useState("");
 
+  // Login Secret Tap State (NEW)
+  const [tapCount, setTapCount] = useState(0); 
+  const timerRef = useRef(null); 
+
+  // Global language state
+  const { selectedLang, setSelectedLang } = useLanguage();
+
+  // Page-level translated labels
+  const labels = useTranslate(HOME_LABELS, selectedLang);
+
+  const LANG_OPTIONS = [
+    "English",
+    "Español",
+    "Français",
+    "Italiano",
+    "Tiếng Việt",
+    "한국어",
+  ];
+
+  // Fetch weather
   useEffect(() => {
     const fetchWeather = async () => {
       const API_KEY = import.meta.env.VITE_OPENWEATHER_API_KEY;
-
-      if (!API_KEY) {
-        console.error("Missing OpenWeather API key (frontend/.env.local). Must start with VITE_");
-        return;
-      }
-
-      const lat = '30.6280';
-      const lon = '-96.3344';
+      if (!API_KEY) return;
 
       try {
+        const lat = "30.6280";
+        const lon = "-96.3344";
+
         const res = await fetch(
           `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=imperial`
         );
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
         const data = await res.json();
         setWeather(data);
       } catch (err) {
-        console.error("Failed to fetch weather data:", err);
+        console.error("Weather API error:", err);
       }
     };
 
-    //fetchWeather();
+    // fetchWeather();
   }, []);
 
-  const handleStartOrder = () => {
-    navigate('/order'); 
-  };
-  
-  const handleEmployeeLogin = () => {
-    navigate('/login')
-  };
+  // Translate weather description on language change
+  useEffect(() => {
+    async function translateWeather() {
+      if (!weather?.weather) return;
+
+      const englishDesc = weather.weather[0].description;
+
+      if (selectedLang === "English") {
+        setTranslatedDesc(englishDesc);
+        return;
+      }
+
+      const targetCode = LANG_MAP[selectedLang];
+      const resp = await translateText(englishDesc, targetCode);
+
+      setTranslatedDesc(resp?.translatedText || englishDesc);
+    }
+
+    translateWeather();
+  }, [weather, selectedLang]);
+
+  //Secret Login Logic
+  const handleSecretTap = useCallback((evt) => {
+    evt.stopPropagation(); 
+    
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+    }
+    
+    setTapCount(prevCount => {
+      const newCount = prevCount + 1;
+      
+      if (newCount >= 5) {
+        navigate("/login");
+        return 0; 
+      }
+      
+      timerRef.current = setTimeout(() => {
+        setTapCount(0);
+      }, 1500); 
+
+      return newCount;
+    });
+  }, [navigate]);
+
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+      }
+    };
+  }, []);
 
   return (
     <div className="home-container">
-      
-      {/* This header is now modeled after OrderScreen.jsx */}
+      <div 
+          className="login-tap-zone" 
+          onClick={handleSecretTap} 
+          title="Hidden Employee Login Access (Tap 5 times)"
+      />
+      {/* Header */}
       <header className="home-header">
-        
-        {/* Empty div for spacing, balances the "Language" button */}
-        <div className="nav-placeholder"></div>
-        
-        {/* The title label "Home" in the center */}
-        <h1 className="home-title">Home</h1>
-        
-        {/* Language button on the right */}
-        <button className="nav-btn lang-btn" onClick={() => setShowLanguage(!showLanguage)}>
-          Language
+        <MagnifyControls />
+
+        <h1 className="home-title">{labels.home}</h1>
+
+        <button className="nav-btn" onClick={() => setShowLanguage(!showLanguage)}>
+          <img 
+            src={`${imageBase}/images/Icons/Language.png`} 
+            alt="Language Icon" 
+            className="nav-icon" 
+          />
+          {labels.language}
         </button>
       </header>
 
-      {/* Conditionally render the language dropdown based on state */}
+      {/* Language Dropdown */}
       {showLanguage && (
         <div className="language-dropdown">
-          <button>English</button>
-          <button>Espanol</button>
-          <button>Francis</button>
-          <button>Italino</button>
+          {["English", "Español", "Français", "Italiano", "Tiếng Việt", "한국어"].map(
+            (lang) => (
+              <button
+                key={lang}
+                className={lang === selectedLang ? "selected" : ""} 
+                onClick={() => {
+                  setSelectedLang(lang);
+                  setShowLanguage(false);
+                }}
+              >
+                {lang}
+              </button>
+          ))}
         </div>
       )}
 
-      {/* Main content and footer remain the same */}
+      {/* Main Content */}
       <main className="home-main">
-        {/* Weather box */}
         <div className="weather-box">
           {weather ? (
             <>
               <p>{weather.name}</p>
               <p className="weather-temp">{Math.round(weather.main.temp)}°F</p>
-              <p>{weather.weather[0].description}</p>
+              <p>{translatedDesc}</p>
             </>
           ) : (
-            <p>Loading Weather...</p>
+            <p>{labels.weatherLoading}</p>
           )}
         </div>
-            
+
         <div className="weather-image">
-          {weather && weather.main && weather.main.temp > 60 ? (
-            <p>Image based on warm weather (e.g., Iced Tea)</p>
+          {weather && weather.main?.temp > 60 ? (
+            <p>{labels.warmWeather}</p>
           ) : (
-            <p>Image based on cold weather (e.g., Hot Coffee)</p>
+            <p>{labels.coldWeather}</p>
           )}
         </div>
       </main>
 
+      {/* Footer */}
       <footer className="home-footer">
-        {/* ... (start button code) ... */}
-        <button className="start-button" onClick={handleStartOrder}>
-          Tap to Start Order
-        </button>
-        
-        <button className="login-button" onClick={handleEmployeeLogin}>
-          Employee Login
+        <button className="start-button" onClick={() => navigate("/order")}>
+          {labels.start}
         </button>
       </footer>
-
     </div>
   );
 }

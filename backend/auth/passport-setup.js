@@ -1,11 +1,17 @@
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
-const pool = require('../db/pool'); // DB 풀 가져오기
+const pool = require('../db/pool'); 
+
+const isProduction = process.env.NODE_ENV === 'production';
+const callbackURL = isProduction
+  ? 'https://project3-group51-y74g.onrender.com/api/auth/google/callback'
+  : 'http://localhost:3000/api/auth/google/callback';
 
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: "/api/auth/google/callback" 
+    callbackURL: "/api/auth/google/callback",
+    proxy: true
   },
   async (accessToken, refreshToken, profile, done) => {
     const email = profile.emails[0].value;
