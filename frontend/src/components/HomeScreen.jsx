@@ -260,7 +260,16 @@ function HomeScreen() {
 
       {/* Footer */}
       <footer className="home-footer">
-        <button className="start-button" onClick={() => navigate("/order")}>
+        <button
+          className="start-button"
+          onClick={() => {
+            if (typeof window !== "undefined") {
+              sessionStorage.removeItem("customerInfo");
+              sessionStorage.removeItem("identityPrompted");
+            }
+            navigate("/order", { state: { fromHome: true } });
+          }}
+        >
           {labels.start}
         </button>
       </footer>

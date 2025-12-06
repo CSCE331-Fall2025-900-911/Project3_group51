@@ -1,13 +1,13 @@
 /* frontend/src/components/ConfirmationScreen.css */
 .confirmation-page {
-  width: 90%;
+  width: 100%;
   height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
-  border: 1px solid #aaa;
-  margin: auto;
+  border: none;
+  margin: 0;
   font-family: sans-serif;
   background-color: #f9f9f9;
 }

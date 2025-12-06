@@ -1,7 +1,11 @@
 const API = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
 
-export async function getTrends() {
-  const res = await fetch(`${API}/reports/trends`);
+export async function getTrends({ start, end } = {}) {
+  const params = [];
+  if (start) params.push(`start=${encodeURIComponent(start)}`);
+  if (end) params.push(`end=${encodeURIComponent(end)}`);
+  const qs = params.length ? `?${params.join("&")}` : "";
+  const res = await fetch(`${API}/reports/trends${qs}`);
   if (!res.ok) {
     const text = await res.text();
     throw new Error(`HTTP ${res.status}: ${text}`);
@@ -42,4 +46,13 @@ export async function updateStockQuantityByDrink(drinkid, quantity, restockDate)
     throw new Error(`HTTP ${res.status}: ${text}`);
   }
   return res.json(); // { stockid }
+}
+
+export async function getRecentOrderItems(limit = 50) {
+  const res = await fetch(`${API}/reports/recent-orderitems?limit=${limit}`);
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`HTTP ${res.status}: ${text}`);
+  }
+  return res.json();
 }

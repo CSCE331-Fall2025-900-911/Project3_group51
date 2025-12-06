@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import "./CashierScreen.css";
 import { getMenu } from "../api/menu"; // From main
 import { useNavigate, Link } from "react-router-dom";
@@ -9,6 +9,7 @@ export default function CashierScreen({ cart = [], setCart }) {
   const [menuItems, setMenuItems] = useState([]);
   const [categories, setCategories] = useState([]);
   const [activeCategory, setActiveCategory] = useState("");
+  const [stockWarning, setStockWarning] = useState(null);
   const navigate = useNavigate();
   const parseCurrency = (value) => {
     const num = parseFloat(value);
@@ -37,7 +38,21 @@ export default function CashierScreen({ cart = [], setCart }) {
       ? menuItems
       : menuItems.filter((i) => i.category === activeCategory);
 
+  const cartQtyByDrink = useMemo(() => {
+    return cart.reduce((acc, item) => {
+      const id = item.id ?? item.drinkid;
+      const qty = item.quantity ?? 1;
+      acc[id] = (acc[id] || 0) + qty;
+      return acc;
+    }, {});
+  }, [cart]);
+
   const handleCustomize = (item) => {
+    const available = (item.stockqty ?? 0) - (cartQtyByDrink[item.drinkid] || 0);
+    if (available <= 0) {
+      setStockWarning(`${item.drinkname} is out of stock.`);
+      return;
+    }
     navigate(`/order/${item.drinkid}`, {
       state: { item, returnTo: "/cashier", origin: "cashier" },
     });
@@ -56,6 +71,23 @@ export default function CashierScreen({ cart = [], setCart }) {
       const current = next[index];
       const currentQty = current.quantity ?? 1;
       const updatedQty = Math.max(0, currentQty + delta);
+
+      if (delta > 0) {
+        const drinkId = current.id ?? current.drinkid;
+        const stockQty = menuItems.find((m) => m.drinkid === drinkId)?.stockqty ?? 0;
+        const otherQty = next.reduce((acc, itm, idx) => {
+          if (idx === index) return acc;
+          if ((itm.id ?? itm.drinkid) === drinkId) acc += itm.quantity ?? 1;
+          return acc;
+        }, 0);
+        const desired = updatedQty + otherQty;
+        if (desired > stockQty) {
+          setStockWarning(`Only ${Math.max(stockQty - otherQty, 0)} left for ${current.name || "this item"}.`);
+          return prev;
+        }
+      }
+      setStockWarning(null);
+
       if (updatedQty === 0) {
         next.splice(index, 1);
       } else {
@@ -87,6 +119,7 @@ export default function CashierScreen({ cart = [], setCart }) {
 
       <div className="main">
         <div className="left-side">
+          {stockWarning && <div className="stock-warning">{stockWarning}</div>}
           <div className="categories-bar">
             {categories.map((cat) => (
               <button
@@ -100,18 +133,25 @@ export default function CashierScreen({ cart = [], setCart }) {
           </div>
 
           <div className="grid">
-            {filteredItems.map((item) => (
-              <button
-                key={item.drinkid}
-                className="cell"
-                onClick={() => handleCustomize(item)}
-              >
-                <div className="item-name">{item.drinkname}</div>
-                <div className="item-price">
-                  ${Number(item.price).toFixed(2)}
-                </div>
-              </button>
-            ))}
+            {filteredItems.map((item) => {
+              const used = cartQtyByDrink[item.drinkid] || 0;
+              const available = (item.stockqty ?? 0) - used;
+              const outOfStock = available <= 0;
+              return (
+                <button
+                  key={item.drinkid}
+                  className={`cell ${outOfStock ? "sold-out" : ""}`}
+                  onClick={() => !outOfStock && handleCustomize(item)}
+                  disabled={outOfStock}
+                >
+                  <div className="item-name">{item.drinkname}</div>
+                  <div className="item-price">
+                    ${Number(item.price).toFixed(2)}
+                  </div>
+                  {outOfStock && <div className="sold-out-overlay">Sold Out</div>}
+                </button>
+              );
+            })}
           </div>
         </div>
 

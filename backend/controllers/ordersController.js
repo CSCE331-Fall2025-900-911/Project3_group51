@@ -4,10 +4,10 @@ const ordersDB = require('../db/orders');
 // POST /api/orders/: create new order
 exports.createOrder = async (req, res) => {
   try {
-    const { employeeid } = req.body;
-     console.log("POST /api/orders - employeeid:", employeeid);
-    const id = await ordersDB.createOrder(employeeid);
-     console.log("Created new order ID:", id);
+    const { employeeid, customerid } = req.body;
+    console.log("POST /api/orders - employeeid:", employeeid, "customerid:", customerid);
+    const id = await ordersDB.createOrder(employeeid, customerid);
+    console.log("Created new order ID:", id);
     res.status(201).json({
       id : id, 
       message: `Created new order #${id}` });
@@ -30,10 +30,21 @@ exports.updateOrder = async (req, res) => {
 // PUT /api/orders/:id/total: update order total
 exports.updateTotal = async (req, res) => {
   try {
-    console.log("PUT /api/orders/" + req.params.id + "/total", "totalprice:", req.body.totalprice);
-    await ordersDB.updateTotal(req.params.id, req.body.totalprice);
+    const { totalprice, customerid, pointsUsed, grossTotal } = req.body;
+    console.log("PUT /api/orders/" + req.params.id + "/total", {
+      totalprice,
+      grossTotal,
+      customerid,
+      pointsUsed,
+    });
+    const result = await ordersDB.updateTotal(req.params.id, {
+      totalprice,
+      grossTotal,
+      customerid,
+      pointsUsed,
+    });
     console.log("Updated total for order:", req.params.id);
-    res.json({ message: 'Total updated' });
+    res.json({ message: 'Total updated', ...result });
   } catch (e) {
     console.error("Error in updateTotal:", e);
     res.status(500).json({ error: e.message });
