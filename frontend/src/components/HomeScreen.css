@@ -98,6 +98,13 @@
   background-color: white;
 }
 
+.weather-drink-image {
+  max-width: 50%;
+  height: auto;
+  border-radius: 12px;
+  margin-bottom: 16px;
+}
+
 .home-footer {
   padding: 25px;
   border-top: none;
