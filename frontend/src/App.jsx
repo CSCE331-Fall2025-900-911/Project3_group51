@@ -13,6 +13,8 @@ import InventoryScreen from "./components/InventoryScreen.jsx";
 import MenuManagementScreen from "./components/MenuManagementScreen.jsx";
 import EmployeeManagementScreen from "./components/EmployeeManagementScreen.jsx";
 import ManagerPortal from "./components/ManagerPortal.jsx";
+import MenuBoardScreen from "./components/MenuBoardScreen.jsx";
+
 
 function App() {
   
@@ -27,6 +29,9 @@ function App() {
     <>
       <Routes>
         <Route path="/" element= {<HomeScreen/>}/>
+
+        <Route path="/menu-board" element={<MenuBoardScreen />} />
+
         
         <Route 
           path="/order" 
