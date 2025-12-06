@@ -147,4 +147,33 @@ router.get('/trends', async (_req, res) => {
   }
 });
 
+/**
+ * RECENT ORDER ITEMS
+ * GET /api/reports/recent-orderitems?limit=50
+ */
+router.get('/recent-orderitems', async (req, res) => {
+  const limit = Math.min(parseInt(req.query.limit, 10) || 50, 200);
+  try {
+    const r = await pool.query(
+      `SELECT
+         oi.orderitemid,
+         oi.orderid,
+         oi.quantity,
+         oi.price,
+         oi.comments,
+         o.date,
+         m.drinkname
+       FROM orderitem oi
+       JOIN orders o ON oi.orderid = o.orderid
+       JOIN menuitem m ON oi.drinkid = m.drinkid
+       ORDER BY o.date DESC, oi.orderitemid DESC
+       LIMIT $1`,
+      [limit]
+    );
+    res.json(r.rows);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 module.exports = router;

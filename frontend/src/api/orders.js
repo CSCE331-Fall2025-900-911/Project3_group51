@@ -32,6 +32,7 @@ export async function addOrderItem(item, orderId) {
     icelevel: item.ice,
     sugarlevel: item.sugar,
     toppings: item.toppings, // Assumes backend accepts array
+    comments: item.comments ? item.comments.slice(0, 255) : null,
   };
 
   const res = await fetch(`${API}/orderitems`, {

@@ -43,3 +43,12 @@ export async function updateStockQuantityByDrink(drinkid, quantity, restockDate)
   }
   return res.json(); // { stockid }
 }
+
+export async function getRecentOrderItems(limit = 50) {
+  const res = await fetch(`${API}/reports/recent-orderitems?limit=${limit}`);
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`HTTP ${res.status}: ${text}`);
+  }
+  return res.json();
+}
