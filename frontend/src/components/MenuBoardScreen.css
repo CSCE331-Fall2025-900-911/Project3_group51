@@ -1,57 +1,82 @@
-.menu-board-container {
+/* ===========================
+   Menu Board Print Style
+   =========================== */
+
+   .menu-board-container {
+    max-width: 1400px;
+    margin: 2rem auto;
+    padding: 1rem 2rem;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-    gap: 2rem;
-    padding: 2rem;
-    max-width: 1600px;
-    margin: auto;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 3rem;
+    font-family: "Helvetica Neue", Arial, sans-serif;
   }
   
+  /* Category block */
   .menu-board-section {
-    background: #fff;
-    border-radius: 12px;
-    padding: 1rem;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    border-right: 2px solid #eee;
+    padding-right: 1.5rem;
   }
   
+  /* Category header row */
+  .menu-board-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+  
+  /* Category title */
   .menu-board-category {
-    font-size: 1.6rem;
-    font-weight: 700;
-    margin-bottom: 0.5rem;
+    font-size: 1.8rem;
+    font-weight: 800;
+    letter-spacing: 1px;
     text-transform: uppercase;
-    letter-spacing: 2px;
-    color: #333;
+    color: #000;
   }
   
+  /* Category thumbnail (small!) */
   .menu-board-category-image {
-    width: 100%;
-    border-radius: 10px;
-    margin: 0.5rem 0 1rem;
+    width: 50px;
+    height: 50px;
     object-fit: cover;
-    max-height: 200px;
+    border-radius: 6px;
+    margin: 0;
+    background: #f4f4f4;
   }
   
+  /* Drink list */
   .menu-board-list {
     list-style: none;
     padding: 0;
     margin: 0;
   }
   
+  /* Each drink */
   .menu-board-item {
-    display: flex;
-    justify-content: space-between;
-    padding: 0.35rem 0;
-    font-size: 1.05rem;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    padding: 0.3rem 0;
+    font-size: 1.1rem;
+    border-bottom: 1px dotted #ddd;
   }
   
+  /* Drink name */
+  .menu-board-item span {
+    color: #222;
+  }
+  
+  /* Right price */
   .menu-board-price {
-    color: #444;
-    font-weight: 600;
+    font-weight: 700;
+    color: #000;
+    padding-left: 1rem;
   }
   
+  /* Loading */
   .menu-board-loading {
-    padding: 4rem;
-    text-align: center;
     font-size: 2rem;
+    text-align: center;
+    padding: 4rem;
   }
   

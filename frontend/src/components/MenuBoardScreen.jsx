@@ -35,17 +35,17 @@ export default function MenuBoardScreen() {
         return (
           <div key={category} className="menu-board-section">
             
-            {/* Category Header */}
+          <div className="menu-board-header">
             <h2 className="menu-board-category">{category}</h2>
-
-            {/* Category Image */}
             {categoryImage && (
-              <img
+                <img
                 src={categoryImage}
                 alt={category}
                 className="menu-board-category-image"
-              />
+                />
             )}
+            </div>
+
 
             {/* Items */}
             <ul className="menu-board-list">
