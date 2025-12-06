@@ -74,6 +74,24 @@ function OrderScreen({ cart, setCart }) {
     setSelectedCategory(category);
   };
 
+  const handleQuantityChange = (index, delta) => {
+    if (!setCart) return;
+    setCart((prev = []) => {
+      if (!prev[index]) return prev;
+      const next = [...prev];
+      const current = next[index];
+      const currentQty = current.quantity ?? 1; 
+      const updatedQty = Math.max(0, currentQty + delta);
+      
+      if (updatedQty === 0) {
+        next.splice(index, 1);
+      } else {
+        next[index] = { ...current, quantity: updatedQty };
+      }
+      return next;
+    });
+  };
+
   // Checkout
   const handleCheckout = () => {
     navigate("/checkout", {
@@ -170,26 +188,30 @@ function OrderScreen({ cart, setCart }) {
         <main className="menu-grid">
           {menuItems
             .filter((i) => !selectedCategory || i.category === selectedCategory)
-            .map((item) => (
-              <button
-                key={item.drinkid}
-                className="menu-item"
-                onClick={() => handleItemClick(item)}
-              >
-                <div className="item-image">
-                  {item.image ? (
-                    <img
-                      src={`${imageBase}/images/${item.image}`}
-                      alt={item.drinkname}
-                    />
-                  ) : (
-                    <span>Item Image</span>
-                  )}
-                </div>
-                <div className="item-name">{item.drinkname}</div>
-                <div className="item-price">${item.price}</div>
-              </button>
-            ))}
+            .map((item) => {
+              const categoryClass = item.category.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-*|-*$/g, '');
+              
+              return (
+                <button
+                  key={item.drinkid}
+                  className={`menu-item category-${categoryClass}`}
+                  onClick={() => handleItemClick(item)}
+                >
+                  <div className="item-image">
+                    {item.image ? (
+                      <img
+                        src={`${imageBase}/images/${item.image}`}
+                        alt={item.drinkname}
+                      />
+                    ) : (
+                      <span>Item Image</span>
+                    )}
+                  </div>
+                  <div className="item-name">{item.drinkname}</div>
+                  <div className="item-price">${item.price}</div>
+                </button>
+              );
+            })}
         </main>
       </div>
 
@@ -213,9 +235,30 @@ function OrderScreen({ cart, setCart }) {
               const translatedName = translatedDrinkNames[item.name] || item.name;
 
               return (
-                <p key={idx}>
-                  {translatedName} x {qty} - ${total}
-                </p>
+                  <div key={idx} className="order-row-item">
+                    <span className="item-name-qty">
+                        {translatedName} x {qty}
+                    </span>
+                    
+                    <span className="item-price-total">
+                        ${total}
+                    </span>
+                    
+                    <div className="item-controls">
+                        <button 
+                            className="control-btn" 
+                            onClick={() => handleQuantityChange(idx, -1)}
+                        >
+                            -
+                        </button>
+                        <button 
+                            className="control-btn" 
+                            onClick={() => handleQuantityChange(idx, 1)}
+                        >
+                            +
+                        </button>
+                    </div>
+                </div>
               );
             })
           )}
