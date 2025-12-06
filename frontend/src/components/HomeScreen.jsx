@@ -1,66 +1,49 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import MagnifyControls from "./MagnifyControls.jsx";
-
+import LanguageSelector from "./translation/LanguageSelector.jsx";
 import "./HomeScreen.css";
 
 function HomeScreen() {
   const navigate = useNavigate();
 
-  /* ----------------------------------------------
-     WEATHER STATE
-  ---------------------------------------------- */
   const [weather, setWeather] = useState(null);
 
-  /* ----------------------------------------------
-     SECRET LOGIN TAP (Tap 5 times)
-  ---------------------------------------------- */
   const [tapCount, setTapCount] = useState(0);
   const timerRef = useRef(null);
 
   const handleSecretTap = useCallback(() => {
-    // clear old timer
     if (timerRef.current) clearTimeout(timerRef.current);
 
     setTapCount((prev) => {
-      const newCount = prev + 1;
+      const next = prev + 1;
 
-      if (newCount >= 5) {
+      if (next >= 5) {
         navigate("/login");
-        return 0; // reset after login
+        return 0;
       }
 
-      // reset tap count after 1.5 seconds
       timerRef.current = setTimeout(() => setTapCount(0), 1500);
-
-      return newCount;
+      return next;
     });
   }, [navigate]);
 
   useEffect(() => {
-    return () => {
-      if (timerRef.current) clearTimeout(timerRef.current);
-    };
+    return () => timerRef.current && clearTimeout(timerRef.current);
   }, []);
 
-  /* ----------------------------------------------
-     FETCH WEATHER
-  ---------------------------------------------- */
   useEffect(() => {
     const fetchWeather = async () => {
       const API_KEY = import.meta.env.VITE_OPENWEATHER_API_KEY;
       if (!API_KEY) return;
 
       try {
-        const lat = "30.6280";
-        const lon = "-96.3344";
-
         const res = await fetch(
-          `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=imperial`
+          "https://api.openweathermap.org/data/2.5/weather?lat=30.6280&lon=-96.3344&appid=" +
+            API_KEY +
+            "&units=imperial"
         );
-
-        const data = await res.json();
-        setWeather(data);
+        setWeather(await res.json());
       } catch (err) {
         console.error("Weather API error:", err);
       }
@@ -69,27 +52,27 @@ function HomeScreen() {
     fetchWeather();
   }, []);
 
-  /* ----------------------------------------------
-     RENDER UI
-  ---------------------------------------------- */
   return (
     <div className="home-container">
-
-      {/* Invisible tap zone for employee login */}
       <div
         className="login-tap-zone"
         onClick={handleSecretTap}
         title="Hidden Employee Login Access (Tap 5 times)"
       />
 
-      {/* Header */}
+      {/* FINAL FIXED HEADER */}
       <header className="home-header">
-        <MagnifyControls />
+        <div className="header-left">
+          <MagnifyControls />
+        </div>
+
         <h1 className="home-title">Home</h1>
-        <div className="nav-placeholder" />
+
+        <div className="header-right">
+          <LanguageSelector />
+        </div>
       </header>
 
-      {/* Main Content */}
       <main className="home-main">
         <div className="weather-box">
           {weather ? (
@@ -104,7 +87,7 @@ function HomeScreen() {
         </div>
 
         <div className="weather-image">
-          {weather && weather.main?.temp > 60 ? (
+          {weather?.main?.temp > 60 ? (
             <p>It’s warm today.</p>
           ) : (
             <p>It’s cold today.</p>
@@ -112,7 +95,6 @@ function HomeScreen() {
         </div>
       </main>
 
-      {/* Footer */}
       <footer className="home-footer">
         <button className="start-button" onClick={() => navigate("/order")}>
           Start
