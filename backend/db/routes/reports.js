@@ -9,7 +9,8 @@ const router = express.Router();
  */
 router.get('/sales', async (req, res) => {
   const { start, end } = req.query;
-  const endNext = new Date(new Date(end).getTime() + 86400000); // +1 day
+  const startDate = start ? new Date(start) : null;
+  const endDate = end ? new Date(end) : null;
   try {
     const r = await pool.query(
       `SELECT m.drinkname,
@@ -18,10 +19,11 @@ router.get('/sales', async (req, res) => {
        FROM orderitem oi
        JOIN menuitem m ON oi.drinkid = m.drinkid
        JOIN orders   o ON oi.orderid = o.orderid
-       WHERE o.date >= $1 AND o.date < $2
+       WHERE ($1::date IS NULL OR o.date >= $1::date)
+         AND ($2::date IS NULL OR o.date < ($2::date + INTERVAL '1 day'))
        GROUP BY m.drinkname
        ORDER BY total_sales DESC`,
-      [start, endNext]
+      [startDate, endDate]
     );
     res.json(r.rows);
   } catch (e) {
@@ -35,7 +37,8 @@ router.get('/sales', async (req, res) => {
  */
 router.get('/usage', async (req, res) => {
   const { start, end } = req.query;
-  const endNext = new Date(new Date(end).getTime() + 86400000);
+  const startDate = start ? new Date(start) : null;
+  const endDate = end ? new Date(end) : null;
   try {
     const r = await pool.query(
       `SELECT s.drinkid,
@@ -44,10 +47,11 @@ router.get('/usage', async (req, res) => {
        JOIN orders   o  ON oi.orderid = o.orderid
        JOIN menuitem mi ON oi.drinkid = mi.drinkid
        JOIN stock   s   ON mi.ingredient = s.drinkid
-       WHERE o.date >= $1 AND o.date < $2
+       WHERE ($1::date IS NULL OR o.date >= $1::date)
+         AND ($2::date IS NULL OR o.date < ($2::date + INTERVAL '1 day'))
        GROUP BY s.drinkid
        ORDER BY total_used DESC`,
-      [start, endNext]
+      [startDate, endDate]
     );
     res.json(r.rows);
   } catch (e) {

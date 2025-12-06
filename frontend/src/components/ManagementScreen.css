@@ -53,6 +53,24 @@
   border-radius: 6px;
   padding: 0.35rem 0.5rem;
 }
+
+.zreport-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.zreport-actions {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.btn.danger {
+  border-color: #dc2626;
+  color: #dc2626;
+  background: #fef2f2;
+}
   
   .mgmt-controls-right {
     display: flex;
