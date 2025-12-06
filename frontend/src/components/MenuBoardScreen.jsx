@@ -6,13 +6,20 @@ export default function MenuBoardScreen() {
   const [menu, setMenu] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // same image base logic as OrderScreen (this is the version that worked before)
+  const imageBase = (import.meta.env.VITE_API_URL || "http://localhost:3000/api")
+    .replace(/\/api$/, "");
+
   useEffect(() => {
     getMenu()
-      .then(data => {
+      .then((data) => {
         setMenu(data);
         setLoading(false);
       })
-      .catch(err => console.error(err));
+      .catch((err) => {
+        console.error(err);
+        setLoading(false);
+      });
   }, []);
 
   if (loading) return <div className="menu-board-loading">Loading...</div>;
@@ -24,25 +31,19 @@ export default function MenuBoardScreen() {
   }, {});
 
   return (
-    <div className="menu-board-wrapper">
-      <div className="menu-board-container">
+    <div className="menu-board-container">
+      {/* MAIN GRID */}
+      <div className="menu-board-grid">
         {Object.entries(grouped).map(([category, items]) => {
-
-          const baseUrl =
-            (import.meta.env.VITE_API_URL || "http://localhost:3000/api").replace(
-              "/api",
-              ""
-            );
-
-          // Use FIRST drink image in this category
+          // Use the FIRST drink image in this category as the icon
           const categoryImage = items[0]?.image
-            ? `${baseUrl}/images/Icons/${items[0].image}`
+            ? `${imageBase}/images/${items[0].image}`
             : null;
 
           return (
             <div key={category} className="menu-board-section">
-
-              <div className="menu-board-header">
+              {/* Header with small icon + title */}
+              <div className="menu-board-category-header">
                 {categoryImage && (
                   <img
                     src={categoryImage}
@@ -53,69 +54,49 @@ export default function MenuBoardScreen() {
                 <h2 className="menu-board-category">{category}</h2>
               </div>
 
+              {/* Items with dotted leader line */}
               <ul className="menu-board-list">
-                {items.map(drink => (
+                {items.map((drink) => (
                   <li key={drink.drinkid} className="menu-board-item">
-                    <span>{drink.drinkname}</span>
-                    <span className="menu-board-price">${drink.price}</span>
+                    <span className="menu-board-item-name">
+                      {drink.drinkname}
+                    </span>
+                    <span className="menu-board-item-dots" />
+                    <span className="menu-board-price">
+                      ${parseFloat(drink.price).toFixed(2)}
+                    </span>
                   </li>
                 ))}
               </ul>
-
             </div>
           );
         })}
       </div>
 
-      {/* ================================================== */}
-      {/* STATIC CUSTOMIZATION SECTION */}
-      {/* ================================================== */}
+      {/* CUSTOMIZATION STRIP (horizontal, aligned like the Sharetea board) */}
+      <div className="menu-board-customization-bar">
+        <div className="menu-board-customization-row">
+          <span className="custom-label">ICE LEVEL</span>
+          <span className="custom-values">
+            Regular Ice • Light Ice • No Ice • Extra Ice
+          </span>
+        </div>
 
-      <div className="menu-board-customization">
-        <h2 className="menu-board-custom-title">CUSTOMIZATION OPTIONS</h2>
+        <div className="menu-board-customization-row">
+          <span className="custom-label">SWEETNESS LEVEL</span>
+          <span className="custom-values">
+            100% Sugar • 80% Sugar • 50% Sugar • 30% Sugar • No Sugar
+          </span>
+        </div>
 
-        <div className="menu-board-custom-grid">
-
-          <div>
-            <h3>Ice Level</h3>
-            <ul>
-              <li>Regular Ice</li>
-              <li>Light Ice</li>
-              <li>No Ice</li>
-              <li>Extra Ice</li>
-            </ul>
-          </div>
-
-          <div>
-            <h3>Sweetness Level</h3>
-            <ul>
-              <li>100% Sugar</li>
-              <li>80% Sugar</li>
-              <li>50% Sugar</li>
-              <li>30% Sugar</li>
-              <li>No Sugar</li>
-            </ul>
-          </div>
-
-          <div>
-            <h3>Toppings (+Extra Cost)</h3>
-            <ul>
-              <li>Pearl (Boba) — $0.75</li>
-              <li>Coffee Jelly — $0.75</li>
-              <li>Pudding — $0.75</li>
-              <li>Lychee Jelly — $0.75</li>
-              <li>Honey Jelly — $0.75</li>
-              <li>Crystal Boba — $0.75</li>
-              <li>Mango Popping Boba — $1.00</li>
-              <li>Strawberry Popping Boba — $1.00</li>
-              <li>Ice Cream — $1.00</li>
-              <li>Creama — $1.25</li>
-            </ul>
-          </div>
-
+        <div className="menu-board-customization-row">
+          <span className="custom-label">TOPPINGS</span>
+          <span className="custom-values">
+            +$0.75 Pearls, Coffee Jelly, Pudding, Lychee Jelly · +$1.00 Mango
+            Popping Boba, Ice Cream · +$1.25 Crema
+          </span>
         </div>
       </div>
-
     </div>
   );
 }

@@ -1,50 +1,50 @@
-/* ======================================================
-   BASE CONTAINER
-   ====================================================== */
+/* ===== MAIN LAYOUT (centered like TV board) ===== */
 
-   .menu-board-wrapper {
+.menu-board-container {
     max-width: 1600px;
-    margin: 0 auto;
-    padding: 2rem;
-    font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
+    margin: 40px auto;
+    padding: 0 60px;
+    font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    color: #222;
   }
   
-  .menu-board-container {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 4rem;
+  /* grid of categories, centered */
+  .menu-board-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 40px;
+    justify-content: center; /* center like digital menu boards */
   }
   
-  /* ======================================================
-     CATEGORY HEADER
-     ====================================================== */
+  /* each category block */
+  .menu-board-section {
+    width: 30%;
+    min-width: 360px;
+  }
   
-  .menu-board-header {
+  /* Header: icon + title */
+  .menu-board-category-header {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    margin-bottom: 0.75rem;
+    gap: 10px;
+    margin-bottom: 8px;
   }
   
   .menu-board-category {
-    font-size: 1.8rem;
+    font-size: 26px;
     font-weight: 800;
-    letter-spacing: 1px;
     text-transform: uppercase;
+    letter-spacing: 1.5px;
     margin: 0;
   }
   
   .menu-board-category-image {
     width: 50px;
     height: 50px;
-    object-fit: cover;
-    border-radius: 6px;
-    background: #f4f4f4;
+    object-fit: contain;
   }
   
-  /* ======================================================
-     DRINK LIST
-     ====================================================== */
+  /* ===== DRINK LIST WITH DOTTED LEADERS ===== */
   
   .menu-board-list {
     list-style: none;
@@ -54,61 +54,86 @@
   
   .menu-board-item {
     display: grid;
-    grid-template-columns: 1fr 60px;
-    border-bottom: 1px dotted rgba(0, 0, 0, 0.2);
-    padding: 0.35rem 0;
-    font-size: 1.1rem;
+    grid-template-columns: auto 1fr auto; /* name | dots | price */
+    align-items: center;
+    column-gap: 8px;
+    font-size: 16px;
+    padding: 4px 0;
   }
   
+  .menu-board-item-name {
+    white-space: nowrap;
+  }
+  
+  /* dotted line between name and price */
+  .menu-board-item-dots {
+    border-bottom: 1px dotted #bbb;
+    margin: 0 4px;
+  }
+  
+  /* price aligned to the right */
   .menu-board-price {
-    font-weight: 700;
-    color: #000;
+    font-weight: 600;
+    justify-self: flex-end;
   }
   
-  /* ======================================================
-     CUSTOMIZATION SECTION
-     ====================================================== */
-  
-  .menu-board-customization {
-    margin-top: 4rem;
-    padding-top: 3rem;
-    border-top: 2px solid #eee;
-  }
-  
-  .menu-board-custom-title {
-    font-size: 1.8rem;
-    font-weight: 800;
-    margin-bottom: 1.5rem;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-  }
-  
-  .menu-board-custom-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 3rem;
-  }
-  
-  .menu-board-custom-grid h3 {
-    font-size: 1.2rem;
-    font-weight: 700;
-    margin-bottom: 0.75rem;
-  }
-  
-  .menu-board-custom-grid ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    line-height: 1.6;
-  }
-  
-  /* ======================================================
-     LOADING
-     ====================================================== */
-  
+  /* loading state */
   .menu-board-loading {
-    font-size: 2rem;
-    text-align: center;
     padding: 4rem;
+    text-align: center;
+    font-size: 2rem;
+  }
+  
+  /* ===== CUSTOMIZATION FOOTER STRIP ===== */
+  
+  .menu-board-customization-bar {
+    margin-top: 32px;
+    padding-top: 16px;
+    border-top: 2px solid #dddddd;
+    max-width: 1000px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  /* each row: label column + values column (kept aligned) */
+  .menu-board-customization-row {
+    display: grid;
+    grid-template-columns: 160px 1fr; /* label width fixed so rows align */
+    column-gap: 12px;
+    font-size: 13px;
+    margin-bottom: 4px;
+  }
+  
+  .custom-label {
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  
+  .custom-values {
+    color: #444;
+  }
+  
+  /* ===== Responsive tweaks ===== */
+  
+  @media screen and (max-width: 1100px) {
+    .menu-board-section {
+      width: 45%;
+    }
+  }
+  
+  @media screen and (max-width: 800px) {
+    .menu-board-section {
+      width: 100%;
+      min-width: 0;
+    }
+  
+    .menu-board-container {
+      padding: 0 20px;
+    }
+  
+    .menu-board-customization-bar {
+      max-width: none;
+    }
   }
   
