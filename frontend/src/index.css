@@ -1,0 +1,23 @@
+/* Remove Google Translate Top Banner */
+.goog-te-banner-frame.skiptranslate {
+  display: none !important;
+}
+iframe.goog-te-banner-frame {
+  display: none !important;
+}
+body {
+  top: 0 !important;
+}
+
+.goog-te-combo,
+.goog-logo-link,
+.goog-te-gadget,
+.goog-te-gadget-simple,
+.goog-te-balloon-frame {
+  display: none !important;
+}
+
+.goog-text-highlight {
+  background: none !important;
+  box-shadow: none !important;
+}
