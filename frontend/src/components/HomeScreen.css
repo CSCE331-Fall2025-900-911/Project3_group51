@@ -17,40 +17,41 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid #e0e0e0;
-  background-color: white; 
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); 
+  background-color: #333333; 
+  border-bottom: 1px solid #555555; 
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4); 
 }
 
 .home-title {
-  font-size: 1.8rem;
-  background: #E0EAF3;
-  color: #333;
-  padding: 8px 20px;
-  border-radius: 25px;
-  margin: 0;
+  font-size: 1.5rem; 
+  background: #4A90E2; /* Solid Sky Blue background */
+  color: white; 
+  padding: 10px 25px;
+  border-radius: 12px; 
+  font-weight: 700;
+  box-shadow: 0 4px 8px rgba(74, 144, 226, 0.4); 
 }
 
 .nav-btn {
   font-size: 18px;
   padding: 10px 20px; 
   border-radius: 30px;
-  border: 1px solid #ccc;
-  background-color: #E5EAF3;
+  border: 1px solid #4A90E2; 
+  background-color: white; 
   color: #333;
   cursor: pointer;
   transition: all 0.2s;
   font-weight: 600;
   
-
   display: flex;
   align-items: center;
-  gap: 8px; 
+  gap: 8px;
 }
 
 .nav-btn:hover {
-  background-color: #d8e0eb; 
+  background-color: #F0F8FF; 
 }
+
 .nav-btn .nav-icon {
   height: 24px;
   width: 24px;
@@ -121,6 +122,7 @@
   box-shadow: 0 8px 15px rgba(255, 153, 0, 0.4); 
   transition: all 0.2s ease-in-out;
 }
+
 .start-button:hover {
   background-color: #e58a00;
   transform: translateY(-2px);
@@ -198,6 +200,10 @@ body[data-magnify-level="1"] .login-button {
   font-size: 22px;
   padding: 18px 32px;
 }
+body[data-magnify-level="1"] .language-dropdown button {
+  font-size: 18px;
+  padding: 14px;
+}
 
 /* --- Level 2 Zoom --- */
 body[data-magnify-level="2"] .home-title {
@@ -220,4 +226,8 @@ body[data-magnify-level="2"] .start-button {
 body[data-magnify-level="2"] .login-button {
   font-size: 24px;
   padding: 20px 35px;
+}
+body[data-magnify-level="2"] .language-dropdown button {
+  font-size: 20px;
+  padding: 16px;
 }

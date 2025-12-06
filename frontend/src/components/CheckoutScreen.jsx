@@ -45,29 +45,34 @@ function CheckoutScreen({ cart, setCart }) {
   const taxAmount = subtotal * TAX_RATE;
   const priceTotal = subtotal + taxAmount;
 
-  const handlePaymentConfirm = async (type) => {
-    setPaymentType(type);
-    setLoading(true);
-    setError(null);
+const handleConfirmOrder = async () => { 
+  // Check for selection and cart items
+  if (!paymentType || cart.length === 0) {
+    setError("Please select a payment type and ensure your cart is not empty.");
+    return;
+  }
+  setLoading(true);
+  setError(null);
 
-    try {
-      const { id: newOrderId } = await createOrder();
+  try {
+    const { id: newOrderId } = await createOrder();
 
-      for (const item of cart) {
-        await addOrderItem(item, newOrderId);
-      }
-
-      await updateOrderTotal(newOrderId, priceTotal);
-
-      setCart([]);
-      navigate("/confirmation", { state: { returnTo: completeReturnTo } });
-
-    } catch (err) {
-      console.error("Failed to create order:", err);
-      setError("Failed to submit order. Please try again.");
-      setLoading(false);
+    for (const item of cart) {
+      await addOrderItem(item, newOrderId);
     }
-  };
+
+    await updateOrderTotal(newOrderId, priceTotal);
+
+    setCart([]);
+    // Pass paymentType to confirmation screen for potential use
+    navigate("/confirmation", { state: { returnTo: completeReturnTo, paymentType: paymentType } }); 
+
+  } catch (err) {
+    console.error("Failed to create order:", err);
+    setError("Failed to submit order. Please try again.");
+    setLoading(false);
+  }
+};
 
   return (
     <div className="checkout-page">
@@ -94,7 +99,7 @@ function CheckoutScreen({ cart, setCart }) {
           <div className="payment-grid">
             <button
               className={`payment-btn ${paymentType === "Cash" ? "selected" : ""}`}
-              onClick={() => handlePaymentConfirm("Cash")}
+              onClick={() => setPaymentType("Cash")} 
               disabled={loading}
             >
               {loading ? "..." : labels.cash}
@@ -102,7 +107,7 @@ function CheckoutScreen({ cart, setCart }) {
 
             <button
               className={`payment-btn ${paymentType === "Credit Card" ? "selected" : ""}`}
-              onClick={() => handlePaymentConfirm("Credit Card")}
+              onClick={() => setPaymentType("Credit Card")} 
               disabled={loading}
             >
               {loading ? "..." : labels.credit}
@@ -110,7 +115,7 @@ function CheckoutScreen({ cart, setCart }) {
 
             <button
               className={`payment-btn ${paymentType === "Mobile Pay" ? "selected" : ""}`}
-              onClick={() => handlePaymentConfirm("Mobile Pay")}
+              onClick={() => setPaymentType("Mobile Pay")} 
               disabled={loading}
             >
               {loading ? "..." : labels.mobile}
@@ -118,7 +123,7 @@ function CheckoutScreen({ cart, setCart }) {
 
             <button
               className={`payment-btn ${paymentType === "Cheque" ? "selected" : ""}`}
-              onClick={() => handlePaymentConfirm("Cheque")}
+              onClick={() => setPaymentType("Cheque")} 
               disabled={loading}
             >
               {loading ? "..." : labels.cheque}
@@ -168,6 +173,15 @@ function CheckoutScreen({ cart, setCart }) {
             <span>{labels.balance}</span>
             <span>${priceTotal.toFixed(2)}</span>
           </div>
+
+          {/* NEW: Confirm Checkout Button */}
+          <button 
+            className="confirm-checkout-btn" 
+            onClick={handleConfirmOrder}
+            disabled={loading || !paymentType || cart.length === 0} 
+          >
+            {loading ? "Processing..." : labels.checkout}
+          </button>
         </aside>
       </div>
     </div>

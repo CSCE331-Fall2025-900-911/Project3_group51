@@ -132,10 +132,6 @@ function CustomizationScreen({ addToCart }) {
   // ------------------------------
   return (
     <div className="custom-page">
-      <h1 className="custom-title">
-        {labels.customization} ({item.drinkname})
-      </h1>
-
       <div className="custom-content">
         {/* LEFT COLUMN */}
         <div className="custom-column">
