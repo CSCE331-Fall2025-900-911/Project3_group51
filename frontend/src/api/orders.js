@@ -4,15 +4,15 @@ const API = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
 
 /**
  * Creates a new blank order in the database.
- * 'employeeid' is hardcoded to 1 (representing the Kiosk itself).
+ * 'employeeid' is hardcoded to 1 (representing the Kiosk itself) unless overridden.
+ * Accepts optional customerid for loyalty tracking.
  * @returns {Promise<{id: number}>} The new order ID
  */
-export async function createOrder() {
+export async function createOrder({ employeeid = 1, customerid = null } = {}) {
   const res = await fetch(`${API}/orders`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    // employeeid 1 is a placeholder for the kiosk/customer order
-    body: JSON.stringify({ employeeid: 1 }), 
+    body: JSON.stringify({ employeeid, customerid }), 
   });
   if (!res.ok) throw new Error(`HTTP ${res.status} on createOrder`);
   return res.json(); // Returns { id: new_order_id }
@@ -32,6 +32,7 @@ export async function addOrderItem(item, orderId) {
     icelevel: item.ice,
     sugarlevel: item.sugar,
     toppings: item.toppings, // Assumes backend accepts array
+    comments: item.comments ? item.comments.slice(0, 255) : null,
   };
 
   const res = await fetch(`${API}/orderitems`, {
@@ -39,20 +40,25 @@ export async function addOrderItem(item, orderId) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
   });
-  if (!res.ok) throw new Error(`HTTP ${res.status} on addOrderItem`);
+  if (!res.ok) {
+    const text = await res.text();
+    const err = new Error(`HTTP ${res.status} on addOrderItem`);
+    err.details = text;
+    throw err;
+  }
   return res.json();
 }
 
 /**
  * Updates the total price of an order after all items are added.
  * @param {number} orderId - The ID of the order to update
- * @param {number} total - The final calculated total price
+ * @param {object} payload - { totalprice, grossTotal, customerid, pointsUsed }
  */
-export async function updateOrderTotal(orderId, total) {
+export async function updateOrderTotal(orderId, { totalprice, grossTotal, customerid = null, pointsUsed = 0 }) {
   const res = await fetch(`${API}/orders/${orderId}/total`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ totalprice: total }),
+    body: JSON.stringify({ totalprice, grossTotal, customerid, pointsUsed }),
   });
   if (!res.ok) throw new Error(`HTTP ${res.status} on updateOrderTotal`);
   return res.json();

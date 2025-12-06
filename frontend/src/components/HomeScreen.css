@@ -1,7 +1,9 @@
 /* ================================
    HOME CONTAINER
 ================================ */
-
+:root {
+  --text-scale: 1;
+}
 .home-container {
   display: flex;
   flex-direction: column;
@@ -27,6 +29,9 @@
   justify-content: center;       /* center title */
 
   position: relative;            /* important for positioning children */
+  background-color: #333333;
+  border-bottom: 1px solid #555555;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
 }
 
 
@@ -44,18 +49,14 @@
 ================================ */
 
 .home-title {
-  font-size: 1.2rem;
-  font-weight: 700;
-
+  font-size: 1.5rem;
   background: #4A90E2;
+  /* Solid Sky Blue background */
   color: white;
-
-  padding: 5px 20px;
-  border-radius: 10px;
-
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.25);
-  text-align: center;
-  margin: 0 auto;
+  padding: 10px 25px;
+  border-radius: 12px;
+  font-weight: 700;
+  box-shadow: 0 4px 8px rgba(74, 144, 226, 0.4);
 }
 
 
@@ -94,6 +95,13 @@
 .nav-icon {
   height: 26px;
   width: 26px;
+  background-color: #F0F8FF;
+}
+
+.nav-btn .nav-icon {
+  height: 24px;
+  width: 24px;
+  filter: invert(30%);
 }
 
 
@@ -152,9 +160,8 @@
   background: #E8F8EA;
   padding: 20px;
   font-size: 20px;
-
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .weather-temp {
@@ -162,6 +169,16 @@
   font-weight: bold;
   margin: 8px 0;
   color: #1A993D;
+}
+
+.weather-drink-image {
+  max-width: 150px;
+  max-height: 150px;
+  width: auto;
+  height: auto;
+  border-radius: 12px;
+  margin-bottom: 16px;
+  object-fit: contain;
 }
 
 
@@ -208,8 +225,8 @@
   color: white;
 
   cursor: pointer;
-  transition: 0.2s;
-  box-shadow: 0 8px 15px rgba(255,153,0,0.4);
+  box-shadow: 0 8px 15px rgba(255, 153, 0, 0.4);
+  transition: all 0.2s ease-in-out;
 }
 
 .start-button:hover {
@@ -227,12 +244,13 @@
   bottom: 0;
   right: 0;
 
-  width: 120px;
-  height: 120px;
+  width: 100px;
+  height: 100px;
 
-  background: transparent;
+  z-index: 50;
   cursor: pointer;
-  z-index: 300;
+
+  background-color: transparent;
 }
 
 /*Language button*/
@@ -241,4 +259,17 @@
   right: 10px;     /* put it at the right side of the dark bar */
   top: 20%;
   transform: translateY(-50%);
+}
+
+/* Scale all text based on magnify level */
+body[data-magnify-level="0"] {
+  --text-scale: 1;
+}
+
+body[data-magnify-level="1"] {
+  --text-scale: 1.2;
+}
+
+body[data-magnify-level="2"] {
+  --text-scale: 1.5;
 }

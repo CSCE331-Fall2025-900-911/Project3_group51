@@ -128,7 +128,8 @@ router.get('/inventory', async (_req, res) => {
  *    ...
  *  ]
  */
-router.get('/trends', async (_req, res) => {
+router.get('/trends', async (req, res) => {
+  const { start, end } = req.query;
   try {
     const r = await pool.query(
       `SELECT
@@ -137,10 +138,42 @@ router.get('/trends', async (_req, res) => {
        FROM orderitem oi
        JOIN menuitem m ON oi.drinkid = m.drinkid
        JOIN orders   o ON oi.orderid = o.orderid
+       WHERE ($1::date IS NULL OR o.date >= $1::date)
+         AND ($2::date IS NULL OR o.date < ($2::date + INTERVAL '1 day'))
        GROUP BY m.drinkname
-       ORDER BY qty DESC`
+       ORDER BY qty DESC`,
+      [start || null, end || null]
     );
 
+    res.json(r.rows);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+/**
+ * RECENT ORDER ITEMS
+ * GET /api/reports/recent-orderitems?limit=50
+ */
+router.get('/recent-orderitems', async (req, res) => {
+  const limit = Math.min(parseInt(req.query.limit, 10) || 50, 200);
+  try {
+    const r = await pool.query(
+      `SELECT
+         oi.orderitemid,
+         oi.orderid,
+         oi.quantity,
+         oi.price,
+         oi.comments,
+         o.date,
+         m.drinkname
+       FROM orderitem oi
+       JOIN orders o ON oi.orderid = o.orderid
+       JOIN menuitem m ON oi.drinkid = m.drinkid
+       ORDER BY o.date DESC, oi.orderitemid DESC
+       LIMIT $1`,
+      [limit]
+    );
     res.json(r.rows);
   } catch (e) {
     res.status(500).json({ error: e.message });
