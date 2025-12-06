@@ -17,6 +17,27 @@ import ManagerPortal from "./components/ManagerPortal.jsx";
 function App() {
   
   const [cart, setCart] = useState([]);
+  const [customer, setCustomer] = useState(() => {
+    if (typeof window === "undefined") return null;
+    try {
+      const saved = sessionStorage.getItem("customerInfo");
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  });
+
+  const persistCustomer = (cust) => {
+    setCustomer(cust);
+    if (typeof window !== "undefined") {
+      if (cust) {
+        sessionStorage.setItem("customerInfo", JSON.stringify(cust));
+      } else {
+        sessionStorage.removeItem("customerInfo");
+        sessionStorage.removeItem("identityPrompted");
+      }
+    }
+  };
 
   const addToCart = (item) => {
     setCart(prevCart => [...prevCart, item]);
@@ -30,7 +51,7 @@ function App() {
         
         <Route 
           path="/order" 
-          element= {<OrderScreen cart={cart} setCart={setCart} />}
+          element= {<OrderScreen cart={cart} setCart={setCart} customer={customer} setCustomer={persistCustomer} />}
         />
         
         <Route 
@@ -45,7 +66,7 @@ function App() {
         
         <Route 
           path="/checkout"
-          element= {<CheckoutScreen cart={cart} setCart={setCart} />}
+          element= {<CheckoutScreen cart={cart} setCart={setCart} customer={customer} setCustomer={persistCustomer} />}
         />
         
         <Route 
