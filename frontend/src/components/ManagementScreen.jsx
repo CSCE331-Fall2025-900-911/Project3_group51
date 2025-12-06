@@ -10,9 +10,9 @@ export default function ManagementScreen() {
     <div className="mgmt-menu-wrap">
       <header className="mgmt-header">
         <h1>Management</h1>
-        <a className="btn back-btn" href={`${API}/auth/logout`}>
-          ⬅ Back to Login
-        </a>
+        <Link className="btn back-btn" to="/manager-portal">
+          ⬅ Back to Manager Portal
+        </Link>
       </header>
 
       <main className="mgmt-main">
