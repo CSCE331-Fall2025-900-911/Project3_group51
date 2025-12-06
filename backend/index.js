@@ -6,7 +6,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const session = require('express-session');
-const passport = require('passport');     
+const passport = require('passport');
 require('./auth/passport-setup');
 
 const app = express();
@@ -15,20 +15,20 @@ const port = 3000;
 // ... (rest of the file is the same) ...
 app.use(cors({
   origin: [
-    'http://localhost:5173', 
-    'https://project3-group51-frontend.onrender.com' 
+    'http://localhost:5173',
+    'https://project3-group51-frontend.onrender.com'
   ],
-  credentials: true 
+  credentials: true
 }));
 app.use(express.json());
 
 app.use(session({
-  secret: process.env.SESSION_SECRET, 
+  secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
-  cookie: { 
-    secure: process.env.NODE_ENV === 'production', 
-    httpOnly: true 
+  cookie: {
+    secure: process.env.NODE_ENV === 'production',
+    httpOnly: true
   }
 }));
 app.use(passport.initialize());
