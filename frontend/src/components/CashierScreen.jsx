@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./CashierScreen.css";
 import { getMenu } from "../api/menu"; // From main
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
 
@@ -78,9 +78,9 @@ export default function CashierScreen({ cart = [], setCart }) {
   return (
     <div className="cashier-root">
       <div className="hdr">
-        <a className="btn" href={`${API}/auth/logout`}>
-          Logout ➔
-        </a>
+        <Link className="btn" to="/manager-portal">
+          Back to Manager Portal ➔
+        </Link>
         <div className="hdr-title">Order</div>
         <div className="hdr-name">Cashier</div>
       </div>
