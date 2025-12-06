@@ -7,6 +7,8 @@ export default function TrendsScreen() {
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
+  const [start, setStart] = useState("");
+  const [end, setEnd] = useState("");
 
   // view / sort controls
   const [view, setView] = useState("top10");   // "top10" | "all"
@@ -20,7 +22,10 @@ export default function TrendsScreen() {
       setErr("");
       setLoading(true);
       try {
-        const data = await getTrends();
+        const data = await getTrends({
+          start: start || undefined,
+          end: end || undefined,
+        });
         if (alive) setRows(Array.isArray(data) ? data : []);
       } catch (e) {
         if (alive) setErr(e.message || "Failed to load");
@@ -31,7 +36,7 @@ export default function TrendsScreen() {
     return () => {
       alive = false;
     };
-  }, []);
+  }, [start, end]);
 
   // Group by item + sort
   const grouped = useMemo(() => {
@@ -83,6 +88,27 @@ export default function TrendsScreen() {
         <section className="card">
           {/* Controls */}
           <div className="mgmt-controls">
+            <div className="date-controls">
+              <label>
+                <span className="muted">Start:</span>
+                <input
+                  type="date"
+                  value={start}
+                  onChange={(e) => setStart(e.target.value)}
+                />
+              </label>
+              <label>
+                <span className="muted">End:</span>
+                <input
+                  type="date"
+                  value={end}
+                  onChange={(e) => setEnd(e.target.value)}
+                />
+              </label>
+              <button className="btn" onClick={() => { setStart(""); setEnd(""); }}>
+                Clear
+              </button>
+            </div>
             <div>
               <span className="muted">View:</span>
               <button

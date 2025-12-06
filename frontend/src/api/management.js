@@ -1,7 +1,11 @@
 const API = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
 
-export async function getTrends() {
-  const res = await fetch(`${API}/reports/trends`);
+export async function getTrends({ start, end } = {}) {
+  const params = [];
+  if (start) params.push(`start=${encodeURIComponent(start)}`);
+  if (end) params.push(`end=${encodeURIComponent(end)}`);
+  const qs = params.length ? `?${params.join("&")}` : "";
+  const res = await fetch(`${API}/reports/trends${qs}`);
   if (!res.ok) {
     const text = await res.text();
     throw new Error(`HTTP ${res.status}: ${text}`);

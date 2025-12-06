@@ -128,7 +128,8 @@ router.get('/inventory', async (_req, res) => {
  *    ...
  *  ]
  */
-router.get('/trends', async (_req, res) => {
+router.get('/trends', async (req, res) => {
+  const { start, end } = req.query;
   try {
     const r = await pool.query(
       `SELECT
@@ -137,8 +138,11 @@ router.get('/trends', async (_req, res) => {
        FROM orderitem oi
        JOIN menuitem m ON oi.drinkid = m.drinkid
        JOIN orders   o ON oi.orderid = o.orderid
+       WHERE ($1::date IS NULL OR o.date >= $1::date)
+         AND ($2::date IS NULL OR o.date < ($2::date + INTERVAL '1 day'))
        GROUP BY m.drinkname
-       ORDER BY qty DESC`
+       ORDER BY qty DESC`,
+      [start || null, end || null]
     );
 
     res.json(r.rows);
