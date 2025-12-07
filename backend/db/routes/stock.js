@@ -48,7 +48,7 @@ router.put('/drink/:drinkid', async (req, res) => {
       stockid = next.rows[0].next;
       await pool.query(
         'INSERT INTO stock (stockid, drinkid, quantity, restock_date, alert_level) VALUES ($1,$2,$3,$4,$5)',
-        [stockid, drinkid, quantity, restock_date, alert_level ?? 0]
+        [stockid, drinkid, quantity, restock_date, alert_level ?? 5]
       );
     }
     res.json({ stockid });

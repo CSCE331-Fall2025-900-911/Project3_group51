@@ -37,6 +37,15 @@ router.post('/', async (req, res) => {
       'INSERT INTO menuitem (drinkid, drinkname, category, ingredient, price, image) VALUES ($1,$2,$3,$4,$5,$6)',
       [id, drinkname, category, ingredient, price, image || null]
     );
+
+    // Create a stock row with default low-stock alert of 5 and quantity 0
+    const nextStock = await pool.query('SELECT COALESCE(MAX(stockid),0)+1 AS next FROM stock');
+    const stockid = nextStock.rows[0].next;
+    await pool.query(
+      'INSERT INTO stock (stockid, drinkid, quantity, restock_date, alert_level) VALUES ($1,$2,$3,$4,$5)',
+      [stockid, id, 0, null, 5]
+    );
+
     res.status(201).json({ id });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
