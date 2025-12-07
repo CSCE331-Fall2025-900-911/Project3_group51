@@ -114,11 +114,11 @@ export async function updateStockQuantity(stockid, quantity, restockDate) {
   return res.json();
 }
 
-export async function updateStockQuantityByDrink(drinkid, quantity, restockDate) {
+export async function updateStockQuantityByDrink(drinkid, quantity, restockDate, alertLevel) {
   const res = await fetch(`${API}/stock/drink/${drinkid}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ quantity, restock_date: restockDate }),
+    body: JSON.stringify({ quantity, restock_date: restockDate, alert_level: alertLevel }),
   });
   if (!res.ok) {
     const text = await res.text();
@@ -129,6 +129,19 @@ export async function updateStockQuantityByDrink(drinkid, quantity, restockDate)
 
 export async function getRecentOrderItems(limit = 50) {
   const res = await fetch(`${API}/reports/recent-orderitems?limit=${limit}`);
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`HTTP ${res.status}: ${text}`);
+  }
+  return res.json();
+}
+
+export async function updateStockAlert(stockid, alertLevel) {
+  const res = await fetch(`${API}/stock/${stockid}/alert`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ alert_level: alertLevel }),
+  });
   if (!res.ok) {
     const text = await res.text();
     throw new Error(`HTTP ${res.status}: ${text}`);

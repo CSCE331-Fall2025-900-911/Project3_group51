@@ -1,6 +1,11 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getInventory, updateStockQuantity, updateStockQuantityByDrink } from "../api/management";
+import {
+  getInventory,
+  updateStockQuantity,
+  updateStockQuantityByDrink,
+  updateStockAlert,
+} from "../api/management";
 import "./ManagementScreen.css";
 
 export default function InventoryScreen() {
@@ -8,6 +13,7 @@ export default function InventoryScreen() {
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
   const [edits, setEdits] = useState({});
+  const [alertEdits, setAlertEdits] = useState({});
   const [showLowOnly, setShowLowOnly] = useState(false);
   const [sortBy, setSortBy] = useState("name");
   const [sortDir, setSortDir] = useState("asc");
@@ -83,11 +89,16 @@ export default function InventoryScreen() {
     setEdits((prev) => ({ ...prev, [stockid]: parsed }));
   };
 
+  const handleAlertChange = (stockid, val) => {
+    const parsed = val === "" ? "" : Number(val);
+    if (Number.isNaN(parsed)) return;
+    setAlertEdits((prev) => ({ ...prev, [stockid]: parsed }));
+  };
+
   const saveQty = async (row, override) => {
     try {
       setLoading(true);
-      const quantity =
-        override !== undefined ? override : edits[row.stockid] ?? row.qty;
+      const quantity = override !== undefined ? override : edits[row.stockid] ?? row.qty;
       const restockDate = new Date().toISOString();
       if (row.stockid) {
         await updateStockQuantity(row.stockid, quantity, restockDate);
@@ -120,6 +131,42 @@ export default function InventoryScreen() {
     }
   };
 
+  const saveAlert = async (row) => {
+    try {
+      setLoading(true);
+      const alertLevel = alertEdits[row.stockid] ?? row.threshold ?? 0;
+      if (row.stockid) {
+        await updateStockAlert(row.stockid, alertLevel);
+      } else {
+        const { stockid } = await updateStockQuantityByDrink(
+          row.drinkid,
+          row.qty ?? 0,
+          row.restockDate ?? null,
+          alertLevel
+        );
+        row.stockid = stockid;
+      }
+      setRows((prev) =>
+        prev.map((r) =>
+          r.stockid === row.stockid
+            ? { ...r, threshold: alertLevel }
+            : r.drinkid === row.drinkid
+            ? { ...r, stockid: row.stockid, threshold: alertLevel }
+            : r
+        )
+      );
+      setAlertEdits((prev) => {
+        const copy = { ...prev };
+        delete copy[row.stockid];
+        return copy;
+      });
+    } catch (e) {
+      setErr(e.message || "Failed to update alert level");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const refillToTwenty = (row) => saveQty(row, 20);
 
   return (
@@ -127,14 +174,12 @@ export default function InventoryScreen() {
       <header className="mgmt-header">
         <h1>Inventory</h1>
         <div className="tabs">
-          <button onClick={() => navigate("/management")}>← Management</button>
-          <button onClick={() => navigate("/management/trends")}>
-            Ordering Trends
-          </button>
+          <button onClick={() => navigate("/management")}>Management</button>
+          <button onClick={() => navigate("/management/trends")}>Ordering Trends</button>
         </div>
       </header>
 
-      {err && <div className="error">⚠️ {err}</div>}
+      {err && <div className="error">{err}</div>}
       {loading && <div className="loading">Loading…</div>}
 
       {!loading && !err && (
@@ -171,6 +216,7 @@ export default function InventoryScreen() {
               <tr>
                 <th>Item</th>
                 <th>On Hand</th>
+                <th>Low Stock Alert</th>
                 <th>Last Restocked</th>
                 <th>Status</th>
                 <th>Actions</th>
@@ -179,7 +225,7 @@ export default function InventoryScreen() {
             <tbody>
               {displayRows.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="muted">
+                  <td colSpan={6} className="muted">
                     No inventory rows
                   </td>
                 </tr>
@@ -197,10 +243,19 @@ export default function InventoryScreen() {
                       />
                     </td>
                     <td>
-                      {r.restockDate
-                        ? new Date(r.restockDate).toLocaleString()
-                        : "—"}
+                      <input
+                        type="number"
+                        min="0"
+                        value={
+                          alertEdits[r.stockid] !== undefined
+                            ? alertEdits[r.stockid]
+                            : r.threshold ?? 0
+                        }
+                        onChange={(e) => handleAlertChange(r.stockid, e.target.value)}
+                        className="inv-input"
+                      />
                     </td>
+                    <td>{r.restockDate ? new Date(r.restockDate).toLocaleString() : "--"}</td>
                     <td>
                       {r.low ? (
                         <span className="low-pill">Low stock</span>
@@ -211,6 +266,9 @@ export default function InventoryScreen() {
                     <td className="inv-actions">
                       <button className="btn" onClick={() => saveQty(r)} disabled={loading}>
                         Save
+                      </button>
+                      <button className="btn" onClick={() => saveAlert(r)} disabled={loading}>
+                        Save Alert
                       </button>
                       <button
                         className="btn"
