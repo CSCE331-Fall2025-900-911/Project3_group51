@@ -32,6 +32,20 @@ export const UserProvider = ({ children }) => {
     checkLoginStatus();
   }, []);
 
+  // Persist user info for other parts of the app that may need a cached name
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      if (user) {
+        sessionStorage.setItem("currentUser", JSON.stringify(user));
+      } else {
+        sessionStorage.removeItem("currentUser");
+      }
+    } catch {
+      // ignore storage errors
+    }
+  }, [user]);
+
   return (
     <UserContext.Provider value={{ user, setUser, loading }}>
       {children}
