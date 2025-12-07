@@ -1,101 +1,121 @@
 import React, { useEffect, useState } from "react";
-import { getMenu } from "../api/menu.js";
 import "./MenuBoardScreen.css";
 
 export default function MenuBoardScreen() {
   const [menu, setMenu] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  // same image base logic as OrderScreen (this is the version that worked before)
-  const imageBase = (import.meta.env.VITE_API_URL || "http://localhost:3000/api")
-    .replace(/\/api$/, "");
 
   useEffect(() => {
-    getMenu()
-      .then((data) => {
-        setMenu(data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error(err);
-        setLoading(false);
-      });
+    fetch("http://localhost:3000/api/menu")
+      .then((res) => res.json())
+      .then((data) => setMenu(data))
+      .catch((err) => console.error("Failed to fetch menu", err));
   }, []);
 
-  if (loading) return <div className="menu-board-loading">Loading...</div>;
+  const categories = [...new Set(menu.map((item) => item.category))];
 
-  // Group drinks by category
-  const grouped = menu.reduce((acc, item) => {
-    (acc[item.category] = acc[item.category] || []).push(item);
-    return acc;
-  }, {});
+  /* CATEGORY → ICON IMAGE MAP */
+  const categoryImages = {
+    "Milky Series": "classic-milk-green-tea.webp",
+    "Fresh Brew": "classic-black.webp",
+    "Fruity Beverage": "mango-green-tea.webp",
+    "Ice-Blended": "oreo-ice-blended-w-pearls.webp"
+  };
+
+  const getBase = (drink) => {
+    if (!drink) return "";
+    if (drink.toLowerCase().includes("milk")) return "Milk Tea";
+    if (drink.toLowerCase().includes("green")) return "Green Tea";
+    if (drink.toLowerCase().includes("black")) return "Black Tea";
+    return "Tea";
+  };
 
   return (
     <div className="menu-board-container">
-      {/* MAIN GRID */}
-      <div className="menu-board-grid">
-        {Object.entries(grouped).map(([category, items]) => {
-          // Use the FIRST drink image in this category as the icon
-          const categoryImage = items[0]?.image
-            ? `${imageBase}/images/${items[0].image}`
-            : null;
 
-          return (
-            <div key={category} className="menu-board-section">
-              {/* Header with small icon + title */}
-              <div className="menu-board-category-header">
-                {categoryImage && (
-                  <img
-                    src={categoryImage}
-                    alt={category}
-                    className="menu-board-category-image"
-                  />
-                )}
-                <h2 className="menu-board-category">{category}</h2>
+      {/* LEFT IMAGE PANEL */}
+      <div
+        className="menu-board-left"
+        style={{
+          backgroundImage: `
+            url("http://localhost:3000/images/thai-milk-tea-with-pearls.webp"),
+            linear-gradient(
+              180deg,
+              rgba(255,226,217,0.55),
+              rgba(255,255,255,0.55)
+            )
+          `,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat"
+        }}
+      />
+
+      {/* RIGHT PANEL */}
+      <div className="menu-board-right">
+
+        <div className="menu-board-grid">
+          {categories.map((cat) => (
+            <div key={cat} className="menu-board-category">
+              
+              {/* CATEGORY HEADER WITH ICON */}
+              <div className="menu-board-title-row">
+                <h2 className="menu-board-category-title">{cat}</h2>
+                <img
+                  className="menu-board-category-icon"
+                  src={`http://localhost:3000/images/${categoryImages[cat]}`}
+                  alt={cat}
+                />
               </div>
 
-              {/* Items with dotted leader line */}
-              <ul className="menu-board-list">
-                {items.map((drink) => (
-                  <li key={drink.drinkid} className="menu-board-item">
-                    <span className="menu-board-item-name">
-                      {drink.drinkname}
-                    </span>
-                    <span className="menu-board-item-dots" />
+              {/* ITEMS */}
+              {menu
+                .filter((item) => item.category === cat)
+                .map((drink) => (
+                  <div className="menu-board-item" key={drink.drinkid}>
+                    <div className="menu-board-item-info">
+                      <span className="menu-board-item-name">{drink.drinkname}</span>
+                      <span className="menu-board-item-sub">{getBase(drink.drinkname)}</span>
+                    </div>
+
+                    <div className="menu-board-dots" />
+
                     <span className="menu-board-price">
-                      ${parseFloat(drink.price).toFixed(2)}
+                      ${Number(drink.price).toFixed(2)}
                     </span>
-                  </li>
+                  </div>
                 ))}
-              </ul>
             </div>
-          );
-        })}
-      </div>
-
-      {/* CUSTOMIZATION STRIP (horizontal, aligned like the Sharetea board) */}
-      <div className="menu-board-customization-bar">
-        <div className="menu-board-customization-row">
-          <span className="custom-label">ICE LEVEL</span>
-          <span className="custom-values">
-            Regular Ice • Light Ice • No Ice • Extra Ice
-          </span>
+          ))}
         </div>
 
-        <div className="menu-board-customization-row">
-          <span className="custom-label">SWEETNESS LEVEL</span>
-          <span className="custom-values">
-            100% Sugar • 80% Sugar • 50% Sugar • 30% Sugar • No Sugar
-          </span>
+        {/* FOOTER  */}
+        <div className="menu-board-footer">
+          <div className="footer-line" />
+
+          <div className="footer-row">
+            <div className="footer-title">ICE LEVEL</div>
+            <div className="footer-options">
+              Regular • Light • No Ice • Extra Ice
+            </div>
+          </div>
+
+          <div className="footer-row">
+            <div className="footer-title">SWEETNESS LEVEL</div>
+            <div className="footer-options">
+              100% • 80% • 50% • 30% • No Sugar
+            </div>
+          </div>
+
+          <div className="footer-row">
+            <div className="footer-title">TOPPINGS</div>
+            <div className="footer-options">
+              +$0.75 Pearls / Coffee Jelly / Pudding / Lychee Jelly —
+              +$1.00 Mango Popping Boba / Ice Cream —
+              +$1.25 Crema
+            </div>
+          </div>
         </div>
 
-        <div className="menu-board-customization-row">
-          <span className="custom-label">TOPPINGS</span>
-          <span className="custom-values">
-            +$0.75 Pearls, Coffee Jelly, Pudding, Lychee Jelly · +$1.00 Mango
-            Popping Boba, Ice Cream · +$1.25 Crema
-          </span>
-        </div>
       </div>
     </div>
   );
