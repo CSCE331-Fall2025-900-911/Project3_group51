@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import "./MenuBoardScreen.css";
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
+const imageBase = API.replace(/\/api$/, "");
 
 export default function MenuBoardScreen() {
   const [menu, setMenu] = useState([]);
@@ -39,7 +40,7 @@ export default function MenuBoardScreen() {
         className="menu-board-left"
         style={{
           backgroundImage: `
-            url("http://localhost:3000/images/thai-milk-tea-with-pearls.webp"),
+            url("${imageBase}/images/thai-milk-tea-with-pearls.webp"),
             linear-gradient(
               180deg,
               rgba(255,226,217,0.55),
@@ -64,7 +65,7 @@ export default function MenuBoardScreen() {
                 <h2 className="menu-board-category-title">{cat}</h2>
                 <img
                   className="menu-board-category-icon"
-                  src={`http://localhost:3000/images/${categoryImages[cat]}`}
+                  src={`${imageBase}/images/${categoryImages[cat]}`}
                   alt={cat}
                 />
               </div>
