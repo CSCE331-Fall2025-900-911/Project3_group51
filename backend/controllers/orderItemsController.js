@@ -3,15 +3,19 @@ const orderItemsDB = require('../db/orderitems');
 
 // POST /api/orderitems
 exports.createOrderItem = async (req, res) => {
-  const { orderid, drinkid, quantity, price, icelevel, sugarlevel, toppings } = req.body;
+  const { orderid, drinkid, quantity, price, icelevel, sugarlevel, toppings, comments } = req.body;
   try {
     console.log("POST /api/orderitems - body:", req.body);
-    const id = await orderItemsDB.insertOrderItem(orderid, drinkid, quantity, price, icelevel, sugarlevel, toppings);
+    const id = await orderItemsDB.insertOrderItem(orderid, drinkid, quantity, price, icelevel, sugarlevel, toppings, comments);
      console.log("Created new order item with ID:", id, "for order:", orderid);
     res.status(201).json({ id });
   } catch (e) {
     console.error("Error in createOrderItem:", e);
-    res.status(500).json({ error: e.message });
+    if (e.code === 'INSUFFICIENT_STOCK') {
+      res.status(400).json({ error: 'Insufficient stock for this item' });
+    } else {
+      res.status(500).json({ error: e.message });
+    }
   }
 };
 

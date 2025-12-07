@@ -1,188 +1,192 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-
-import useLanguage, { LANG_MAP } from "../hooks/useLanguage.js";
-import useTranslate from "../hooks/useTranslate";
-import { translateText } from "../utils/translate";
-import { HOME_LABELS } from "./HomeScreen.labels.js";
 import MagnifyControls from "./MagnifyControls.jsx";
-
+import LanguageSelector from "./translation/LanguageSelector.jsx";
 import "./HomeScreen.css";
+
+// Base API for images
+const imageBase = (import.meta.env.VITE_API_URL || "http://localhost:3000/api")
+  .replace(/\/api$/, "");
+
+// Labels fallback (if your translation hook not used here)
+const labels = {
+  start: "Start",
+  weatherLoading: "Loading weather...",
+};
+
+// --- Weather Logic Helper ---
+function getDrinkSuggestion(weather) {
+  if (!weather || !weather.main) return null;
+
+  const temp = weather.main.temp;
+  const condition = weather.weather?.[0]?.main?.toLowerCase() || "";
+  const description = weather.weather?.[0]?.description?.toLowerCase() || "";
+
+  if (condition.includes("rain") || condition.includes("snow") || description.includes("rain")) {
+    return {
+      title: "Cozy Oreo Ice Blended",
+      description: "It's wet outside. Treat yourself to something rich and creamy!",
+      key: "oreo-ice-blended-w-pearls"
+    };
+  }
+
+  if (temp > 80 && condition.includes("clear")) {
+    return {
+      title: "Mango Passion Fruit Green Tea",
+      description: "Hot day? Cool off with this tropical refresher.",
+      key: "mango-passion-fruit-green-tea"
+    };
+  }
+
+  if (temp <= 45) {
+    return {
+      title: "Hot Hokkaido Pearl Milk Tea",
+      description: "Warm up with our rich caramel-flavored milk tea.",
+      key: "hokkaido-pearl-milk-tea"
+    };
+  }
+
+  if (temp > 45 && temp <= 70) {
+    return {
+      title: "Classic Milk Green Tea",
+      description: "The weather is perfect for a classic favorite!",
+      key: "classic-milk-green-tea"
+    };
+  }
+
+  return {
+    title: "Wintermelon Lemonade",
+    description: "Warm day? Enjoy this refreshing citrus drink.",
+    key: "wintermelon-lemonade"
+  };
+}
 
 function HomeScreen() {
   const navigate = useNavigate();
 
-  const imageBase = (import.meta.env.VITE_API_URL || "http://localhost:3000/api").replace(/\/api$/, "");
-
-  // UI state
-  const [showLanguage, setShowLanguage] = useState(false);
   const [weather, setWeather] = useState(null);
-  const [translatedDesc, setTranslatedDesc] = useState("");
+  const [drinkSuggestion, setDrinkSuggestion] = useState(null);
+  const [weatherError, setWeatherError] = useState(false);
 
-  // Login Secret Tap State (NEW)
-  const [tapCount, setTapCount] = useState(0); 
-  const timerRef = useRef(null); 
+  // Secret Login Tap
+  const tapRef = useRef(0);
+  const timerRef = useRef(null);
 
-  // Global language state
-  const { selectedLang, setSelectedLang } = useLanguage();
+  const handleSecretTap = useCallback(() => {
+    if (timerRef.current) clearTimeout(timerRef.current);
 
-  // Page-level translated labels
-  const labels = useTranslate(HOME_LABELS, selectedLang);
+    tapRef.current += 1;
 
-  const LANG_OPTIONS = [
-    "English",
-    "Español",
-    "Français",
-    "Italiano",
-    "Tiếng Việt",
-    "한국어",
-  ];
-
-  // Fetch weather
-  useEffect(() => {
-    const fetchWeather = async () => {
-      const API_KEY = import.meta.env.VITE_OPENWEATHER_API_KEY;
-      if (!API_KEY) return;
-
-      try {
-        const lat = "30.6280";
-        const lon = "-96.3344";
-
-        const res = await fetch(
-          `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=imperial`
-        );
-
-        const data = await res.json();
-        setWeather(data);
-      } catch (err) {
-        console.error("Weather API error:", err);
-      }
-    };
-
-    // fetchWeather();
-  }, []);
-
-  // Translate weather description on language change
-  useEffect(() => {
-    async function translateWeather() {
-      if (!weather?.weather) return;
-
-      const englishDesc = weather.weather[0].description;
-
-      if (selectedLang === "English") {
-        setTranslatedDesc(englishDesc);
-        return;
-      }
-
-      const targetCode = LANG_MAP[selectedLang];
-      const resp = await translateText(englishDesc, targetCode);
-
-      setTranslatedDesc(resp?.translatedText || englishDesc);
+    if (tapRef.current >= 5) {
+      navigate("/login");
+      tapRef.current = 0;
+      return;
     }
 
-    translateWeather();
-  }, [weather, selectedLang]);
-
-  //Secret Login Logic
-  const handleSecretTap = useCallback((evt) => {
-    evt.stopPropagation(); 
-    
-    if (timerRef.current) {
-      clearTimeout(timerRef.current);
-    }
-    
-    setTapCount(prevCount => {
-      const newCount = prevCount + 1;
-      
-      if (newCount >= 5) {
-        navigate("/login");
-        return 0; 
-      }
-      
-      timerRef.current = setTimeout(() => {
-        setTapCount(0);
-      }, 1500); 
-
-      return newCount;
-    });
+    timerRef.current = setTimeout(() => (tapRef.current = 0), 1500);
   }, [navigate]);
 
   useEffect(() => {
-    return () => {
-      if (timerRef.current) {
-        clearTimeout(timerRef.current);
+    return () => timerRef.current && clearTimeout(timerRef.current);
+  }, []);
+
+  // Fetch Weather
+  useEffect(() => {
+    const fetchWeather = async () => {
+      const API_KEY = import.meta.env.VITE_OPENWEATHER_API_KEY;
+      if (!API_KEY) {
+        setWeatherError(true);
+        return;
+      }
+
+      try {
+        const res = await fetch(
+          `https://api.openweathermap.org/data/2.5/weather?lat=30.6280&lon=-96.3344&appid=${API_KEY}&units=imperial`
+        );
+
+        if (!res.ok) throw new Error("Weather fetch failed");
+
+        const data = await res.json();
+        setWeather(data);
+        setDrinkSuggestion(getDrinkSuggestion(data));
+        setWeatherError(false);
+      } catch (err) {
+        console.error("Weather API error:", err);
+        setWeatherError(true);
       }
     };
+
+    fetchWeather();
   }, []);
 
   return (
     <div className="home-container">
-      <div 
-          className="login-tap-zone" 
-          onClick={handleSecretTap} 
-          title="Hidden Employee Login Access (Tap 5 times)"
+      {/* Invisible secret login zone */}
+      <div
+        className="login-tap-zone"
+        onClick={handleSecretTap}
+        title="Tap 5 times to access login"
       />
-      {/* Header */}
+
+      {/* HEADER */}
       <header className="home-header">
-        <MagnifyControls />
+        <div className="header-left">
+          <MagnifyControls />
+        </div>
 
-        <h1 className="home-title">{labels.home}</h1>
+        <h1 className="home-title">Home</h1>
 
-        <button className="nav-btn" onClick={() => setShowLanguage(!showLanguage)}>
-          <img 
-            src={`${imageBase}/images/Icons/Language.png`} 
-            alt="Language Icon" 
-            className="nav-icon" 
-          />
-          {labels.language}
-        </button>
+        <div className="header-right">
+          <LanguageSelector />
+        </div>
       </header>
 
-      {/* Language Dropdown */}
-      {showLanguage && (
-        <div className="language-dropdown">
-          {["English", "Español", "Français", "Italiano", "Tiếng Việt", "한국어"].map(
-            (lang) => (
-              <button
-                key={lang}
-                className={lang === selectedLang ? "selected" : ""} 
-                onClick={() => {
-                  setSelectedLang(lang);
-                  setShowLanguage(false);
-                }}
-              >
-                {lang}
-              </button>
-          ))}
-        </div>
-      )}
-
-      {/* Main Content */}
+      {/* MAIN */}
       <main className="home-main">
         <div className="weather-box">
           {weather ? (
             <>
               <p>{weather.name}</p>
               <p className="weather-temp">{Math.round(weather.main.temp)}°F</p>
-              <p>{translatedDesc}</p>
+              <p>{weather.weather[0].description}</p>
             </>
+          ) : weatherError ? (
+            <p>We couldn’t load the weather.</p>
           ) : (
             <p>{labels.weatherLoading}</p>
           )}
         </div>
 
         <div className="weather-image">
-          {weather && weather.main?.temp > 60 ? (
-            <p>{labels.warmWeather}</p>
+          {drinkSuggestion ? (
+            <div>
+              <img
+                src={`${imageBase}/images/${drinkSuggestion.key}.webp`}
+                alt={drinkSuggestion.title}
+                className="weather-drink-image"
+              />
+
+              <h2>{drinkSuggestion.title}</h2>
+              <p>{drinkSuggestion.description}</p>
+            </div>
+          ) : weatherError ? (
+            <p>Try one of our classic iced or hot drinks!</p>
           ) : (
-            <p>{labels.coldWeather}</p>
+            <p>{labels.weatherLoading}</p>
           )}
         </div>
       </main>
 
-      {/* Footer */}
+      {/* FOOTER */}
       <footer className="home-footer">
-        <button className="start-button" onClick={() => navigate("/order")}>
+        <button
+          className="start-button"
+          onClick={() => {
+            sessionStorage.removeItem("customerInfo");
+            sessionStorage.removeItem("identityPrompted");
+            navigate("/order", { state: { fromHome: true } });
+          }}
+        >
           {labels.start}
         </button>
       </footer>
