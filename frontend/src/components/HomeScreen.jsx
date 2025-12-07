@@ -64,7 +64,7 @@ function getDrinkSuggestion(weather) {
 function HomeScreen() {
   const navigate = useNavigate();
 
-  const imageBase = (import.meta.env.VITE_API_URL || "http://localhost:3000/api").replace(/\/api$/, "");
+  const imageBase = (import.meta.env.VITE_API_URL || "http://localhost:3000/api").replace(/\/api\/?$/, "");
 
   // UI state
   const [showLanguage, setShowLanguage] = useState(false);
