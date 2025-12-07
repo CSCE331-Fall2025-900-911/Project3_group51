@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import {
   getSalesReport,
   getUsageReport,
+  getHourlyReport,
   getZReportSummary,
   generateZReport,
   resetTodayZReport,
@@ -13,6 +14,7 @@ import { useUser } from "../context/UserContext";
 export default function TrendsScreen() {
   const [salesRows, setSalesRows] = useState([]);
   const [usageRows, setUsageRows] = useState([]);
+  const [hourlyRows, setHourlyRows] = useState([]);
   const [zSummary, setZSummary] = useState(null);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
@@ -61,6 +63,13 @@ export default function TrendsScreen() {
       } else if (activeTab === "usage") {
         const data = await getUsageReport({ start, end });
         setUsageRows(Array.isArray(data) ? data : []);
+      } else if (activeTab === "xreport") {
+        const fallback = new Date().toISOString().slice(0, 10);
+        const data = await getHourlyReport({
+          start: start || fallback,
+          end: end || start || fallback,
+        });
+        setHourlyRows(Array.isArray(data) ? data : []);
       } else if (activeTab === "zreport") {
         const data = await getZReportSummary();
         setZSummary(data);
@@ -194,14 +203,13 @@ export default function TrendsScreen() {
             <thead>
               <tr>
                 <th>Item</th>
-                <th>Qty</th>
                 <th>Total Sales</th>
               </tr>
             </thead>
             <tbody>
               {salesRows.length === 0 ? (
                 <tr>
-                  <td colSpan={3} className="muted">
+                  <td colSpan={2} className="muted">
                     No data
                   </td>
                 </tr>
@@ -209,7 +217,6 @@ export default function TrendsScreen() {
                 salesRows.map((r, idx) => (
                   <tr key={idx}>
                     <td>{r.drinkname}</td>
-                    <td>{r.total_quantity}</td>
                     <td>${parseFloat(r.total_sales).toFixed(2)}</td>
                   </tr>
                 ))
@@ -222,8 +229,8 @@ export default function TrendsScreen() {
           <table className="table">
             <thead>
               <tr>
-                <th>Drink ID</th>
-                <th>Total Used</th>
+                <th>Item</th>
+                <th>Quantity Sold</th>
               </tr>
             </thead>
             <tbody>
@@ -236,8 +243,8 @@ export default function TrendsScreen() {
               ) : (
                 usageRows.map((r, idx) => (
                   <tr key={idx}>
-                    <td>{r.drinkid}</td>
-                    <td>{r.total_used}</td>
+                    <td>{r.drinkname || r.drinkid}</td>
+                    <td>{r.total_used ?? r.quantity_sold ?? r.qty ?? 0}</td>
                   </tr>
                 ))
               )}
@@ -246,7 +253,30 @@ export default function TrendsScreen() {
         )}
 
         {activeTab === "xreport" && (
-          <div className="muted">X-Report (Hourly Today) view placeholder.</div>
+          <table className="table">
+            <thead>
+              <tr>
+                <th>Hour</th>
+                <th>Total Sales</th>
+              </tr>
+            </thead>
+            <tbody>
+              {hourlyRows.length === 0 ? (
+                <tr>
+                  <td colSpan={2} className="muted">
+                    No data
+                  </td>
+                </tr>
+              ) : (
+                hourlyRows.map((r, idx) => (
+                  <tr key={idx}>
+                    <td>{r.hour || r.hr || r.hour_label || "-"}</td>
+                    <td>${parseFloat(r.sales ?? r.total_sales ?? 0).toFixed(2)}</td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
         )}
 
         {activeTab === "zreport" && (

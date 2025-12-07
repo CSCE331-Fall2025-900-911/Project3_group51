@@ -48,6 +48,24 @@ export async function getUsageReport({ start, end }) {
   return res.json();
 }
 
+export async function getHourlyReport({ start, end } = {}) {
+  const params = [];
+  if (start) params.push(`start=${encodeURIComponent(start)}`);
+  if (end) params.push(`end=${encodeURIComponent(end)}`);
+  // default to today if neither provided
+  if (params.length === 0) {
+    const today = new Date().toISOString().slice(0, 10);
+    params.push(`start=${today}`, `end=${today}`);
+  }
+  const qs = params.length ? `?${params.join("&")}` : "";
+  const res = await fetch(`${API}/reports/hourly${qs}`);
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`HTTP ${res.status}: ${text}`);
+  }
+  return res.json();
+}
+
 export async function getZReportSummary() {
   const res = await fetch(`${API}/zreport/summary`, { credentials: "include" });
   if (!res.ok) {

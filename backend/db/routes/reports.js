@@ -41,15 +41,15 @@ router.get('/usage', async (req, res) => {
   const endDate = end ? new Date(end) : null;
   try {
     const r = await pool.query(
-      `SELECT s.drinkid,
+      `SELECT mi.drinkid,
+              mi.drinkname,
               SUM(oi.quantity) AS total_used
        FROM orderitem oi
        JOIN orders   o  ON oi.orderid = o.orderid
        JOIN menuitem mi ON oi.drinkid = mi.drinkid
-       JOIN stock   s   ON mi.ingredient = s.drinkid
        WHERE ($1::date IS NULL OR o.date >= $1::date)
          AND ($2::date IS NULL OR o.date < ($2::date + INTERVAL '1 day'))
-       GROUP BY s.drinkid
+       GROUP BY mi.drinkid, mi.drinkname
        ORDER BY total_used DESC`,
       [startDate, endDate]
     );
@@ -61,28 +61,45 @@ router.get('/usage', async (req, res) => {
 
 /**
  * HOURLY SALES
- * GET /api/reports/hourly?day=YYYY-MM-DD
+ * GET /api/reports/hourly?start=YYYY-MM-DD&end=YYYY-MM-DD
  */
 router.get('/hourly', async (req, res) => {
-  const { day } = req.query;
-  const start = new Date(day);
-  const end = new Date(start.getTime() + 86400000);
+  const { start, end } = req.query;
+  const startDate = start ? new Date(start) : new Date(); // default to today if not provided
+  const endDate = end ? new Date(end) : startDate;
   try {
     const r = await pool.query(
-      `SELECT DATE_TRUNC('hour', o.date) AS hr,
-              COUNT(DISTINCT o.orderid)    AS orders,
-              COALESCE(SUM(oi.price), 0)  AS sales
-       FROM orders o
-       LEFT JOIN orderitem oi ON oi.orderid = o.orderid
-       WHERE o.date >= $1 AND o.date < $2
-       GROUP BY hr
-       ORDER BY hr ASC`,
-      [start, end]
+      `
+        WITH bounds AS (
+          SELECT $1::date AS start_date, $2::date AS end_date
+        ),
+        hours AS (
+          -- business hours 10:00 through 22:00 (10 AM to 10 PM)
+          SELECT generate_series(10, 22) AS hr
+        ),
+        summed AS (
+          SELECT
+            DATE_PART('hour', o.date) AS hr,
+            COALESCE(SUM(oi.price), 0) AS sales
+          FROM orders o
+          LEFT JOIN orderitem oi ON oi.orderid = o.orderid
+          CROSS JOIN bounds b
+          WHERE o.date >= b.start_date
+            AND o.date < (b.end_date + INTERVAL '1 day')
+          GROUP BY hr
+        )
+        SELECT
+          TO_CHAR(make_time(hours.hr, 0, 0), 'HH24:MI') AS hour_label,
+          COALESCE(summed.sales, 0) AS sales
+        FROM hours
+        LEFT JOIN summed ON summed.hr = hours.hr
+        ORDER BY hours.hr ASC
+      `,
+      [startDate, endDate]
     );
 
     const rows = r.rows.map(row => ({
-      hour: new Date(row.hr).getHours().toString().padStart(2, '0') + ':00',
-      orders: row.orders,
+      hour: row.hour_label,
       sales: parseFloat(row.sales)
     }));
 
