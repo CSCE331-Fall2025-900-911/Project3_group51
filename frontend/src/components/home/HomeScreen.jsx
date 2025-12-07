@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import MagnifyControls from "./MagnifyControls.jsx";
-import LanguageSelector from "./translation/LanguageSelector.jsx";
+import MagnifyControls from "../MagnifyControls.jsx";
+import LanguageSelector from "../translation/LanguageSelector.jsx";
 import "./HomeScreen.css";
 
 // Base API for images

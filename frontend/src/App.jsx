@@ -1,12 +1,12 @@
 import React, { useState } from 'react'; 
 import { Routes, Route, useLocation} from 'react-router-dom';
-import HomeScreen from './components/HomeScreen.jsx';
-import OrderScreen from './components/OrderScreen.jsx';
-import CustomizationScreen from './components/CustomizationScreen.jsx'; 
+import HomeScreen from './components/home/HomeScreen.jsx';
+import OrderScreen from './components/order/OrderScreen.jsx';
+import CustomizationScreen from './components/order/CustomizationScreen.jsx'; 
 import LoginScreen from './components/LoginScreen.jsx'; 
-import CheckoutScreen from './components/CheckoutScreen.jsx';
-import ConfirmationScreen from './components/ConfirmationScreen.jsx'; 
-import CashierScreen from './components/CashierScreen.jsx';
+import CheckoutScreen from './components/checkout/CheckoutScreen.jsx';
+import ConfirmationScreen from './components/checkout/ConfirmationScreen.jsx'; 
+import CashierScreen from './components/cashier/CashierScreen.jsx';
 import ManagementMenu from "./components/ManagementScreen.jsx";
 import TrendsScreen from "./components/TrendsScreen.jsx";
 import InventoryScreen from "./components/InventoryScreen.jsx";
