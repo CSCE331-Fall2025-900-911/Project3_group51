@@ -1,53 +1,41 @@
-.home-container,
-.home-container * {
+:root {
+  --text-scale: 1;
+}
+
+.home-container {
   font-size: calc(1rem * var(--text-scale));
 }
 
-/* ============================================
-   STOP GOOGLE FROM RESIZING OR SHIFTING LAYOUT
-   ============================================ */
+font {
+  font-size: inherit !important;
+  font-family: inherit !important;
+  color: inherit !important;
+  box-shadow: none !important;
+}
+
 html, body {
   margin: 0 !important;
   padding: 0 !important;
   width: 100% !important;
   max-width: 100% !important;
   overflow-x: hidden !important;
-  transform: none !important;        /* Prevent auto-scaling */
+  transform: none !important;
+  top: 0 !important;
+  position: static !important;
 }
 
 #root {
   width: 100% !important;
 }
 
-/* Google’s wrapper div that causes spacing shifts */
 .skiptranslate {
-  height: 0 !important;
-  width: 0 !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  border: none !important;
-  position: static !important;
-  overflow: hidden !important;
+  display: none !important;
 }
 
-/* Prevent Google Translate from scaling elements */
-body * {
-  transform: none !important;
-  line-height: normal !important;
-}
-
-/* ============================================================
-   HIDE ALL GOOGLE TRANSLATE UI COMPONENTS
-   ============================================================ */
-
-/* Top banner */
 .goog-te-banner-frame {
   display: none !important;
-  visibility: hidden !important;
-  height: 0 !important;
 }
 
-/* Floating mini UI, dropdown, iframe */
 .goog-te-gadget,
 .goog-te-gadget-simple,
 .goog-te-combo,
@@ -55,37 +43,24 @@ body * {
 .goog-te-spinner-pos,
 .goog-te-gadget-icon {
   display: none !important;
-  visibility: hidden !important;
-  opacity: 0 !important;
-  height: 0 !important;
-  width: 0 !important;
-  pointer-events: none !important;
 }
 
-/* ============================================================
-   REMOVE GOOGLE TRANSLATE POPUP TOOLTIP (THE BIG BLUE BUBBLE)
-   ============================================================ */
 #goog-gt-tt,
 .goog-tooltip,
 .goog-tooltip:hover,
 .goog-text-highlight,
 .goog-te-balloon-frame {
   display: none !important;
-  visibility: hidden !important;
   opacity: 0 !important;
   pointer-events: none !important;
-  box-shadow: none !important;
-  border: none !important;
-  background: transparent !important;
 }
 
-/* Remove blue background highlight from translated text */
 .goog-text-highlight {
   background: transparent !important;
   box-shadow: none !important;
+  border: none !important;
 }
 
-body {
-  top: 0 !important;
-  position: static !important;
+iframe[id^=":"] {
+  display: none !important;
 }

@@ -1,20 +1,28 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import MagnifyControls from "../MagnifyControls.jsx";
-import LanguageSelector from "../translation/LanguageSelector.jsx";
+import useLanguage from "../../hooks/useLanguage.js";
 import "./HomeScreen.css";
 
-// Base API for images
 const imageBase = (import.meta.env.VITE_API_URL || "http://localhost:3000/api")
   .replace(/\/api$/, "");
 
-// Labels fallback (if your translation hook not used here)
 const labels = {
-  start: "Start",
+  start: "Start Order",
   weatherLoading: "Loading weather...",
 };
 
-// --- Weather Logic Helper ---
+const LANG_TO_CODE = {
+  "English": "en",
+  "Español": "es",
+  "Français": "fr",
+  "Italiano": "it",
+  "Tiếng Việt": "vi",
+  "한국어": "ko",
+  "हिन्दी": "hi",
+  "Türkçe": "tr"
+};
+
 function getDrinkSuggestion(weather) {
   if (!weather || !weather.main) return null;
 
@@ -29,7 +37,6 @@ function getDrinkSuggestion(weather) {
       key: "oreo-ice-blended-w-pearls"
     };
   }
-
   if (temp > 80 && condition.includes("clear")) {
     return {
       title: "Mango Passion Fruit Green Tea",
@@ -37,7 +44,6 @@ function getDrinkSuggestion(weather) {
       key: "mango-passion-fruit-green-tea"
     };
   }
-
   if (temp <= 45) {
     return {
       title: "Hot Hokkaido Pearl Milk Tea",
@@ -45,7 +51,6 @@ function getDrinkSuggestion(weather) {
       key: "hokkaido-pearl-milk-tea"
     };
   }
-
   if (temp > 45 && temp <= 70) {
     return {
       title: "Classic Milk Green Tea",
@@ -53,7 +58,6 @@ function getDrinkSuggestion(weather) {
       key: "classic-milk-green-tea"
     };
   }
-
   return {
     title: "Wintermelon Lemonade",
     description: "Warm day? Enjoy this refreshing citrus drink.",
@@ -63,26 +67,24 @@ function getDrinkSuggestion(weather) {
 
 function HomeScreen() {
   const navigate = useNavigate();
-
   const [weather, setWeather] = useState(null);
   const [drinkSuggestion, setDrinkSuggestion] = useState(null);
   const [weatherError, setWeatherError] = useState(false);
 
-  // Secret Login Tap
+  const { selectedLang, setSelectedLang } = useLanguage();
+  const [showLanguage, setShowLanguage] = useState(false);
+
   const tapRef = useRef(0);
   const timerRef = useRef(null);
 
   const handleSecretTap = useCallback(() => {
     if (timerRef.current) clearTimeout(timerRef.current);
-
     tapRef.current += 1;
-
     if (tapRef.current >= 5) {
       navigate("/login");
       tapRef.current = 0;
       return;
     }
-
     timerRef.current = setTimeout(() => (tapRef.current = 0), 1500);
   }, [navigate]);
 
@@ -90,7 +92,6 @@ function HomeScreen() {
     return () => timerRef.current && clearTimeout(timerRef.current);
   }, []);
 
-  // Fetch Weather
   useEffect(() => {
     const fetchWeather = async () => {
       const API_KEY = import.meta.env.VITE_OPENWEATHER_API_KEY;
@@ -98,14 +99,11 @@ function HomeScreen() {
         setWeatherError(true);
         return;
       }
-
       try {
         const res = await fetch(
           `https://api.openweathermap.org/data/2.5/weather?lat=30.6280&lon=-96.3344&appid=${API_KEY}&units=imperial`
         );
-
         if (!res.ok) throw new Error("Weather fetch failed");
-
         const data = await res.json();
         setWeather(data);
         setDrinkSuggestion(getDrinkSuggestion(data));
@@ -115,20 +113,32 @@ function HomeScreen() {
         setWeatherError(true);
       }
     };
-
     fetchWeather();
   }, []);
 
+  const handleLanguageChange = (langLabel) => {
+    setSelectedLang(langLabel);
+    setShowLanguage(false);
+    setTimeout(() => {
+      const code = LANG_TO_CODE[langLabel];
+      if (code) {
+        const select = document.querySelector(".goog-te-combo");
+        if (select) {
+          select.value = code;
+          select.dispatchEvent(new Event("change"));
+        }
+      }
+    }, 0);
+  };
+
   return (
     <div className="home-container">
-      {/* Invisible secret login zone */}
       <div
         className="login-tap-zone"
         onClick={handleSecretTap}
         title="Tap 5 times to access login"
       />
 
-      {/* HEADER */}
       <header className="home-header">
         <div className="header-left">
           <MagnifyControls />
@@ -137,11 +147,27 @@ function HomeScreen() {
         <h1 className="home-title">Home</h1>
 
         <div className="header-right">
-          <LanguageSelector />
+          <button className="home-lang-btn" onClick={() => setShowLanguage(!showLanguage)}>
+            <img src={`${imageBase}/images/Icons/Language.png`} className="nav-icon" alt="Language" />
+            Language
+          </button>
         </div>
       </header>
 
-      {/* MAIN */}
+      {showLanguage && (
+        <div className="language-dropdown notranslate">
+          {Object.keys(LANG_TO_CODE).map((lang) => (
+            <button
+              key={lang}
+              className={lang === selectedLang ? "selected" : ""}
+              onClick={() => handleLanguageChange(lang)}
+            >
+              {lang}
+            </button>
+          ))}
+        </div>
+      )}
+
       <main className="home-main">
         <div className="weather-box">
           {weather ? (
@@ -151,7 +177,7 @@ function HomeScreen() {
               <p>{weather.weather[0].description}</p>
             </>
           ) : weatherError ? (
-            <p>We couldn’t load the weather.</p>
+            <p>Welcome to Sharetea!</p>
           ) : (
             <p>{labels.weatherLoading}</p>
           )}
@@ -159,25 +185,21 @@ function HomeScreen() {
 
         <div className="weather-image">
           {drinkSuggestion ? (
-            <div>
+            <>
               <img
                 src={`${imageBase}/images/${drinkSuggestion.key}.webp`}
                 alt={drinkSuggestion.title}
                 className="weather-drink-image"
               />
-
               <h2>{drinkSuggestion.title}</h2>
               <p>{drinkSuggestion.description}</p>
-            </div>
-          ) : weatherError ? (
-            <p>Try one of our classic iced or hot drinks!</p>
+            </>
           ) : (
-            <p>{labels.weatherLoading}</p>
+            <p>Discover your favorite drink.</p>
           )}
         </div>
       </main>
 
-      {/* FOOTER */}
       <footer className="home-footer">
         <button
           className="start-button"
