@@ -207,7 +207,7 @@ function CheckoutScreen({ cart, setCart, customer, setCustomer }) {
             <>
               <div className="summary-total">
                 <span>Available Points</span>
-                <span>{availablePoints}</span>
+                <span className="notranslate">{availablePoints}</span>
               </div>
 
               <div
@@ -232,25 +232,25 @@ function CheckoutScreen({ cart, setCart, customer, setCustomer }) {
               </div>
 
               <div className="summary-total">
-                <span>Points Applied</span>
-                <span>{appliedPoints}</span>
-              </div>
+                  <span>Points Applied</span>
+                  <span className="notranslate">{appliedPoints}</span>
+                </div>
 
               <div className="summary-total">
                 <span>Points Discount</span>
-                <span>-${discount.toFixed(2)}</span>
+                <span className="notranslate">-${discount.toFixed(2)}</span>
               </div>
             </>
           )}
 
           <div className="summary-total total-row">
             <span>Final Total</span>
-            <span>${finalTotal.toFixed(2)}</span>
+            <span className="notranslate">${finalTotal.toFixed(2)}</span>
           </div>
 
           <div className="summary-total balance-row">
             <span>Balance Due</span>
-            <span>${finalTotal.toFixed(2)}</span>
+            <span className="notranslate">${finalTotal.toFixed(2)}</span>
           </div>
 
           {/* CONFIRM BUTTON */}
