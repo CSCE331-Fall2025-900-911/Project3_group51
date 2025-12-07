@@ -348,8 +348,11 @@ function OrderScreen({ cart, setCart, customer, setCustomer }) {
               const total = (qty * parseFloat(item.price)).toFixed(2);
               return (
                 <div key={index} className="order-row-item">
-                  <span>{item.name} × {qty}</span>
-                  <span>${total}</span>
+                  <span>
+                    {item.name} <span className="notranslate">× {qty}</span>
+                  </span>
+                  <span className="notranslate">${total}</span>
+                  
                   <div className="item-controls">
                     <button className="control-btn" onClick={() => handleQuantityChange(index, -1)}>-</button>
                     <button className="control-btn" onClick={() => handleQuantityChange(index, 1)}>+</button>
@@ -360,7 +363,9 @@ function OrderScreen({ cart, setCart, customer, setCustomer }) {
           )}
         </div>
 
-        <div className="subtotal">Subtotal: ${subtotal.toFixed(2)}</div>
+        <div className="subtotal">
+          Subtotal: <span className="notranslate">${subtotal.toFixed(2)}</span>
+        </div>
 
         <button className="checkout-btn" onClick={handleCheckout}>
           <img src={`${imageBase}/images/Icons/Cart.png`} className="checkout-icon" alt="Cart" />
