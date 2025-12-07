@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
 import "./MenuBoardScreen.css";
 
+const API = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
+
 export default function MenuBoardScreen() {
   const [menu, setMenu] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:3000/api/menu")
+    fetch(`${API}/menu`)
       .then((res) => res.json())
       .then((data) => setMenu(data))
       .catch((err) => console.error("Failed to fetch menu", err));
