@@ -1,38 +1,51 @@
-/* Container: button stays on the LEFT side of the screen */
 .language-selector-container {
   position: relative;
   display: inline-block;
-  z-index: 20;   /* stays above header */
+  z-index: 20;
 }
-/* Main language button */
+
 .language-selector-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  
   background: white;
-  padding: 8px 14px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
+  color: #333;
+  font-size: 18px;
+  font-weight: 600;
+  
+  padding: 10px 20px;
+  border-radius: 30px;
+  border: 1px solid #4A90E2;
   cursor: pointer;
-  font-size: 15px;
-  box-shadow: 0px 2px 6px rgba(0,0,0,0.2);
   transition: background 0.2s;
 }
 
 .language-selector-button:hover {
-  background: #f1f1f1;
+  background: #F0F8FF;
 }
 
-/* Dropdown UNDER the button */
+.lang-icon {
+  height: 20px;
+  width: 20px;
+  filter: invert(30%);
+}
+
 .language-dropdown {
   position: absolute;
-  top: 120%;        /* BELOW the button */
-  left: 0;          /* align left edges */
+  top: 100%;
+  margin-top: 0;
+  
+  right: 0;
+  left: auto; 
   width: 180px;
   background: white;
   border-radius: 10px;
   padding: 10px 0;
   box-shadow: 0px 4px 20px rgba(0,0,0,0.15);
   z-index: 99999;
-
-  /* Smooth fade animation */
+  border: 1px solid #ccc;
+  
   opacity: 0;
   transform: translateY(-5px);
   animation: dropdownFade 0.2s ease forwards;
@@ -45,25 +58,13 @@
   }
 }
 
-.language-button {
-  background: white;
-  padding: 6px 14px;
-  border-radius: 20px;
-  font-size: 14px;
-  font-weight: 600;
-  color: #333;
-  border: 1px solid #4A90E2;
-  cursor: pointer;
-}
-
-/* Dropdown buttons */
 .language-option {
   width: 100%;
   background: none;
   border: none;
   text-align: left;
-  padding: 10px 15px;
-  font-size: 14px;
+  padding: 12px 15px;
+  font-size: 16px;
   cursor: pointer;
   transition: background 0.15s;
 }
@@ -72,6 +73,12 @@
   background: #f0f0f0;
 }
 
-.header-right {
-  position: relative; /* lets dropdown anchor to it */
+.language-option.selected {
+  background-color: #4A90E2;
+  color: white;
+  font-weight: bold;
+}
+
+.language-option.selected:hover {
+  background-color: #3578c0;
 }

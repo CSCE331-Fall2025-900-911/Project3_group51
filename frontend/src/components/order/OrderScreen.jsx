@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 
 import "./OrderScreen.css";
@@ -8,14 +8,23 @@ import MagnifyControls from "../MagnifyControls.jsx";
 
 import useLanguage from "../../hooks/useLanguage.js";
 
+const LANG_TO_CODE = {
+  "English": "en",
+  "Español": "es",
+  "Français": "fr",
+  "Italiano": "it",
+  "Tiếng Việt": "vi",
+  "한국어": "ko",
+  "हिन्दी": "hi",
+  "Türkçe": "tr"
+};
+
 function OrderScreen({ cart, setCart, customer, setCustomer }) {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Language — only for dropdown, no translation used
   const { selectedLang, setSelectedLang } = useLanguage();
 
-  // Local state
   const [menuItems, setMenuItems] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
@@ -42,7 +51,7 @@ function OrderScreen({ cart, setCart, customer, setCustomer }) {
     return sessionStorage.getItem("identityPrompted") === "true";
   });
 
-  const resetFromHomeRef = React.useRef(false);
+  const resetFromHomeRef = useRef(false);
   const fromHome = location.state?.fromHome || false;
 
   const cashierOrder = location.state?.returnTo === "/cashier";
@@ -55,14 +64,12 @@ function OrderScreen({ cart, setCart, customer, setCustomer }) {
     sessionStorage.setItem("orderOrigin", cashierOrder ? "cashier" : "customer");
   }, [cashierOrder]);
 
-  // Identity prompt
   useEffect(() => {
     if (fromHome && !customer && !allowAnon && !identityPrompted) {
       setShowIdentityPrompt(true);
     }
   }, [fromHome, customer, allowAnon, identityPrompted]);
 
-  // Reset customer if returning from Home
   useEffect(() => {
     if (fromHome && !resetFromHomeRef.current) {
       resetFromHomeRef.current = true;
@@ -74,7 +81,6 @@ function OrderScreen({ cart, setCart, customer, setCustomer }) {
     }
   }, [fromHome, setCustomer]);
 
-  // Fetch menu
   useEffect(() => {
     getMenu()
       .then((data) => {
@@ -82,11 +88,10 @@ function OrderScreen({ cart, setCart, customer, setCustomer }) {
         setCategories([...new Set(data.map((d) => d.category))]);
       })
       .catch(() => {
-        setError("Could not load menu.");
+        console.error("Could not load menu.");
       });
   }, []);
 
-  // Count cart qty
   const cartQtyByDrink = useMemo(() => {
     return cart.reduce((acc, item) => {
       const id = item.id ?? item.drinkid;
@@ -96,7 +101,6 @@ function OrderScreen({ cart, setCart, customer, setCustomer }) {
     }, {});
   }, [cart]);
 
-  // Click drink
   const handleItemClick = (item) => {
     const used = cartQtyByDrink[item.drinkid] || 0;
     const available = (item.stockqty ?? 0) - used;
@@ -116,10 +120,8 @@ function OrderScreen({ cart, setCart, customer, setCustomer }) {
     });
   };
 
-  // Category select
   const handleCategoryClick = (cat) => setSelectedCategory(cat);
 
-  // Change quantity
   const handleQuantityChange = (index, delta) => {
     setCart((prev = []) => {
       if (!prev[index]) return prev;
@@ -129,7 +131,6 @@ function OrderScreen({ cart, setCart, customer, setCustomer }) {
       const qty = item.quantity ?? 1;
       const updatedQty = Math.max(0, qty + delta);
 
-      // enforce stock
       if (delta > 0) {
         const drinkId = item.id ?? item.drinkid;
         const stockQty =
@@ -159,7 +160,6 @@ function OrderScreen({ cart, setCart, customer, setCustomer }) {
     });
   };
 
-  // Checkout
   const handleCheckout = () => {
     if (fromHome && !customer && !allowAnon) {
       setShowIdentityPrompt(true);
@@ -174,14 +174,24 @@ function OrderScreen({ cart, setCart, customer, setCustomer }) {
     });
   };
 
-  // ------------------------------
-  // Identity: Login
-  // ------------------------------
+  const handleLanguageChange = (langLabel) => {
+    setSelectedLang(langLabel);
+    setShowLanguage(false);
+    setTimeout(() => {
+      const code = LANG_TO_CODE[langLabel];
+      if (code) {
+        const select = document.querySelector(".goog-te-combo");
+        if (select) {
+          select.value = code;
+          select.dispatchEvent(new Event("change"));
+        }
+      }
+    }, 0);
+  };
+
   const handleIdentify = async () => {
     setIdentityError(null);
-
-    const inputValue =
-      contactMode === "phone" ? contactInfo.phone : contactInfo.email;
+    const inputValue = contactMode === "phone" ? contactInfo.phone : contactInfo.email;
 
     if (!inputValue) {
       setIdentityError("Please enter your contact info.");
@@ -214,12 +224,8 @@ function OrderScreen({ cart, setCart, customer, setCustomer }) {
     }
   };
 
-  // ------------------------------
-  // Identity: Create New Account
-  // ------------------------------
   const handleCreateCustomer = async () => {
     const { name, phone, email } = contactInfo;
-
     if (!name || !phone || !email) {
       setIdentityError("All fields are required.");
       return;
@@ -227,7 +233,6 @@ function OrderScreen({ cart, setCart, customer, setCustomer }) {
 
     try {
       const result = await createCustomer({ name, phone, email });
-
       setCustomer?.({
         id: result.id,
         name,
@@ -235,7 +240,6 @@ function OrderScreen({ cart, setCart, customer, setCustomer }) {
         email,
         points: result.points ?? 0
       });
-
       setShowIdentityPrompt(false);
       setIdentityPrompted(true);
       sessionStorage.setItem("identityPrompted", "true");
@@ -251,51 +255,41 @@ function OrderScreen({ cart, setCart, customer, setCustomer }) {
 
   return (
     <div className="menu-page">
-      {/* Header */}
       <header className="header">
         <MagnifyControls />
         <h1 className="menu-title">Menu</h1>
 
-        <button className="nav-btn" onClick={() => setShowLanguage(!showLanguage)}>
-          <img src={`${imageBase}/images/Icons/Language.png`} className="nav-icon" />
+        <button className="order-lang-btn" onClick={() => setShowLanguage(!showLanguage)}>
+          <img src={`${imageBase}/images/Icons/Language.png`} className="nav-icon" alt="Language" />
           Language
         </button>
       </header>
 
-      {/* Language dropdown */}
       {showLanguage && (
-        <div className="language-dropdown">
-          {["English", "Español", "Français", "Italiano", "Tiếng Việt", "한국어"].map(
-            (lang) => (
-              <button
-                key={lang}
-                className={lang === selectedLang ? "selected" : ""}
-                onClick={() => {
-                  setSelectedLang(lang);
-                  setShowLanguage(false);
-                }}
-              >
-                {lang}
-              </button>
-            )
-          )}
+        <div className="language-dropdown notranslate">
+          {Object.keys(LANG_TO_CODE).map((lang) => (
+            <button
+              key={lang}
+              className={lang === selectedLang ? "selected" : ""}
+              onClick={() => handleLanguageChange(lang)}
+            >
+              {lang}
+            </button>
+          ))}
         </div>
       )}
 
       {stockWarning && <div className="stock-warning">{stockWarning}</div>}
 
-      {/* Main Content */}
       <div className="content">
         <aside className="categories">
           <h2>Categories</h2>
-
           <button
             className={`category-btn ${!selectedCategory ? "selected" : ""}`}
             onClick={() => handleCategoryClick(null)}
           >
             All
           </button>
-
           {categories.map((cat) => (
             <button
               key={cat}
@@ -314,7 +308,6 @@ function OrderScreen({ cart, setCart, customer, setCustomer }) {
               const used = cartQtyByDrink[item.drinkid] || 0;
               const available = (item.stockqty ?? 0) - used;
               const out = available <= 0;
-
               const categoryClass = item.category.toLowerCase().replace(/[^a-z0-9]/g, "-");
 
               return (
@@ -336,9 +329,8 @@ function OrderScreen({ cart, setCart, customer, setCustomer }) {
         </main>
       </div>
 
-      {/* Footer */}
       <footer className="order-summary">
-        <button className="nav-btn" onClick={() => setShowCancelConfirm(true)}>
+        <button className="order-cancel-btn" onClick={() => setShowCancelConfirm(true)}>
           Cancel Order
         </button>
 
@@ -354,16 +346,13 @@ function OrderScreen({ cart, setCart, customer, setCustomer }) {
             cart.map((item, index) => {
               const qty = item.quantity ?? 1;
               const total = (qty * parseFloat(item.price)).toFixed(2);
-
               return (
                 <div key={index} className="order-row-item">
-                  <span>
-                    {item.name} × {qty}
-                  </span>
+                  <span>{item.name} × {qty}</span>
                   <span>${total}</span>
                   <div className="item-controls">
-                    <button onClick={() => handleQuantityChange(index, -1)}>-</button>
-                    <button onClick={() => handleQuantityChange(index, 1)}>+</button>
+                    <button className="control-btn" onClick={() => handleQuantityChange(index, -1)}>-</button>
+                    <button className="control-btn" onClick={() => handleQuantityChange(index, 1)}>+</button>
                   </div>
                 </div>
               );
@@ -374,20 +363,18 @@ function OrderScreen({ cart, setCart, customer, setCustomer }) {
         <div className="subtotal">Subtotal: ${subtotal.toFixed(2)}</div>
 
         <button className="checkout-btn" onClick={handleCheckout}>
-          <img src={`${imageBase}/images/Icons/Cart.png`} className="checkout-icon" />
+          <img src={`${imageBase}/images/Icons/Cart.png`} className="checkout-icon" alt="Cart" />
           Checkout
         </button>
       </footer>
 
-      {/* Cancel modal */}
       {showCancelConfirm && (
         <div className="modal-backdrop">
           <div className="modal">
             <p>Are you sure you want to cancel your order?</p>
-
             <div className="modal-actions">
               <button
-                className="nav-btn"
+                className="order-modal-btn"
                 onClick={() => {
                   setCart([]);
                   navigate(cancelDestination);
@@ -395,8 +382,7 @@ function OrderScreen({ cart, setCart, customer, setCustomer }) {
               >
                 Yes
               </button>
-
-              <button className="nav-btn" onClick={() => setShowCancelConfirm(false)}>
+              <button className="order-modal-btn" onClick={() => setShowCancelConfirm(false)}>
                 No
               </button>
             </div>
@@ -404,7 +390,6 @@ function OrderScreen({ cart, setCart, customer, setCustomer }) {
         </div>
       )}
 
-      {/* Identity modal */}
       {showIdentityPrompt && (
         <div className="modal-backdrop">
           <div className="modal">
@@ -415,20 +400,14 @@ function OrderScreen({ cart, setCart, customer, setCustomer }) {
                 type="text"
                 placeholder="Full Name (required)"
                 value={contactInfo.name}
-                onChange={(e) =>
-                  setContactInfo({ ...contactInfo, name: e.target.value })
-                }
+                onChange={(e) => setContactInfo({ ...contactInfo, name: e.target.value })}
               />
             )}
 
             {!showCreateForm && (
               <>
                 <label>
-                  <input
-                    type="radio"
-                    checked={contactMode === "phone"}
-                    onChange={() => setContactMode("phone")}
-                  />
+                  <input type="radio" checked={contactMode === "phone"} onChange={() => setContactMode("phone")} />
                   Phone
                 </label>
                 <input
@@ -436,17 +415,10 @@ function OrderScreen({ cart, setCart, customer, setCustomer }) {
                   placeholder="Phone"
                   disabled={contactMode !== "phone"}
                   value={contactInfo.phone}
-                  onChange={(e) =>
-                    setContactInfo({ ...contactInfo, phone: e.target.value })
-                  }
+                  onChange={(e) => setContactInfo({ ...contactInfo, phone: e.target.value })}
                 />
-
                 <label>
-                  <input
-                    type="radio"
-                    checked={contactMode === "email"}
-                    onChange={() => setContactMode("email")}
-                  />
+                  <input type="radio" checked={contactMode === "email"} onChange={() => setContactMode("email")} />
                   Email
                 </label>
                 <input
@@ -454,9 +426,7 @@ function OrderScreen({ cart, setCart, customer, setCustomer }) {
                   placeholder="Email"
                   disabled={contactMode !== "email"}
                   value={contactInfo.email}
-                  onChange={(e) =>
-                    setContactInfo({ ...contactInfo, email: e.target.value })
-                  }
+                  onChange={(e) => setContactInfo({ ...contactInfo, email: e.target.value })}
                 />
               </>
             )}
@@ -467,17 +437,13 @@ function OrderScreen({ cart, setCart, customer, setCustomer }) {
                   type="text"
                   placeholder="Phone"
                   value={contactInfo.phone}
-                  onChange={(e) =>
-                    setContactInfo({ ...contactInfo, phone: e.target.value })
-                  }
+                  onChange={(e) => setContactInfo({ ...contactInfo, phone: e.target.value })}
                 />
                 <input
                   type="email"
                   placeholder="Email"
                   value={contactInfo.email}
-                  onChange={(e) =>
-                    setContactInfo({ ...contactInfo, email: e.target.value })
-                  }
+                  onChange={(e) => setContactInfo({ ...contactInfo, email: e.target.value })}
                 />
               </>
             )}
@@ -487,12 +453,9 @@ function OrderScreen({ cart, setCart, customer, setCustomer }) {
             <div className="modal-actions">
               {!showCreateForm ? (
                 <>
-                  <button className="nav-btn" onClick={handleIdentify}>
-                    Continue
-                  </button>
-
+                  <button className="order-modal-btn" onClick={handleIdentify}>Continue</button>
                   <button
-                    className="nav-btn"
+                    className="order-modal-btn"
                     onClick={() => {
                       setShowCreateForm(true);
                       setOfferCreate(false);
@@ -504,12 +467,9 @@ function OrderScreen({ cart, setCart, customer, setCustomer }) {
                 </>
               ) : (
                 <>
-                  <button className="nav-btn" onClick={handleCreateCustomer}>
-                    Create Account
-                  </button>
-
+                  <button className="order-modal-btn" onClick={handleCreateCustomer}>Create Account</button>
                   <button
-                    className="nav-btn"
+                    className="order-modal-btn"
                     onClick={() => {
                       setShowCreateForm(false);
                       setIdentityError(null);
@@ -519,9 +479,8 @@ function OrderScreen({ cart, setCart, customer, setCustomer }) {
                   </button>
                 </>
               )}
-
               <button
-                className="nav-btn"
+                className="order-modal-btn"
                 onClick={() => {
                   setAllowAnon(true);
                   setShowIdentityPrompt(false);
