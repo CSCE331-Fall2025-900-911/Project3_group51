@@ -1,24 +1,48 @@
 import React, { useState } from 'react'; 
-import { Routes, Route} from 'react-router-dom';
-import HomeScreen from './components/HomeScreen.jsx';
-import OrderScreen from './components/OrderScreen.jsx';
-import CustomizationScreen from './components/CustomizationScreen.jsx'; 
+import { Routes, Route, useLocation} from 'react-router-dom';
+import HomeScreen from './components/home/HomeScreen.jsx';
+import OrderScreen from './components/order/OrderScreen.jsx';
+import CustomizationScreen from './components/order/CustomizationScreen.jsx'; 
 import LoginScreen from './components/LoginScreen.jsx'; 
-import CheckoutScreen from './components/CheckoutScreen.jsx';
-import ConfirmationScreen from './components/ConfirmationScreen.jsx'; 
-import CashierScreen from './components/CashierScreen.jsx';
+import CheckoutScreen from './components/checkout/CheckoutScreen.jsx';
+import ConfirmationScreen from './components/checkout/ConfirmationScreen.jsx'; 
+import CashierScreen from './components/cashier/CashierScreen.jsx';
 import ManagementMenu from "./components/ManagementScreen.jsx";
 import TrendsScreen from "./components/TrendsScreen.jsx";
 import InventoryScreen from "./components/InventoryScreen.jsx";
 import MenuManagementScreen from "./components/MenuManagementScreen.jsx";
 import EmployeeManagementScreen from "./components/EmployeeManagementScreen.jsx";
 import ManagerPortal from "./components/ManagerPortal.jsx";
-import ProtectedRoute from "./components/ProtectedRoute.jsx";
-import MagnifyControls from './components/MagnifyControls.jsx';
+import GoogleTranslateLoader from "./components/translation/GoogleTranslateLoader.jsx";
+import "./index.css";
+import RecentOrdersScreen from "./components/RecentOrdersScreen.jsx";
+import MenuBoardScreen from "./components/MenuBoardScreen.jsx";
+
 
 function App() {
   
   const [cart, setCart] = useState([]);
+  const [customer, setCustomer] = useState(() => {
+    if (typeof window === "undefined") return null;
+    try {
+      const saved = sessionStorage.getItem("customerInfo");
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  });
+
+  const persistCustomer = (cust) => {
+    setCustomer(cust);
+    if (typeof window !== "undefined") {
+      if (cust) {
+        sessionStorage.setItem("customerInfo", JSON.stringify(cust));
+      } else {
+        sessionStorage.removeItem("customerInfo");
+        sessionStorage.removeItem("identityPrompted");
+      }
+    }
+  };
 
   const addToCart = (item) => {
     setCart(prevCart => [...prevCart, item]);
@@ -27,13 +51,17 @@ function App() {
 
   return (
     <>
-      <MagnifyControls />
+      {/* Load Google Translate ONCE */}
+      <GoogleTranslateLoader />
       <Routes>
         <Route path="/" element= {<HomeScreen/>}/>
+
+        <Route path="/menu-board" element={<MenuBoardScreen />} />
+
         
         <Route 
           path="/order" 
-          element= {<OrderScreen cart={cart} setCart={setCart} />}
+          element= {<OrderScreen cart={cart} setCart={setCart} customer={customer} setCustomer={persistCustomer} />}
         />
         
         <Route 
@@ -48,7 +76,7 @@ function App() {
         
         <Route 
           path="/checkout"
-          element= {<CheckoutScreen cart={cart} setCart={setCart} />}
+          element= {<CheckoutScreen cart={cart} setCart={setCart} customer={customer} setCustomer={persistCustomer} />}
         />
         
         <Route 
@@ -88,6 +116,10 @@ function App() {
       <Route
         path="/management/employees"
         element={<EmployeeManagementScreen />}
+      />
+      <Route
+        path="/management/recent-orders"
+        element={<RecentOrdersScreen />}
       />
       </Routes>
     </>

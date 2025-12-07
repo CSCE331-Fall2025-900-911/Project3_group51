@@ -1,0 +1,66 @@
+:root {
+  --text-scale: 1;
+}
+
+.home-container {
+  font-size: calc(1rem * var(--text-scale));
+}
+
+font {
+  font-size: inherit !important;
+  font-family: inherit !important;
+  color: inherit !important;
+  box-shadow: none !important;
+}
+
+html, body {
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow-x: hidden !important;
+  transform: none !important;
+  top: 0 !important;
+  position: static !important;
+}
+
+#root {
+  width: 100% !important;
+}
+
+.skiptranslate {
+  display: none !important;
+}
+
+.goog-te-banner-frame {
+  display: none !important;
+}
+
+.goog-te-gadget,
+.goog-te-gadget-simple,
+.goog-te-combo,
+.goog-te-balloon-frame,
+.goog-te-spinner-pos,
+.goog-te-gadget-icon {
+  display: none !important;
+}
+
+#goog-gt-tt,
+.goog-tooltip,
+.goog-tooltip:hover,
+.goog-text-highlight,
+.goog-te-balloon-frame {
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+.goog-text-highlight {
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+iframe[id^=":"] {
+  display: none !important;
+}

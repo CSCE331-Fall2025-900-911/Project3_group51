@@ -5,10 +5,15 @@ const pool = require('../pool');
 const router = express.Router();
 const IMAGES_DIR = path.join(__dirname, '..', '..', 'images');
 
-// All menu items
+// All menu items with stock quantity
 router.get('/', async (_, res) => {
   try {
-    const r = await pool.query('SELECT * FROM menuitem ORDER BY drinkid');
+    const r = await pool.query(
+      `SELECT mi.*, COALESCE(s.quantity, 0) AS stockqty
+       FROM menuitem mi
+       LEFT JOIN stock s ON s.drinkid = mi.drinkid
+       ORDER BY mi.drinkid`
+    );
     res.json(r.rows);
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
@@ -32,6 +37,15 @@ router.post('/', async (req, res) => {
       'INSERT INTO menuitem (drinkid, drinkname, category, ingredient, price, image) VALUES ($1,$2,$3,$4,$5,$6)',
       [id, drinkname, category, ingredient, price, image || null]
     );
+
+    // Create a stock row with default low-stock alert of 5 and quantity 0
+    const nextStock = await pool.query('SELECT COALESCE(MAX(stockid),0)+1 AS next FROM stock');
+    const stockid = nextStock.rows[0].next;
+    await pool.query(
+      'INSERT INTO stock (stockid, drinkid, quantity, restock_date, alert_level) VALUES ($1,$2,$3,$4,$5)',
+      [stockid, id, 0, null, 5]
+    );
+
     res.status(201).json({ id });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });

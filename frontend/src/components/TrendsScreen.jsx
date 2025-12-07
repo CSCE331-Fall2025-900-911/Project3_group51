@@ -1,165 +1,353 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { getTrends } from "../api/management";
+import React, { useEffect, useState } from "react";
+import {
+  getSalesReport,
+  getUsageReport,
+  getHourlyReport,
+  getZReportSummary,
+  generateZReport,
+  resetTodayZReport,
+} from "../api/management";
 import "./ManagementScreen.css";
 import { useNavigate } from "react-router-dom";
+import { useUser } from "../context/UserContext";
 
 export default function TrendsScreen() {
-  const [rows, setRows] = useState([]);
+  const [salesRows, setSalesRows] = useState([]);
+  const [usageRows, setUsageRows] = useState([]);
+  const [hourlyRows, setHourlyRows] = useState([]);
+  const [zSummary, setZSummary] = useState(null);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
-
-  // view / sort controls
-  const [view, setView] = useState("top10");   // "top10" | "all"
-  const [sortBy, setSortBy] = useState("total"); // "total" | "alpha"
+  const [start, setStart] = useState("");
+  const [end, setEnd] = useState("");
+  const [activeTab, setActiveTab] = useState("zreport"); // sales | usage | xreport | zreport
 
   const navigate = useNavigate();
+  const { user } = useUser();
+  const [storedUser, setStoredUser] = useState(() => {
+    if (typeof window === "undefined") return null;
+    try {
+      const raw = sessionStorage.getItem("currentUser");
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
+  });
+
+  // Sync stored user when context user changes
+  useEffect(() => {
+    if (!user) return;
+    const merged = {
+      firstname: user.firstname || user.firstName || user.name,
+      firstName: user.firstName || user.firstname || user.name,
+      name: user.name || user.firstname || user.firstName,
+      email: user.email || user.Email,
+    };
+    setStoredUser(merged);
+    if (typeof window !== "undefined") {
+      try {
+        sessionStorage.setItem("currentUser", JSON.stringify(merged));
+      } catch {
+        /* ignore */
+      }
+    }
+  }, [user]);
+
+  const fetchData = async () => {
+    setErr("");
+    setLoading(true);
+    try {
+      if (activeTab === "sales") {
+        const data = await getSalesReport({ start, end });
+        setSalesRows(Array.isArray(data) ? data : []);
+      } else if (activeTab === "usage") {
+        const data = await getUsageReport({ start, end });
+        setUsageRows(Array.isArray(data) ? data : []);
+      } else if (activeTab === "xreport") {
+        const fallback = new Date().toISOString().slice(0, 10);
+        const data = await getHourlyReport({
+          start: start || fallback,
+          end: end || start || fallback,
+        });
+        setHourlyRows(Array.isArray(data) ? data : []);
+      } else if (activeTab === "zreport") {
+        const data = await getZReportSummary();
+        setZSummary(data);
+      }
+    } catch (e) {
+      setErr(e.message || "Failed to load");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    let alive = true;
-    (async () => {
-      setErr("");
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab]);
+
+  const handleGenerateZ = async () => {
+    try {
       setLoading(true);
-      try {
-        const data = await getTrends();
-        if (alive) setRows(Array.isArray(data) ? data : []);
-      } catch (e) {
-        if (alive) setErr(e.message || "Failed to load");
-      } finally {
-        if (alive) setLoading(false);
+      const genBy =
+        user?.firstname ||
+        user?.firstName ||
+        user?.name ||
+        storedUser?.firstname ||
+        storedUser?.firstName ||
+        storedUser?.name ||
+        "System";
+      const genEmail =
+        user?.email ||
+        user?.Email ||
+        storedUser?.email ||
+        storedUser?.Email ||
+        null;
+      // persist the chosen name in session storage for future calls
+      if (typeof window !== "undefined" && genBy) {
+        sessionStorage.setItem(
+          "currentUser",
+          JSON.stringify({
+            firstname: genBy,
+            firstName: genBy,
+            name: genBy,
+            email: genEmail,
+          })
+        );
+        setStoredUser({ firstname: genBy, firstName: genBy, name: genBy, email: genEmail });
       }
-    })();
-    return () => {
-      alive = false;
-    };
-  }, []);
-
-  // Group by item + sort
-  const grouped = useMemo(() => {
-    const m = new Map();
-    rows.forEach((r) => {
-      const key = r.itemname ?? r.item ?? "Unknown";
-      m.set(key, (m.get(key) || 0) + Number(r.qty ?? r.quantity ?? 0));
-    });
-
-    let arr = Array.from(m, ([item, total]) => ({ item, total }));
-
-    if (sortBy === "alpha") {
-      arr.sort((a, b) => a.item.localeCompare(b.item));
-    } else {
-      // total
-      arr.sort((a, b) => b.total - a.total);
+      await generateZReport(genBy, genEmail);
+      const data = await getZReportSummary();
+      setZSummary(data);
+      setErr("");
+    } catch (e) {
+      setErr(e.message || "Failed to generate Z-report");
+    } finally {
+      setLoading(false);
     }
+  };
 
-    if (view === "top10") {
-      arr = arr.slice(0, 10);
+  const handleResetZ = async () => {
+    try {
+      setLoading(true);
+      await resetTodayZReport();
+      const data = await getZReportSummary();
+      setZSummary(data);
+      setErr("");
+    } catch (e) {
+      setErr(e.message || "Failed to reset Z-report");
+    } finally {
+      setLoading(false);
     }
-
-    return arr;
-  }, [rows, view, sortBy]);
-
-  const maxTotal = useMemo(
-    () => grouped.reduce((m, r) => Math.max(m, r.total), 0),
-    [grouped]
-  );
+  };
 
   return (
     <div className="mgmt-wrap">
       <header className="mgmt-header">
-        <h1>Ordering Trends</h1>
+        <h1>Trend Analysis</h1>
         <div className="tabs">
-          <button onClick={() => navigate("/management")}>
-            ⬅ Management
-          </button>
+          <button onClick={() => navigate("/management")}>Management</button>
           <button onClick={() => navigate("/management/inventory")}>
             Inventory
           </button>
         </div>
       </header>
 
-      {err && <div className="error">⚠️ {err}</div>}
+      {err && <div className="error">{err}</div>}
       {loading && <div className="loading">Loading…</div>}
 
-      {!loading && !err && (
-        <section className="card">
-          {/* Controls */}
-          <div className="mgmt-controls">
-            <div>
-              <span className="muted">View:</span>
-              <button
-                className={`btn ${view === "top10" ? "btn-active" : ""}`}
-                onClick={() => setView("top10")}
-              >
-                Top 10
-              </button>
-              <button
-                className={`btn ${view === "all" ? "btn-active" : ""}`}
-                onClick={() => setView("all")}
-              >
-                All items
-              </button>
-            </div>
-            <div className="mgmt-controls-right">
-              <span className="muted">Sort:</span>
-              <button
-                className={`btn ${sortBy === "total" ? "btn-active" : ""}`}
-                onClick={() => setSortBy("total")}
-              >
-                By orders
-              </button>
-              <button
-                className={`btn ${sortBy === "alpha" ? "btn-active" : ""}`}
-                onClick={() => setSortBy("alpha")}
-              >
-                A–Z
-              </button>
-            </div>
+      <section className="card">
+        <div className="mgmt-controls">
+          <div className="date-controls">
+            <label>
+              <span className="muted">Start:</span>
+              <input
+                type="date"
+                value={start}
+                onChange={(e) => setStart(e.target.value)}
+              />
+            </label>
+            <label>
+              <span className="muted">End:</span>
+              <input
+                type="date"
+                value={end}
+                onChange={(e) => setEnd(e.target.value)}
+              />
+            </label>
+            <button className="btn" onClick={fetchData}>
+              Generate Reports
+            </button>
           </div>
+        </div>
 
-          <p className="muted trends-caption">
-            Relative order volume for each drink based on all recorded orders.
-          </p>
+        <div className="tabs" style={{ marginBottom: "0.75rem" }}>
+          {[
+            { id: "sales", label: "Sales Report" },
+            { id: "usage", label: "Product Usage" },
+            { id: "xreport", label: "X-Report (Hourly Today)" },
+            { id: "zreport", label: "Z-Report" },
+          ].map((t) => (
+            <button
+              key={t.id}
+              className={`btn ${activeTab === t.id ? "btn-active" : ""}`}
+              onClick={() => setActiveTab(t.id)}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
 
-          {/* Table + bar chart */}
+        {activeTab === "sales" && (
           <table className="table">
             <thead>
               <tr>
                 <th>Item</th>
-                <th>Total Ordered</th>
-                <th>Activity</th>
+                <th>Total Sales</th>
               </tr>
             </thead>
             <tbody>
-              {grouped.length === 0 ? (
+              {salesRows.length === 0 ? (
                 <tr>
-                  <td colSpan={3} className="muted">
+                  <td colSpan={2} className="muted">
                     No data
                   </td>
                 </tr>
               ) : (
-                grouped.map((r) => (
-                  <tr key={r.item}>
-                    <td>{r.item}</td>
-                    <td>{r.total}</td>
-                    <td>
-                      <div className="trend-bar-wrap">
-                        <div
-                          className="trend-bar"
-                          style={{
-                            width:
-                              maxTotal > 0
-                                ? `${(r.total / maxTotal) * 100}%`
-                                : "0%",
-                          }}
-                        />
-                      </div>
-                    </td>
+                salesRows.map((r, idx) => (
+                  <tr key={idx}>
+                    <td>{r.drinkname}</td>
+                    <td>${parseFloat(r.total_sales).toFixed(2)}</td>
                   </tr>
                 ))
               )}
             </tbody>
           </table>
-        </section>
-      )}
+        )}
+
+        {activeTab === "usage" && (
+          <table className="table">
+            <thead>
+              <tr>
+                <th>Item</th>
+                <th>Quantity Sold</th>
+              </tr>
+            </thead>
+            <tbody>
+              {usageRows.length === 0 ? (
+                <tr>
+                  <td colSpan={2} className="muted">
+                    No data
+                  </td>
+                </tr>
+              ) : (
+                usageRows.map((r, idx) => (
+                  <tr key={idx}>
+                    <td>{r.drinkname || r.drinkid}</td>
+                    <td>{r.total_used ?? r.quantity_sold ?? r.qty ?? 0}</td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        )}
+
+        {activeTab === "xreport" && (
+          <table className="table">
+            <thead>
+              <tr>
+                <th>Hour</th>
+                <th>Total Sales</th>
+              </tr>
+            </thead>
+            <tbody>
+              {hourlyRows.length === 0 ? (
+                <tr>
+                  <td colSpan={2} className="muted">
+                    No data
+                  </td>
+                </tr>
+              ) : (
+                hourlyRows.map((r, idx) => (
+                  <tr key={idx}>
+                    <td>{r.hour || r.hr || r.hour_label || "-"}</td>
+                    <td>${parseFloat(r.sales ?? r.total_sales ?? 0).toFixed(2)}</td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        )}
+
+        {activeTab === "zreport" && (
+          <div className="zreport-section">
+            <p className="muted">
+              Generate the end-of-day Z-Report. This can only be run once per
+              day.
+            </p>
+            <div className="zreport-actions">
+              <button className="btn" onClick={handleGenerateZ}>
+                Generate Today's Z-Report
+              </button>
+              <button className="btn danger" onClick={handleResetZ}>
+                Reset Today's Z-Report
+              </button>
+            </div>
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Report Date</th>
+                  <th>Total Sales</th>
+                  <th>Total Voided</th>
+                  <th>Calculated Tax</th>
+                  <th>Generated By</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    {zSummary?.reportDate
+                      ? new Date(zSummary.reportDate).toLocaleDateString()
+                      : "-"}
+                  </td>
+                  <td>
+                    {zSummary
+                      ? `$${parseFloat(
+                          (zSummary.totalSales ??
+                            zSummary.totalsales ??
+                            0)
+                        ).toFixed(2)}`
+                      : "-"}
+                  </td>
+                  <td>
+                    {zSummary
+                      ? `$${parseFloat(
+                          (zSummary.totalAmountVoided ??
+                            zSummary.total_voids ??
+                            0)
+                        ).toFixed(2)}`
+                      : "-"}
+                  </td>
+                  <td>
+                    {zSummary
+                      ? `$${parseFloat(
+                          (zSummary.totalCalculatedTax ??
+                            zSummary.calculated_tax ??
+                            0)
+                        ).toFixed(2)}`
+                      : "-"}
+                  </td>
+                  <td>
+                    {zSummary?.generatedByEmployeeName ||
+                      zSummary?.generated_by ||
+                      "-"}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
     </div>
   );
 }

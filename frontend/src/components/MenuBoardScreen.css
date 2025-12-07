@@ -1,0 +1,119 @@
+.menu-board-container {
+    display: flex;
+    height: 100vh;
+    width: 100%;
+    overflow: hidden;
+    background: white;
+    font-family: "Inter", sans-serif;
+  }
+  
+  /* LEFT PANEL */
+  .menu-board-left {
+    width: 30%;
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-color: #fff;
+    border-right: 1px solid #e4e4e4;
+  }
+  
+  /* RIGHT PANEL */
+  .menu-board-right {
+    width: 70%;
+    padding: 32px 42px;
+    overflow-y: auto;
+  }
+  
+  /* GRID */
+  .menu-board-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    column-gap: 60px;
+    row-gap: 45px;
+  }
+  
+  /* TITLE ROW (TEXT + ICON) */
+  .menu-board-title-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  /* CATEGORY TITLE */
+  .menu-board-category-title {
+    font-size: 28px;
+    font-weight: 700;
+  }
+  
+  /* CATEGORY ICONS */
+  .menu-board-category-icon {
+    width: 38px;
+    height: 38px;
+    object-fit: contain;
+    opacity: 0.9;
+  }
+  
+  /* ITEMS */
+  .menu-board-item {
+    display: flex;
+    align-items: center;
+    font-size: 16px;
+    margin: 5px 0;
+  }
+  
+  .menu-board-item-info {
+    display: flex;
+    flex-direction: column;
+    width: 56%;
+  }
+  
+  .menu-board-item-name {
+    font-weight: 500;
+  }
+  
+  .menu-board-item-sub {
+    font-size: 12px;
+    color: gray;
+    margin-top: -2px;
+  }
+  
+  /* DOTTED LINE */
+  .menu-board-dots {
+    flex: 1;
+    border-bottom: 1px dotted #bbb;
+    margin: 0 10px;
+  }
+  
+  /* PRICE */
+  .menu-board-price {
+    font-weight: 700;
+    font-size: 16px;
+  }
+  
+  /* FOOTER */
+  .menu-board-footer {
+    margin-top: 50px;
+    font-size: 14px;
+  }
+  
+  .footer-line {
+    border-top: 1px solid #ddd;
+    margin-bottom: 18px;
+  }
+  
+  .footer-row {
+    display: flex;
+    margin-bottom: 6px;
+  }
+  
+  .footer-title {
+    width: 160px;
+    font-weight: 700;
+  }
+  
+  .footer-options {
+    flex: 1;
+    color: #444;
+    line-height: 1.3;
+  }
+  
