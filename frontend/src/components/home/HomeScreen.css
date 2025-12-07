@@ -1,0 +1,275 @@
+/* ================================
+   HOME CONTAINER
+================================ */
+:root {
+  --text-scale: 1;
+}
+.home-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100%;
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #F4F8FB;
+  position: relative;
+}
+
+
+/* ================================
+   HEADER BAR
+================================ */
+.home-header {
+  width: 100%;
+  height: 70px;                 /* tighter bar */
+  background: #2d2d2d;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;       /* center title */
+
+  position: relative;            /* important for positioning children */
+  background-color: #333333;
+  border-bottom: 1px solid #555555;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+
+/* LEFT SIDE: Magnify Controls */
+.header-left {
+  position: absolute;
+  left: 0px;
+  top: 15%;
+  transform: translateY(-58%);   /* move slightly upward */
+}
+
+
+/* ================================
+   TITLE BAR (Blue Box)
+================================ */
+
+.home-title {
+  font-size: 1.5rem;
+  background: #4A90E2;
+  /* Solid Sky Blue background */
+  color: white;
+  padding: 10px 25px;
+  border-radius: 12px;
+  font-weight: 700;
+  box-shadow: 0 4px 8px rgba(74, 144, 226, 0.4);
+}
+
+
+/* ================================
+   LANGUAGE BUTTON (Right Side)
+================================ */
+
+.nav-btn {
+  position: absolute;
+  right: 20px;       
+  top: 50%;
+  transform: translateY(-50%);
+
+  font-size: 20px;
+  font-weight: 600;
+
+  padding: 12px 30px;
+  border-radius: 45px;       /* more rounded and larger */
+  border: 2px solid #4A90E2;
+
+  background-color: white;
+  color: #333;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+
+  transition: 0.2s ease-in-out;
+}
+
+.nav-btn:hover {
+  background-color: #eef6ff;
+}
+
+.nav-icon {
+  height: 26px;
+  width: 26px;
+  background-color: #F0F8FF;
+}
+
+.nav-btn .nav-icon {
+  height: 24px;
+  width: 24px;
+  filter: invert(30%);
+}
+
+
+/* ================================
+   LANGUAGE DROPDOWN
+================================ */
+
+.language-dropdown {
+  position: absolute;
+  top: 75px;            /* right under header bar */
+  right: 20px;
+
+  width: 170px;
+  background: white;
+
+  border-radius: 12px;
+  border: 1px solid #ccc;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+
+  z-index: 200;
+}
+
+.language-dropdown button {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  text-align: left;
+  border: none;
+  background: white;
+  cursor: pointer;
+}
+
+.language-dropdown button:hover {
+  background-color: #eef3ff;
+}
+
+
+/* ================================
+   MAIN CONTENT AREA
+================================ */
+
+.home-main {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 25px;
+  gap: 30px;
+}
+
+
+/* WEATHER BOX */
+.weather-box {
+  width: 300px;
+  background: #E8F8EA;
+  padding: 20px;
+  font-size: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.weather-temp {
+  font-size: 36px;
+  font-weight: bold;
+  margin: 8px 0;
+  color: #1A993D;
+}
+
+.weather-drink-image {
+  max-width: 150px;
+  max-height: 150px;
+  width: auto;
+  height: auto;
+  border-radius: 12px;
+  margin-bottom: 16px;
+  object-fit: contain;
+}
+
+
+/* WEATHER IMAGE ZONE */
+.weather-image {
+  width: 90%;
+  flex-grow: 1;
+
+  border: 1px dashed #d0d0d0;
+  border-radius: 15px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: white;
+  font-size: 24px;
+  color: #777;
+}
+
+
+/* ================================
+   FOOTER
+================================ */
+
+.home-footer {
+  padding: 25px;
+  background: #333333;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.start-button {
+  font-size: 35px;
+  font-weight: 800;
+
+  padding: 40px 70px;
+  border-radius: 15px;
+
+  border: none;
+  background-color: #FF9900;
+  color: white;
+
+  cursor: pointer;
+  box-shadow: 0 8px 15px rgba(255, 153, 0, 0.4);
+  transition: all 0.2s ease-in-out;
+}
+
+.start-button:hover {
+  background-color: #e58a00;
+  transform: translateY(-2px);
+}
+
+
+/* ================================
+   SECRET LOGIN TAP ZONE
+================================ */
+
+.login-tap-zone {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+
+  width: 100px;
+  height: 100px;
+
+  z-index: 50;
+  cursor: pointer;
+
+  background-color: transparent;
+}
+
+/*Language button*/
+.header-right {
+  position: absolute;
+  right: 10px;     /* put it at the right side of the dark bar */
+  top: 20%;
+  transform: translateY(-50%);
+}
+
+/* Scale all text based on magnify level */
+body[data-magnify-level="0"] {
+  --text-scale: 1;
+}
+
+body[data-magnify-level="1"] {
+  --text-scale: 1.2;
+}
+
+body[data-magnify-level="2"] {
+  --text-scale: 1.5;
+}

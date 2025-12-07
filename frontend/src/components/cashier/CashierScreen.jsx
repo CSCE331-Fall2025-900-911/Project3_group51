@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import "./CashierScreen.css";
-import { getMenu } from "../api/menu"; // From main
+import { getMenu } from "../../api/menu"; // From main
 import { useNavigate, Link } from "react-router-dom";
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:3000/api";

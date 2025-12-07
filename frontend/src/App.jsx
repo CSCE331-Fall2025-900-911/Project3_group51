@@ -1,19 +1,23 @@
 import React, { useState } from 'react'; 
 import { Routes, Route, useLocation} from 'react-router-dom';
-import HomeScreen from './components/HomeScreen.jsx';
-import OrderScreen from './components/OrderScreen.jsx';
-import CustomizationScreen from './components/CustomizationScreen.jsx'; 
+import HomeScreen from './components/home/HomeScreen.jsx';
+import OrderScreen from './components/order/OrderScreen.jsx';
+import CustomizationScreen from './components/order/CustomizationScreen.jsx'; 
 import LoginScreen from './components/LoginScreen.jsx'; 
-import CheckoutScreen from './components/CheckoutScreen.jsx';
-import ConfirmationScreen from './components/ConfirmationScreen.jsx'; 
-import CashierScreen from './components/CashierScreen.jsx';
+import CheckoutScreen from './components/checkout/CheckoutScreen.jsx';
+import ConfirmationScreen from './components/checkout/ConfirmationScreen.jsx'; 
+import CashierScreen from './components/cashier/CashierScreen.jsx';
 import ManagementMenu from "./components/ManagementScreen.jsx";
 import TrendsScreen from "./components/TrendsScreen.jsx";
 import InventoryScreen from "./components/InventoryScreen.jsx";
 import MenuManagementScreen from "./components/MenuManagementScreen.jsx";
 import EmployeeManagementScreen from "./components/EmployeeManagementScreen.jsx";
 import ManagerPortal from "./components/ManagerPortal.jsx";
+import GoogleTranslateLoader from "./components/translation/GoogleTranslateLoader.jsx";
+import "./index.css";
 import RecentOrdersScreen from "./components/RecentOrdersScreen.jsx";
+import MenuBoardScreen from "./components/MenuBoardScreen.jsx";
+
 
 function App() {
   
@@ -47,8 +51,13 @@ function App() {
 
   return (
     <>
+      {/* Load Google Translate ONCE */}
+      <GoogleTranslateLoader />
       <Routes>
         <Route path="/" element= {<HomeScreen/>}/>
+
+        <Route path="/menu-board" element={<MenuBoardScreen />} />
+
         
         <Route 
           path="/order" 
