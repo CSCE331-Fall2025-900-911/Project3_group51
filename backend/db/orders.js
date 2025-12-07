@@ -9,7 +9,7 @@ exports.createOrder = async (employeeid, customerid = null) => {
   const id = next.rows[0].next;
   await pool.query(
     `INSERT INTO orders (orderid, customerid, employeeid, date, totalprice, orderstatus)
-     VALUES ($1, $2, $3, NOW(), 0.0, 'Pending')`,
+     VALUES ($1, $2, $3, (NOW() AT TIME ZONE 'America/Chicago'), 0.0, 'Pending')`,
     [id, customerid ?? null, employeeid]
   );
   return id;
@@ -19,7 +19,7 @@ exports.createOrder = async (employeeid, customerid = null) => {
 exports.updateOrder = async (id, { customerid, employeeid, totalprice, orderstatus }) => {
   await pool.query(
     `UPDATE orders
-     SET customerid=$1, employeeid=$2, totalprice=$3, orderstatus=$4, date=NOW()
+     SET customerid=$1, employeeid=$2, totalprice=$3, orderstatus=$4, date=(NOW() AT TIME ZONE 'America/Chicago')
      WHERE orderid=$5`,
     [customerid, employeeid, totalprice, orderstatus, id]
   );

@@ -3,17 +3,9 @@ import React, { useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import "./ConfirmationScreen.css";
 
-import useLanguage from "../hooks/useLanguage";
-import useTranslate from "../hooks/useTranslate";
-import { CONFIRM_LABELS } from "./ConfirmationScreen.labels";
-
 function ConfirmationScreen() {
   const navigate = useNavigate();
   const location = useLocation();
-
-  // Language + translation
-  const { selectedLang } = useLanguage();
-  const labels = useTranslate(CONFIRM_LABELS, selectedLang);
 
   const storedOrigin =
     typeof window !== "undefined"
@@ -30,22 +22,25 @@ function ConfirmationScreen() {
     const timer = setTimeout(() => {
       navigate(redirectTo);
     }, 5000);
-
     return () => clearTimeout(timer);
   }, [navigate, redirectTo]);
 
   return (
     <div className="confirmation-page">
       <div className="confirmation-box">
-        <h1>{labels.thankYou}</h1>
+        <h1>Thank you for your order!</h1>
 
-        <p className="order-number">{labels.yourOrderNumber}</p>
+        <p className="order-number">Your order number is:</p>
 
         <h2 className="order-id">{orderNumber}</h2>
 
-        <p className="wait-message">{labels.waitCounter}</p>
+        <p className="wait-message">
+          Please wait while we prepare your items.
+        </p>
 
-        <p className="redirect-message">{labels.redirectMsg}</p>
+        <p className="redirect-message">
+          Returning to the previous screen in 5 seconds...
+        </p>
       </div>
     </div>
   );

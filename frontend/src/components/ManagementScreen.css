@@ -53,6 +53,24 @@
   border-radius: 6px;
   padding: 0.35rem 0.5rem;
 }
+
+.zreport-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.zreport-actions {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.btn.danger {
+  border-color: #dc2626;
+  color: #dc2626;
+  background: #fef2f2;
+}
   
   .mgmt-controls-right {
     display: flex;
@@ -253,17 +271,24 @@
 }
   
   .menu-buttons {
-    display: flex;
-    gap: 4rem;
-    justify-content: center;
-    align-items: center;
+    width: 100%;
+    max-width: 900px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    justify-items: stretch;
     margin-bottom: 2rem;
   }
   
   .menu-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    min-height: 120px;
     border: none;
     border-radius: 12px;
-    padding: 2rem 3rem;
+    padding: 1.5rem 1.25rem;
     font-size: 1.25rem;
     font-weight: 600;
     color: #fff;
@@ -296,6 +321,18 @@
 .hint {
   margin-top: 1rem;
   color: #9ca3af;
+}
+
+@media (min-width: 640px) {
+  .menu-buttons {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 900px) {
+  .menu-buttons {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 
 /* Recent orders page tweaks */
