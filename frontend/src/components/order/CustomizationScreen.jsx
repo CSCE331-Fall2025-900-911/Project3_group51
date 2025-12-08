@@ -30,7 +30,6 @@ const TOPPING_OPTIONS = [
   { name: "Creama", price: "+1.25" },
 ];
 
-// Large 사이즈 추가 금액 설정
 const LARGE_SIZE_EXTRA = 0.50;
 
 function CustomizationScreen({ addToCart }) {
@@ -55,16 +54,13 @@ function CustomizationScreen({ addToCart }) {
   const [toppings, setToppings] = useState([]);
   const [comments, setComments] = useState("");
 
-  // 실시간 가격 계산 함수
   const calculateTotalPrice = () => {
     let price = parseFloat(item.price);
     
-    // Large 사이즈 추가 금액
     if (size === "Large") {
       price += LARGE_SIZE_EXTRA;
     }
 
-    // 토핑 추가 금액
     toppings.forEach((name) => {
       const found = TOPPING_OPTIONS.find((t) => t.name === name);
       if (found) price += parseFloat(found.price);
@@ -84,7 +80,7 @@ function CustomizationScreen({ addToCart }) {
   const handleToppingClick = (name) => {
     setToppings((prev) => {
       if (prev.includes(name)) return prev.filter((t) => t !== name);
-      return prev.length < 2 ? [...prev, name] : prev;
+      return [...prev, name];
     });
   };
 
@@ -181,7 +177,8 @@ function CustomizationScreen({ addToCart }) {
         <div className="custom-column">
           
           <section className="custom-section">
-            <h2>Choose Toppings (Max 2)</h2>
+            {/* 텍스트 수정: Max 2 문구 제거 */}
+            <h2>Choose Toppings</h2>
             <div className="custom-grid grid-2-col">
               {TOPPING_OPTIONS.map((t) => (
                 <button
@@ -190,7 +187,7 @@ function CustomizationScreen({ addToCart }) {
                     toppings.includes(t.name) ? "selected" : ""
                   }`}
                   onClick={() => handleToppingClick(t.name)}
-                  disabled={toppings.length >= 2 && !toppings.includes(t.name)}
+                  // disabled 속성 제거 (무제한 선택 가능)
                 >
                   <span>{t.name}</span>
                   <span className="topping-price">({t.price})</span>
