@@ -1,12 +1,24 @@
-import React, { useEffect } from "react"; 
-import { useNavigate } from "react-router-dom";
-import { useUser } from "../context/UserContext"; 
+import React, { useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useUser } from "../context/UserContext";
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
 
 const LoginPage = () => {
   const navigate = useNavigate();
-  const { user, loading } = useUser(); 
+  const location = useLocation(); // Get location for query params
+  const { user, loading } = useUser();
+
+  // Check for error param
+  const queryParams = new URLSearchParams(location.search);
+  const errorParam = queryParams.get("error");
+  const [errorMessage, setErrorMessage] = React.useState("");
+
+  useEffect(() => {
+    if (errorParam) {
+      setErrorMessage("Login failed. You may be unauthorized or an error occurred.");
+    }
+  }, [errorParam]);
 
   useEffect(() => {
     if (loading) return;
@@ -32,11 +44,18 @@ const LoginPage = () => {
   return (
     <div style={styles.container}>
       <h1 style={styles.title}>Employee Login</h1>
+
+      {errorMessage && (
+        <div style={styles.errorBox}>
+          {errorMessage}
+        </div>
+      )}
+
       <div style={styles.form}>
         <button onClick={googleLogin} style={styles.googleButton}>
           Sign in with Google
         </button>
-      
+
         <button
           type="button"
           onClick={() => navigate("/")}
@@ -80,7 +99,7 @@ const styles = {
     gap: "1rem",
   },
 
-  googleButton: { 
+  googleButton: {
     background: "#4285F4", // Google Blue
     color: "white",
     padding: "0.75rem 1.5rem",
@@ -88,6 +107,15 @@ const styles = {
     border: "none",
     borderRadius: "6px",
     cursor: "pointer",
+    fontWeight: "bold",
+  },
+  errorBox: {
+    backgroundColor: "#ffebee",
+    color: "#c62828",
+    padding: "10px",
+    borderRadius: "5px",
+    marginBottom: "15px",
+    border: "1px solid #ffcdd2",
     fontWeight: "bold",
   }
 };
