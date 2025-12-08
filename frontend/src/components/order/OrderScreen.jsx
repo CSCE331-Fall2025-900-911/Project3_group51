@@ -7,6 +7,7 @@ import { identifyCustomer, createCustomer } from "../../api/customers.js";
 import MagnifyControls from "../MagnifyControls.jsx";
 
 import useLanguage from "../../hooks/useLanguage.js";
+import { useAccessibility } from "../../context/AccessibilityContext";
 
 const LANG_TO_CODE = {
   "English": "en",
@@ -24,6 +25,7 @@ function OrderScreen({ cart, setCart, customer, setCustomer }) {
   const location = useLocation();
 
   const { selectedLang, setSelectedLang } = useLanguage();
+  const { resetMagnify } = useAccessibility();
 
   const [menuItems, setMenuItems] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -31,6 +33,9 @@ function OrderScreen({ cart, setCart, customer, setCustomer }) {
   const [showLanguage, setShowLanguage] = useState(false);
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
   const [showIdentityPrompt, setShowIdentityPrompt] = useState(false);
+
+  // State for item detail popup
+  const [detailItem, setDetailItem] = useState(null);
 
   const [contactInfo, setContactInfo] = useState({
     name: "",
@@ -349,7 +354,13 @@ function OrderScreen({ cart, setCart, customer, setCustomer }) {
               return (
                 <div key={index} className="order-row-item">
                   <span>
-                    {item.name} <span className="notranslate">× {qty}</span>
+                    <span 
+                      onClick={() => setDetailItem(item)}
+                      style={{ cursor: "pointer", textDecoration: "underline", fontWeight: "bold" }}
+                    >
+                      {item.name}
+                    </span>
+                    <span className="notranslate"> × {qty}</span>
                   </span>
                   <span className="notranslate">${total}</span>
                   
@@ -381,6 +392,15 @@ function OrderScreen({ cart, setCart, customer, setCustomer }) {
               <button
                 className="order-modal-btn"
                 onClick={() => {
+                  setSelectedLang("English");
+                  const select = document.querySelector(".goog-te-combo");
+                  if (select) {
+                    select.value = "en";
+                    select.dispatchEvent(new Event("change"));
+                  }
+                  
+                  resetMagnify();
+
                   setCart([]);
                   navigate(cancelDestination);
                 }}
@@ -395,11 +415,49 @@ function OrderScreen({ cart, setCart, customer, setCustomer }) {
         </div>
       )}
 
+      {detailItem && (
+        <div className="modal-backdrop" onClick={() => setDetailItem(null)}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <h3>Item Details</h3>
+            <p style={{ fontWeight: "bold", fontSize: "1.2em", marginBottom: "10px" }}>
+              {detailItem.name}
+            </p>
+            
+            <div style={{ textAlign: "left", width: "100%", padding: "0 20px", fontSize: "1.1rem" }}>
+              <p><strong>Ice:</strong> {detailItem.ice || "-"}</p>
+              <p><strong>Sugar:</strong> {detailItem.sugar || "-"}</p>
+              
+              <p style={{ marginTop: "10px" }}><strong>Toppings:</strong></p>
+              {detailItem.toppings && detailItem.toppings.length > 0 ? (
+                <ul style={{ paddingLeft: "20px", marginTop: "5px" }}>
+                  {detailItem.toppings.map((t, i) => (
+                    <li key={i}>{t}</li>
+                  ))}
+                </ul>
+              ) : (
+                <p style={{ paddingLeft: "10px", color: "#888" }}>None</p>
+              )}
+
+              {detailItem.comments && (
+                <div style={{ marginTop: "10px", color: "red" }}>
+                  <strong>Note:</strong> {detailItem.comments}
+                </div>
+              )}
+            </div>
+
+            <div className="modal-actions" style={{ marginTop: "20px" }}>
+              <button className="order-modal-btn" onClick={() => setDetailItem(null)}>
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {showIdentityPrompt && (
         <div className="modal-backdrop">
           <div className="modal">
             <p>Please enter your details to earn/use points.</p>
-
             {showCreateForm && (
               <input
                 type="text"
@@ -408,7 +466,6 @@ function OrderScreen({ cart, setCart, customer, setCustomer }) {
                 onChange={(e) => setContactInfo({ ...contactInfo, name: e.target.value })}
               />
             )}
-
             {!showCreateForm && (
               <>
                 <label>
@@ -435,7 +492,6 @@ function OrderScreen({ cart, setCart, customer, setCustomer }) {
                 />
               </>
             )}
-
             {showCreateForm && (
               <>
                 <input
@@ -452,9 +508,7 @@ function OrderScreen({ cart, setCart, customer, setCustomer }) {
                 />
               </>
             )}
-
             {identityError && <p style={{ color: "red" }}>{identityError}</p>}
-
             <div className="modal-actions">
               {!showCreateForm ? (
                 <>

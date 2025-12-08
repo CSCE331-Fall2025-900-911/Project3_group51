@@ -1,8 +1,8 @@
-// backend/db/orderItems.js
+// backend/db/orderitems.js
 const pool = require('./pool');
 
 // Insert new order item and decrement stock
-exports.insertOrderItem = async (orderid, drinkid, quantity, price, icelevel, sugarlevel, toppings, comments) => {
+exports.insertOrderItem = async (orderid, drinkid, quantity, price, icelevel, sugarlevel, toppings, comments, size, temperature) => {
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
@@ -23,9 +23,9 @@ exports.insertOrderItem = async (orderid, drinkid, quantity, price, icelevel, su
     const trimmedComments = comments ? comments.toString().slice(0, 255) : null;
 
     await client.query(
-      `INSERT INTO orderitem (orderitemid, orderid, drinkid, quantity, price, icelevel, sugarlevel, toppings, comments)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
-      [id, orderid, drinkid, quantity, price, icelevel, sugarlevel, toppings, trimmedComments]
+      `INSERT INTO orderitem (orderitemid, orderid, drinkid, quantity, price, icelevel, sugarlevel, toppings, comments, size, temperature)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
+      [id, orderid, drinkid, quantity, price, icelevel, sugarlevel, toppings, trimmedComments, size, temperature]
     );
 
     await client.query(

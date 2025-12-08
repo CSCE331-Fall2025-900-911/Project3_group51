@@ -187,7 +187,12 @@ router.get('/recent-orderitems', async (req, res) => {
          oi.price,
          oi.comments,
          o.date,
-         m.drinkname
+         m.drinkname,
+         oi.size,
+         oi.temperature,
+         oi.icelevel,
+         oi.sugarlevel,
+         oi.toppings
        FROM orderitem oi
        JOIN orders o ON oi.orderid = o.orderid
        JOIN menuitem m ON oi.drinkid = m.drinkid

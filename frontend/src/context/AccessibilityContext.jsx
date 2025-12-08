@@ -30,11 +30,17 @@ export const AccessibilityProvider = ({ children }) => {
     setMagnifyLevel(level => Math.max(level - 1, 0)); // Stop at 0
   };
 
+  // [NEW] Function to reset magnification to default (0)
+  const resetMagnify = () => {
+    setMagnifyLevel(0);
+  };
+
   // 4. Provide the new state and functions
   const value = {
     magnifyLevel,
     increaseMagnify,
     decreaseMagnify,
+    resetMagnify, // [NEW] Export this function
     MAX_LEVEL
   };
 
