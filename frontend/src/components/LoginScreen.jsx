@@ -11,7 +11,6 @@ const LoginPage = () => {
   const navigate = useNavigate();
   const location = useLocation(); 
   const { user, loading } = useUser();
-
   const { setSelectedLang } = useLanguage();
   const { resetMagnify } = useAccessibility();
 
@@ -26,7 +25,6 @@ const LoginPage = () => {
     resetMagnify();
   }, [setSelectedLang, resetMagnify]);
 
-  // Check for error param
   const queryParams = new URLSearchParams(location.search);
   const errorParam = queryParams.get("error");
   const [errorMessage, setErrorMessage] = React.useState("");
