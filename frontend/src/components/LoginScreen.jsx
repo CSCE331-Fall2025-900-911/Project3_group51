@@ -2,14 +2,29 @@ import React, { useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useUser } from "../context/UserContext";
 
+import useLanguage from "../hooks/useLanguage";
+import { useAccessibility } from "../context/AccessibilityContext";
+
 const API = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
 
 const LoginPage = () => {
   const navigate = useNavigate();
-  const location = useLocation(); // Get location for query params
+  const location = useLocation(); 
   const { user, loading } = useUser();
+  const { setSelectedLang } = useLanguage();
+  const { resetMagnify } = useAccessibility();
 
-  // Check for error param
+  useEffect(() => {
+    setSelectedLang("English");
+    const select = document.querySelector(".goog-te-combo");
+    if (select) {
+      select.value = "en";
+      select.dispatchEvent(new Event("change"));
+    }
+
+    resetMagnify();
+  }, [setSelectedLang, resetMagnify]);
+
   const queryParams = new URLSearchParams(location.search);
   const errorParam = queryParams.get("error");
   const [errorMessage, setErrorMessage] = React.useState("");

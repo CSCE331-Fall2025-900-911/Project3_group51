@@ -1,4 +1,3 @@
-
 // Get the API base URL from the environment variable
 const API = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
 
@@ -27,12 +26,14 @@ export async function addOrderItem(item, orderId) {
   const payload = {
     orderid: orderId,
     drinkid: item.id,
-    quantity: item.quantity, // We'll add this in the next step
+    quantity: item.quantity, 
     price: item.price,
     icelevel: item.ice,
     sugarlevel: item.sugar,
-    toppings: item.toppings, // Assumes backend accepts array
+    toppings: item.toppings,
     comments: item.comments ? item.comments.slice(0, 255) : null,
+    size: item.size || null,
+    temperature: item.temperature || null,
   };
 
   const res = await fetch(`${API}/orderitems`, {
