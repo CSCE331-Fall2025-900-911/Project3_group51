@@ -177,7 +177,6 @@ function CustomizationScreen({ addToCart }) {
         <div className="custom-column">
           
           <section className="custom-section">
-            {/* 텍스트 수정: Max 2 문구 제거 */}
             <h2>Choose Toppings</h2>
             <div className="custom-grid grid-2-col">
               {TOPPING_OPTIONS.map((t) => (
@@ -187,7 +186,6 @@ function CustomizationScreen({ addToCart }) {
                     toppings.includes(t.name) ? "selected" : ""
                   }`}
                   onClick={() => handleToppingClick(t.name)}
-                  // disabled 속성 제거 (무제한 선택 가능)
                 >
                   <span>{t.name}</span>
                   <span className="topping-price">({t.price})</span>
@@ -209,7 +207,7 @@ function CustomizationScreen({ addToCart }) {
           </section>
 
           <button className="confirm-btn" onClick={handleConfirm}>
-            Confirm - ${calculateTotalPrice()}
+            Confirm - <div className="notranslate">${calculateTotalPrice()}</div> 
           </button>
         </div>
       </div>
