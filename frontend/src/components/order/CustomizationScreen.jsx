@@ -3,6 +3,9 @@ import { useParams, useNavigate, useLocation } from "react-router-dom";
 
 import "./CustomizationScreen.css";
 
+const SIZE_OPTIONS = ["Medium", "Large"];
+const TEMP_OPTIONS = ["Cold", "Hot"];
+
 const ICE_OPTIONS = ["Regular Ice", "Light Ice", "No Ice", "Extra Ice"];
 
 const SUGAR_OPTIONS = [
@@ -27,12 +30,14 @@ const TOPPING_OPTIONS = [
   { name: "Creama", price: "+1.25" },
 ];
 
+// Large 사이즈 추가 금액 설정
+const LARGE_SIZE_EXTRA = 0.50;
+
 function CustomizationScreen({ addToCart }) {
   const { drinkid } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Drink item passed from OrderScreen
   const locationState = location.state || {};
   const { item } = locationState;
   const orderOrigin = locationState.origin || "customer";
@@ -43,13 +48,39 @@ function CustomizationScreen({ addToCart }) {
     sessionStorage.setItem("orderOrigin", orderOrigin);
   }, [orderOrigin]);
 
-  // Local UI state
+  const [size, setSize] = useState("Medium");
+  const [temperature, setTemperature] = useState("Cold");
   const [iceLevel, setIceLevel] = useState("Regular Ice");
   const [sugarLevel, setSugarLevel] = useState("100% Sugar");
   const [toppings, setToppings] = useState([]);
   const [comments, setComments] = useState("");
 
-  // Select/deselect toppings (max 2)
+  // 실시간 가격 계산 함수
+  const calculateTotalPrice = () => {
+    let price = parseFloat(item.price);
+    
+    // Large 사이즈 추가 금액
+    if (size === "Large") {
+      price += LARGE_SIZE_EXTRA;
+    }
+
+    // 토핑 추가 금액
+    toppings.forEach((name) => {
+      const found = TOPPING_OPTIONS.find((t) => t.name === name);
+      if (found) price += parseFloat(found.price);
+    });
+
+    return price.toFixed(2);
+  };
+
+  useEffect(() => {
+    if (temperature === "Hot") {
+      setIceLevel("No Ice");
+    } else if (iceLevel === "No Ice" && temperature === "Cold") {
+      setIceLevel("Regular Ice");
+    }
+  }, [temperature]);
+
   const handleToppingClick = (name) => {
     setToppings((prev) => {
       if (prev.includes(name)) return prev.filter((t) => t !== name);
@@ -57,17 +88,8 @@ function CustomizationScreen({ addToCart }) {
     });
   };
 
-  // Add customized drink to cart
   const handleConfirm = () => {
-    let basePrice = parseFloat(item.price);
-    let toppingsPrice = 0;
-
-    toppings.forEach((name) => {
-      const found = TOPPING_OPTIONS.find((t) => t.name === name);
-      if (found) toppingsPrice += parseFloat(found.price);
-    });
-
-    const finalPrice = basePrice + toppingsPrice;
+    const finalPrice = calculateTotalPrice();
 
     const uniqueSuffix = `${Date.now()}-${Math.random()
       .toString(36)
@@ -75,8 +97,10 @@ function CustomizationScreen({ addToCart }) {
 
     const customizedItem = {
       id: item.drinkid,
-      name: `${item.drinkname} (Custom)`,
-      price: finalPrice.toFixed(2),
+      name: `${item.drinkname} (${size}, ${temperature})`,
+      price: finalPrice,
+      size: size,
+      temperature: temperature,
       ice: iceLevel,
       sugar: sugarLevel,
       toppings,
@@ -94,10 +118,34 @@ function CustomizationScreen({ addToCart }) {
   return (
     <div className="custom-page">
       <div className="custom-content">
-        {/* LEFT COLUMN */}
         <div className="custom-column">
           
-          {/* ICE */}
+          <section className="custom-section">
+            <h2>Size & Temperature</h2>
+            <div className="custom-grid grid-2-col">
+              {SIZE_OPTIONS.map((opt) => (
+                <button
+                  key={opt}
+                  className={`option-btn ${size === opt ? "selected" : ""}`}
+                  onClick={() => setSize(opt)}
+                >
+                  {opt}
+                  {opt === "Large" && <span style={{display:"block", fontSize:"0.8em", color:"#666"}}>(+${LARGE_SIZE_EXTRA.toFixed(2)})</span>}
+                </button>
+              ))}
+              
+              {TEMP_OPTIONS.map((opt) => (
+                <button
+                  key={opt}
+                  className={`option-btn ${temperature === opt ? "selected" : ""}`}
+                  onClick={() => setTemperature(opt)}
+                >
+                  {opt}
+                </button>
+              ))}
+            </div>
+          </section>
+
           <section className="custom-section">
             <h2>Ice Level</h2>
             <div className="custom-grid grid-2-col">
@@ -106,6 +154,7 @@ function CustomizationScreen({ addToCart }) {
                   key={name}
                   className={`option-btn ${iceLevel === name ? "selected" : ""}`}
                   onClick={() => setIceLevel(name)}
+                  disabled={temperature === "Hot"}
                 >
                   {name}
                 </button>
@@ -113,7 +162,6 @@ function CustomizationScreen({ addToCart }) {
             </div>
           </section>
 
-          {/* SUGAR */}
           <section className="custom-section">
             <h2>Sugar Level</h2>
             <div className="custom-grid grid-2-col">
@@ -128,24 +176,10 @@ function CustomizationScreen({ addToCart }) {
               ))}
             </div>
           </section>
-
-          {/* OTHER CUSTOMIZATION */}
-          <section className="custom-section">
-            <h2>Other Customization</h2>
-            <textarea
-              className="custom-textarea"
-              rows="5"
-              maxLength={255}
-              value={comments}
-              onChange={(e) => setComments(e.target.value)}
-            ></textarea>
-          </section>
         </div>
 
-        {/* RIGHT COLUMN */}
         <div className="custom-column">
           
-          {/* TOPPINGS */}
           <section className="custom-section">
             <h2>Choose Toppings (Max 2)</h2>
             <div className="custom-grid grid-2-col">
@@ -165,9 +199,20 @@ function CustomizationScreen({ addToCart }) {
             </div>
           </section>
 
-          {/* CONFIRM BUTTON */}
+          <section className="custom-section">
+            <h2>Other Customization</h2>
+            <textarea
+              className="custom-textarea"
+              rows="3"
+              maxLength={255}
+              placeholder="Any special requests?"
+              value={comments}
+              onChange={(e) => setComments(e.target.value)}
+            ></textarea>
+          </section>
+
           <button className="confirm-btn" onClick={handleConfirm}>
-            Confirm
+            Confirm - ${calculateTotalPrice()}
           </button>
         </div>
       </div>
