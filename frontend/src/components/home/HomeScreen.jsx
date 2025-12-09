@@ -160,7 +160,7 @@ function HomeScreen() {
 
         <div className="header-right">
           <button className="home-lang-btn" onClick={() => setShowLanguage(!showLanguage)}>
-            <img src={`${imageBase}/images/Icons/Language.png`} className="nav-icon"/>
+            <img src={`${imageBase}/images/Icons/Language.png`} className="nav-icon" alt="Translate Image" />
             Language
           </button>
         </div>
