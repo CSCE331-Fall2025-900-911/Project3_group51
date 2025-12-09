@@ -16,14 +16,6 @@ export default function MenuBoardScreen() {
 
   const categories = [...new Set(menu.map((item) => item.category))];
 
-  /* CATEGORY → ICON IMAGE MAP */
-  const categoryImages = {
-    "Milky Series": "classic-milk-green-tea.webp",
-    "Fresh Brew": "classic-black.webp",
-    "Fruity Beverage": "mango-green-tea.webp",
-    "Ice-Blended": "oreo-ice-blended-w-pearls.webp"
-  };
-
   const getBase = (drink) => {
     if (!drink) return "";
     if (drink.toLowerCase().includes("milk")) return "Milk Tea";
@@ -34,7 +26,6 @@ export default function MenuBoardScreen() {
 
   return (
     <div className="menu-board-container">
-
       {/* LEFT IMAGE PANEL */}
       <div
         className="menu-board-left"
@@ -49,25 +40,18 @@ export default function MenuBoardScreen() {
           `,
           backgroundSize: "cover",
           backgroundPosition: "center",
-          backgroundRepeat: "no-repeat"
+          backgroundRepeat: "no-repeat",
         }}
       />
 
       {/* RIGHT PANEL */}
       <div className="menu-board-right">
-
         <div className="menu-board-grid">
           {categories.map((cat) => (
             <div key={cat} className="menu-board-category">
-              
-              {/* CATEGORY HEADER WITH ICON */}
+              {/* CATEGORY HEADER */}
               <div className="menu-board-title-row">
                 <h2 className="menu-board-category-title">{cat}</h2>
-                <img
-                  className="menu-board-category-icon"
-                  src={`${imageBase}/images/${categoryImages[cat]}`}
-                  alt={cat}
-                />
               </div>
 
               {/* ITEMS */}
@@ -97,28 +81,22 @@ export default function MenuBoardScreen() {
 
           <div className="footer-row">
             <div className="footer-title">ICE LEVEL</div>
-            <div className="footer-options">
-              Regular • Light • No Ice • Extra Ice
-            </div>
+            <div className="footer-options">Regular › Light › No Ice › Extra Ice</div>
           </div>
 
           <div className="footer-row">
             <div className="footer-title">SWEETNESS LEVEL</div>
-            <div className="footer-options">
-              100% • 80% • 50% • 30% • No Sugar
-            </div>
+            <div className="footer-options">100% › 80% › 50% › 30% › No Sugar</div>
           </div>
 
           <div className="footer-row">
             <div className="footer-title">TOPPINGS</div>
             <div className="footer-options">
-              +$0.75 Pearls / Coffee Jelly / Pudding / Lychee Jelly —
-              +$1.00 Mango Popping Boba / Ice Cream —
-              +$1.25 Crema
+              +$0.75 Pearls / Coffee Jelly / Pudding / Lychee Jelly — +$1.00 Mango Popping Boba /
+              Ice Cream — +$1.25 Crema
             </div>
           </div>
         </div>
-
       </div>
     </div>
   );
