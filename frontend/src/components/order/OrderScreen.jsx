@@ -265,7 +265,7 @@ function OrderScreen({ cart, setCart, customer, setCustomer }) {
         <h1 className="menu-title">Menu</h1>
 
         <button className="order-lang-btn" onClick={() => setShowLanguage(!showLanguage)}>
-          <img src={`${imageBase}/images/Icons/Language.png`} className="nav-icon" />
+          <img src={`${imageBase}/images/Icons/Language.png`} className="nav-icon" alt="Translate Image" />
           Language
         </button>
       </header>

@@ -40,7 +40,9 @@ export default function LanguageSelector() {
       >
         <img 
           src={`${imageBase}/images/Icons/Language.png`} 
-          className="lang-icon"/>
+          className="lang-icon" 
+          alt="Translate Image" 
+        />
         Language
       </button>
 
