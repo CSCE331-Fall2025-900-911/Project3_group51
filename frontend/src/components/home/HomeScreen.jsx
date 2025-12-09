@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import MagnifyControls from "../MagnifyControls.jsx";
 import useLanguage from "../../hooks/useLanguage.js";
+import { useAccessibility } from "../../context/AccessibilityContext";
 import "./HomeScreen.css";
 
 const imageBase = (import.meta.env.VITE_API_URL || "http://localhost:3000/api")
@@ -72,6 +73,7 @@ function HomeScreen() {
   const [weatherError, setWeatherError] = useState(false);
 
   const { selectedLang, setSelectedLang } = useLanguage();
+  const { resetMagnify } = useAccessibility();
   const [showLanguage, setShowLanguage] = useState(false);
 
   const tapRef = useRef(0);
@@ -80,13 +82,23 @@ function HomeScreen() {
   const handleSecretTap = useCallback(() => {
     if (timerRef.current) clearTimeout(timerRef.current);
     tapRef.current += 1;
+    
     if (tapRef.current >= 5) {
+      setSelectedLang("English");
+      resetMagnify();
+
+      const select = document.querySelector(".goog-te-combo");
+      if (select) {
+        select.value = "en";
+        select.dispatchEvent(new Event("change"));
+      }
+
       navigate("/login");
       tapRef.current = 0;
       return;
     }
     timerRef.current = setTimeout(() => (tapRef.current = 0), 1500);
-  }, [navigate]);
+  }, [navigate, setSelectedLang, resetMagnify]);
 
   useEffect(() => {
     return () => timerRef.current && clearTimeout(timerRef.current);
@@ -148,7 +160,7 @@ function HomeScreen() {
 
         <div className="header-right">
           <button className="home-lang-btn" onClick={() => setShowLanguage(!showLanguage)}>
-            <img src={`${imageBase}/images/Icons/Language.png`} className="nav-icon" alt="Language" />
+            <img src={`${imageBase}/images/Icons/Language.png`} className="nav-icon"/>
             Language
           </button>
         </div>

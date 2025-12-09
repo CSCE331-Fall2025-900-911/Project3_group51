@@ -1,12 +1,54 @@
-import React, { useEffect } from "react"; 
-import { useNavigate } from "react-router-dom";
-import { useUser } from "../context/UserContext"; 
+import React, { useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useUser } from "../context/UserContext";
+
+import useLanguage from "../hooks/useLanguage";
+import { useAccessibility } from "../context/AccessibilityContext";
 
 const API = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
 
 const LoginPage = () => {
   const navigate = useNavigate();
-  const { user, loading } = useUser(); 
+  const location = useLocation();
+  const { user, loading } = useUser();
+
+  const { setSelectedLang } = useLanguage();
+  const { resetMagnify } = useAccessibility();
+
+  useEffect(() => {
+    setSelectedLang("English");
+    resetMagnify();
+
+    const checkInterval = setInterval(() => {
+      const select = document.querySelector(".goog-te-combo");
+      if (select) {
+        if (select.value !== "en") {
+          select.value = "en";
+          select.dispatchEvent(new Event("change"));
+        }
+        clearInterval(checkInterval);
+      }
+    }, 200);
+
+    const stopTimeout = setTimeout(() => {
+      clearInterval(checkInterval);
+    }, 2000);
+
+    return () => {
+      clearInterval(checkInterval);
+      clearTimeout(stopTimeout);
+    };
+  }, [setSelectedLang, resetMagnify]);
+
+  const queryParams = new URLSearchParams(location.search);
+  const errorParam = queryParams.get("error");
+  const [errorMessage, setErrorMessage] = React.useState("");
+
+  useEffect(() => {
+    if (errorParam) {
+      setErrorMessage("Login failed. You may be unauthorized or an error occurred.");
+    }
+  }, [errorParam]);
 
   useEffect(() => {
     if (loading) return;
@@ -26,17 +68,24 @@ const LoginPage = () => {
   };
 
   if (loading || user) {
-    return <div style={styles.container}><h1>Loading...</h1></div>
+    return <div style={styles.container}><h1>Loading...</h1></div>;
   }
 
   return (
     <div style={styles.container}>
       <h1 style={styles.title}>Employee Login</h1>
+
+      {errorMessage && (
+        <div style={styles.errorBox}>
+          {errorMessage}
+        </div>
+      )}
+
       <div style={styles.form}>
         <button onClick={googleLogin} style={styles.googleButton}>
           Sign in with Google
         </button>
-      
+
         <button
           type="button"
           onClick={() => navigate("/")}
@@ -79,15 +128,23 @@ const styles = {
     boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
     gap: "1rem",
   },
-
-  googleButton: { 
-    background: "#4285F4", // Google Blue
+  googleButton: {
+    background: "#4285F4",
     color: "white",
     padding: "0.75rem 1.5rem",
     fontSize: "1rem",
     border: "none",
     borderRadius: "6px",
     cursor: "pointer",
+    fontWeight: "bold",
+  },
+  errorBox: {
+    backgroundColor: "#ffebee",
+    color: "#c62828",
+    padding: "10px",
+    borderRadius: "5px",
+    marginBottom: "15px",
+    border: "1px solid #ffcdd2",
     fontWeight: "bold",
   }
 };

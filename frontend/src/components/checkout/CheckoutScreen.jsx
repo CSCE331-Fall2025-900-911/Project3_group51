@@ -29,6 +29,9 @@ function CheckoutScreen({ cart, setCart, customer, setCustomer }) {
   const [error, setError] = useState(null);
   const [pointsToUse, setPointsToUse] = useState(0);
 
+  // [NEW] State for item popup
+  const [detailItem, setDetailItem] = useState(null);
+
   // Price calculations
   const subtotal = cart.reduce(
     (acc, item) => acc + parseFloat(item.price) * (item.quantity ?? 1),
@@ -178,7 +181,14 @@ function CheckoutScreen({ cart, setCart, customer, setCustomer }) {
                   return (
                     <div key={index} className="summary-item">
                       <span>
-                        {item.name} x {qty}
+                        {/* [CHANGED] Make name clickable for popup */}
+                        <span 
+                          onClick={() => setDetailItem(item)}
+                          style={{ cursor: "pointer", textDecoration: "underline", fontWeight: "bold" }}
+                        >
+                          {item.name}
+                        </span> 
+                        <span> x {qty}</span>
                       </span>
                       <span>${lineTotal}</span>
                     </div>
@@ -263,6 +273,44 @@ function CheckoutScreen({ cart, setCart, customer, setCustomer }) {
           </button>
         </aside>
       </div>
+
+      {/* [NEW] Detail Popup Modal */}
+      {detailItem && (
+        <div className="modal-backdrop" onClick={() => setDetailItem(null)}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <h3>{detailItem.name}</h3>
+            
+            <div style={{ textAlign: "left", padding: "0 20px", fontSize: "1.1rem", color: "#555" }}>
+              <p><strong>Ice:</strong> {detailItem.ice || "-"}</p>
+              <p><strong>Sugar:</strong> {detailItem.sugar || "-"}</p>
+              
+              <div style={{ marginTop: "8px" }}>
+                <strong>Toppings:</strong>
+                {detailItem.toppings && detailItem.toppings.length > 0 ? (
+                  <ul style={{ margin: "5px 0 0 20px" }}>
+                    {detailItem.toppings.map((t, i) => <li key={i}>{t}</li>)}
+                  </ul>
+                ) : (
+                  <span> None</span>
+                )}
+              </div>
+
+              {detailItem.comments && (
+                <div style={{ marginTop: "10px", color: "#d32f2f" }}>
+                  <strong>Note:</strong> {detailItem.comments}
+                </div>
+              )}
+            </div>
+
+            <div className="modal-actions">
+              <button className="modal-btn" onClick={() => setDetailItem(null)}>
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

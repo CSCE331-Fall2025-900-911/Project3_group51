@@ -45,7 +45,7 @@ function RecentOrdersScreen() {
                 <tr>
                   <th>Date/Time</th>
                   <th>Order #</th>
-                  <th>Item</th>
+                  <th>Item Details</th>
                   <th>Qty</th>
                   <th>Price</th>
                   <th>Comments</th>
@@ -56,10 +56,31 @@ function RecentOrdersScreen() {
                   <tr key={row.orderitemid}>
                     <td>{new Date(row.date).toLocaleString()}</td>
                     <td className="nowrap">{row.orderid}</td>
-                    <td>{row.drinkname}</td>
+                    
+                    <td>
+                      <div style={{ fontWeight: "bold", fontSize: "1.05em" }}>
+                        {row.drinkname}
+                      </div>
+                      <div style={{ fontSize: "0.85em", color: "#555", marginTop: "4px" }}>
+                        <div>
+                          [{row.size || "Reg"} / {row.temperature || "-"}]
+                        </div>
+                        <div>
+                          Ice: {row.icelevel || "-"} | Sugar: {row.sugarlevel || "-"}
+                        </div>
+                        {row.toppings && row.toppings.length > 0 && (
+                          <div style={{ color: "#007bff" }}>
+                            + {Array.isArray(row.toppings) ? row.toppings.join(", ") : row.toppings}
+                          </div>
+                        )}
+                      </div>
+                    </td>
+
                     <td>{row.quantity}</td>
                     <td className="nowrap">${parseFloat(row.price).toFixed(2)}</td>
-                    <td className="muted">{row.comments || ""}</td>
+                    <td className="muted" style={{ color: row.comments ? "red" : "inherit" }}>
+                        {row.comments || ""}
+                    </td>
                   </tr>
                 ))}
               </tbody>

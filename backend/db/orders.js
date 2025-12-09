@@ -77,7 +77,10 @@ exports.updateTotal = async (id, { totalprice, grossTotal, customerid, pointsUse
 exports.getOrderItems = async (id) => {
   const result = await pool.query(
     `SELECT o.orderitemid, o.orderid, o.drinkid, o.quantity, o.price,
-            o.icelevel, o.sugarlevel, o.toppings, m.drinkname
+            o.icelevel, o.sugarlevel, o.toppings, m.drinkname,
+            o.size, 
+            o.temperature, 
+            o.comments
      FROM orderitem o
      JOIN menuitem m ON o.drinkid = m.drinkid
      WHERE o.orderid = $1

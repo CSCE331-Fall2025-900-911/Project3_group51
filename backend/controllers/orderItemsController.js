@@ -3,10 +3,10 @@ const orderItemsDB = require('../db/orderitems');
 
 // POST /api/orderitems
 exports.createOrderItem = async (req, res) => {
-  const { orderid, drinkid, quantity, price, icelevel, sugarlevel, toppings, comments } = req.body;
+  const { orderid, drinkid, quantity, price, icelevel, sugarlevel, toppings, comments, size, temperature } = req.body;
   try {
     console.log("POST /api/orderitems - body:", req.body);
-    const id = await orderItemsDB.insertOrderItem(orderid, drinkid, quantity, price, icelevel, sugarlevel, toppings, comments);
+    const id = await orderItemsDB.insertOrderItem(orderid, drinkid, quantity, price, icelevel, sugarlevel, toppings, comments, size, temperature);
      console.log("Created new order item with ID:", id, "for order:", orderid);
     res.status(201).json({ id });
   } catch (e) {
