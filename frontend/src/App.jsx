@@ -13,6 +13,7 @@ import InventoryScreen from "./components/InventoryScreen.jsx";
 import MenuManagementScreen from "./components/MenuManagementScreen.jsx";
 import EmployeeManagementScreen from "./components/EmployeeManagementScreen.jsx";
 import ManagerPortal from "./components/ManagerPortal.jsx";
+import PortalPage from "./components/PortalPage.jsx";
 import GoogleTranslateLoader from "./components/translation/GoogleTranslateLoader.jsx";
 import "./index.css";
 import RecentOrdersScreen from "./components/RecentOrdersScreen.jsx";
@@ -56,7 +57,8 @@ function App() {
       <Routes>
         <Route path="/" element= {<HomeScreen/>}/>
 
-        <Route path="/menu-board" element={<MenuBoardScreen />} />
+      <Route path="/menu-board" element={<MenuBoardScreen />} />
+      <Route path="/portal" element={<PortalPage />} />
 
         
         <Route 
