@@ -13,13 +13,17 @@ export default function MenuBoardScreen() {
 
   const categories = [...new Set(menu.map((item) => item.category))];
 
-  /* CATEGORY → ICON IMAGE MAP */
-  const categoryImages = {
-    "Milky Series": "classic-milk-green-tea.webp",
-    "Fresh Brew": "classic-black.webp",
-    "Fruity Beverage": "mango-green-tea.webp",
-    "Ice-Blended": "oreo-ice-blended-w-pearls.webp"
-  };
+  /**
+   * Automatically generate an image name based on category.
+   * Example:
+   * "Milky Series" ➜ "milky-series.webp"
+   * "Seasonal Drinks" ➜ "seasonal-drinks.webp"
+   */
+  const getCategoryImage = (cat) =>
+    `http://localhost:3000/images/${cat
+      .toLowerCase()
+      .replace(/\s+/g, "-")
+      .replace(/[^\w-]/g, "")}.webp`;
 
   const getBase = (drink) => {
     if (!drink) return "";
@@ -60,10 +64,15 @@ export default function MenuBoardScreen() {
               {/* CATEGORY HEADER WITH ICON */}
               <div className="menu-board-title-row">
                 <h2 className="menu-board-category-title">{cat}</h2>
+
                 <img
                   className="menu-board-category-icon"
-                  src={`http://localhost:3000/images/${categoryImages[cat]}`}
+                  src={getCategoryImage(cat)}
                   alt={cat}
+                  onError={(e) => {
+                    // fallback to a default icon if missing
+                    e.target.src = "http://localhost:3000/images/default.webp";
+                  }}
                 />
               </div>
 
@@ -73,8 +82,12 @@ export default function MenuBoardScreen() {
                 .map((drink) => (
                   <div className="menu-board-item" key={drink.drinkid}>
                     <div className="menu-board-item-info">
-                      <span className="menu-board-item-name">{drink.drinkname}</span>
-                      <span className="menu-board-item-sub">{getBase(drink.drinkname)}</span>
+                      <span className="menu-board-item-name">
+                        {drink.drinkname}
+                      </span>
+                      <span className="menu-board-item-sub">
+                        {getBase(drink.drinkname)}
+                      </span>
                     </div>
 
                     <div className="menu-board-dots" />
