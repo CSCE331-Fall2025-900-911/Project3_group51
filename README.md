@@ -11,20 +11,9 @@
 
 ## 🚀 Live Demo & Access
 
-**🔗 URL:** [Click here to view the Live Demo](YOUR_RENDER_LINK_HERE)
+**🔗 URL:** https://project3-group51-frontend.onrender.com/
 
 > **⚠️ Note:** Since this is hosted on a Render Free Tier, the server may go to sleep after inactivity. **Please allow 30-60 seconds for the initial load.**
-
-### 🔑 Demo Credentials (Try it out!)
-To explore the Manager Dashboard and Analytics features, please use the following test account:
-- **ID:** `admin` (or `testuser`)
-- **Password:** `1234` (or `password`)
-
----
-
-## 📸 Screenshots
-*(Add a GIF or Screenshot of your dashboard here. Seeing is believing!)*
-![Dashboard Preview](LINK_TO_IMAGE_OR_GIF)
 
 ---
 
